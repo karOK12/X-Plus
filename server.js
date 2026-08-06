@@ -1,28 +1,59 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg');
 
-const auth = require('./server/middleware/auth');
+const express = require("express");
+const cors = require("cors");
+
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+
+const pool = require("./server/config/database");
+
+const auth = require("./server/middleware/auth");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+const path = require("path");
 
-// اتصال قاعدة البيانات Neon
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
+app.use(express.static(path.join(__dirname)));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
+
+const JWT_SECRET = process.env.JWT_SECRET || "xplus_secret_key_2026";
+
+// إعداد إرسال البريد
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+});
+
+// التحقق من إعداد SMTP
+transporter.verify()
+.then(() => {
+    console.log("✅ SMTP Ready");
+})
+.catch((err) => {
+    console.log("❌ SMTP Error:", err.message);
 });
 
 
-// فحص الاتصال وإنشاء الجداول
+
+// إنشاء الجداول
 async function initDatabase() {
+  
+
+
+
 
     try {
 
@@ -59,6 +90,7 @@ async function initDatabase() {
 
         console.log("✅ Neon Database Connected");
 
+
     } catch(error){
 
         console.log("❌ Database Error:", error.message);
@@ -72,8 +104,8 @@ initDatabase();
 
 
 
-// بيانات المستخدم
-app.get('/api/user/init', auth, async(req,res)=>{
+// جلب بيانات المستخدم
+app.get("/api/user/init", auth, async(req,res)=>{
 
     try {
 
@@ -101,25 +133,26 @@ app.get('/api/user/init', auth, async(req,res)=>{
         }
 
 
-        const data=user.rows[0];
+        const data = user.rows[0];
 
 
-        let balance=data.balance;
+        let balance = data.balance;
 
 
         if(data.mining_start_time){
 
             const seconds =
-            (Date.now()-data.mining_start_time)/1000;
+            (Date.now() - data.mining_start_time) / 1000;
 
 
             const profit =
-            (data.power*0.5)/3600;
+            (data.power * 0.5) / 3600;
 
 
             balance += seconds * profit;
 
         }
+
 
 
         const config = await pool.query(
@@ -143,6 +176,7 @@ app.get('/api/user/init', auth, async(req,res)=>{
         });
 
 
+
     }catch(error){
 
         res.status(500).json({
@@ -153,46 +187,30 @@ app.get('/api/user/init', auth, async(req,res)=>{
     }
 
 });
-
 
 
 
 
 // بدء التعدين
-app.post('/api/mining/start', auth, async(req,res)=>{
+app.post("/api/mining/start", auth, async(req,res)=>{
 
     try{
 
-
-        const result = await pool.query(
+        await pool.query(
         `
         UPDATE users
         SET mining_start_time=$1
         WHERE id=$2
-        RETURNING id
         `,
         [
             Date.now(),
             req.user.id
-        ]
-        );
-
-
-        if(result.rows.length===0){
-
-            return res.status(404).json({
-                success:false,
-                message:"المستخدم غير موجود"
-            });
-
-        }
+        ]);
 
 
         res.json({
-
             success:true,
             message:"تم بدء التعدين"
-
         });
 
 
@@ -210,34 +228,21 @@ app.post('/api/mining/start', auth, async(req,res)=>{
 
 
 
-
-// مشاهدة إعلان وإضافة نقاط
-app.post('/api/ad/watch', auth, async(req,res)=>{
+// مشاهدة إعلان
+app.post("/api/ad/watch", auth, async(req,res)=>{
 
     try{
-
 
         const result = await pool.query(
         `
         UPDATE users
-        SET points=points+10
+        SET points = points + 10
         WHERE id=$1
         RETURNING points
         `,
         [
             req.user.id
-        ]
-        );
-
-
-        if(result.rows.length===0){
-
-            return res.status(404).json({
-                success:false,
-                message:"المستخدم غير موجود"
-            });
-
-        }
+        ]);
 
 
         res.json({
@@ -260,16 +265,18 @@ app.post('/api/ad/watch', auth, async(req,res)=>{
 });
 
 
+const authRoutes = require("./server/routes/auth");
+app.use("/api/auth", authRoutes);
 
+
+// Upload API
+const uploadRoutes = require("./api/index");
+app.use("/api", uploadRoutes);
 
 
 // تشغيل السيرفر
-
 const PORT = 3000;
 
-
-app.listen(PORT,()=>{
-
-console.log(`🚀 Server running on port ${PORT}`);
-
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });

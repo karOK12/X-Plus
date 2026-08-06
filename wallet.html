@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>X Plus | المحفظة</title>
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@500;600;700;800&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0E11;--bg2:#181A20;--card:#1E2329;--card2:#2B3139;--line:#2B3139;--text:#EAECEF;--muted:#848E9C;--muted2:#5E6673;--yellow:#FCD535;--yellow2:#F0C935;--green:#0ECB81;--red:#F6465D}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Almarai',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased}button,input{font-family:inherit}.num{font-family:'Changa',sans-serif}::selection{background:rgba(252,213,53,.25)}
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(560px 300px at 85% -8%,rgba(252,213,53,.07),transparent 60%),radial-gradient(500px 340px at 8% 108%,rgba(14,203,129,.05),transparent 60%),var(--bg)}
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+@media(min-width:560px){body{display:grid;place-items:center;padding:20px 0}.app{height:min(880px,94dvh);border-radius:26px;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden}}
+header{display:flex;align-items:center;gap:10px;padding:18px 20px 10px;flex-shrink:0}header h1{font-size:1.08rem;font-weight:800}.brand-dot{width:9px;height:9px;border-radius:3px;background:var(--yellow);display:inline-block;margin-inline-end:7px;transform:rotate(45deg)}.hdr-x{margin-inline-start:auto;display:flex;gap:6px}.icb{width:36px;height:36px;border-radius:10px;border:none;background:var(--card);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:.2s}.icb svg{width:18px;height:18px}.icb:hover{background:var(--card2);color:var(--yellow)}
+main{flex:1;overflow-y:auto;padding:6px 16px 104px;scrollbar-width:none}main::-webkit-scrollbar{display:none}
+.bnav{position:absolute;bottom:0;right:0;left:0;display:flex;justify-content:space-around;align-items:flex-end;background:rgba(24,26,32,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px 6px calc(10px + env(safe-area-inset-bottom));z-index:30}
+.bn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--muted);font-size:.62rem;font-weight:700;cursor:pointer;padding:4px 10px;transition:.2s}.bn svg{width:21px;height:21px}.bn:hover{color:var(--text)}.bn.on{color:var(--yellow)}.bn-mid{position:relative;top:-22px}.bn-mid .mc{width:52px;height:52px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;box-shadow:0 8px 22px rgba(252,213,53,.4);transition:.25s}.bn-mid .mc svg{width:24px;height:24px;color:#181A20}.bn-mid:hover .mc{transform:translateY(-3px) scale(1.05);box-shadow:0 12px 28px rgba(252,213,53,.5)}.bn-mid:active .mc{transform:scale(.92)}.bn-mid span{color:var(--muted);margin-top:5px}.bn-mid.on span{color:var(--yellow)}
+.view{display:none}.view.active{display:block;animation:vin .32s cubic-bezier(.2,.7,.3,1)}@keyframes vin{from{opacity:0;transform:translateY(14px)}}
+.card{background:var(--card);border-radius:14px;padding:18px;margin-bottom:12px;position:relative}.sec-h{display:flex;align-items:center;margin:18px 4px 10px;font-size:.92rem;font-weight:800}.sec-h .more{margin-inline-start:auto;background:none;border:none;color:var(--yellow);font-size:.72rem;font-weight:700;cursor:pointer}
+.bal-card{padding:22px 20px;background:linear-gradient(180deg,#1E2329 0%,#181A20 100%);border:1px solid var(--line)}.b-lbl{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.78rem}.b-lbl button{background:none;border:none;color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:.2s}.b-lbl button:hover{color:var(--yellow)}.b-lbl svg{width:16px;height:16px}.b-total{font-family:'Changa';font-weight:800;font-size:clamp(2.3rem,9vw,2.9rem);direction:ltr;text-align:right;line-height:1.25;margin:2px 0}.b-total small{font-size:.5em;color:var(--muted)}.b-sub{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.b-chip{font-size:.68rem;padding:5px 12px;border-radius:99px;background:var(--card2);color:var(--muted);display:flex;gap:6px;align-items:center;font-weight:700}.b-chip b{color:var(--yellow);font-family:'Changa';direction:ltr;display:inline-block}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 4px}.act{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text);font-size:.7rem;font-weight:700}.act .ac{width:50px;height:50px;border-radius:50%;background:var(--card);display:grid;place-items:center;transition:.22s;border:1px solid var(--line)}.act .ac svg{width:20px;height:20px;color:var(--yellow)}.act:hover .ac{background:var(--card2);transform:translateY(-3px);border-color:rgba(252,213,53,.4)}.act:active .ac{transform:scale(.9)}
+.claim{display:flex;align-items:center;gap:13px;background:linear-gradient(120deg,rgba(252,213,53,.14),rgba(252,213,53,.05));border:1px solid rgba(252,213,53,.3);border-radius:14px;padding:15px;margin-bottom:12px;overflow:hidden;position:relative}.claim::before{content:'';position:absolute;top:-40px;inset-inline-start:-30px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(252,213,53,.16),transparent 70%)}.claim .ci{width:44px;height:44px;border-radius:13px;background:var(--yellow);display:grid;place-items:center;font-size:1.3rem;flex-shrink:0;animation:bob 2.8s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-5px)}}.claim .ct{flex:1}.claim .ct b{font-size:.88rem;display:block}.claim .ct small{color:var(--muted);font-size:.68rem}.claim .ct b em{font-style:normal;color:var(--yellow);font-family:'Changa';direction:ltr;display:inline-block}
+.btn-y{background:var(--yellow);color:#181A20;border:none;border-radius:9px;padding:10px 18px;font-weight:800;font-size:.78rem;cursor:pointer;transition:.2s;flex-shrink:0}.btn-y:hover{background:var(--yellow2);transform:translateY(-2px);box-shadow:0 6px 16px rgba(252,213,53,.35)}.btn-y:active{transform:scale(.96)}.btn-y.big{width:100%;padding:15px;font-size:.95rem;border-radius:11px;margin-top:16px;font-family:'Changa'}.btn-y:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:9px 16px;font-weight:700;font-size:.75rem;cursor:pointer;transition:.2s}.btn-ghost:hover{border-color:var(--yellow);color:var(--yellow)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:4px}.stat{background:var(--card);border-radius:13px;padding:14px 8px;text-align:center;transition:.2s;border:1px solid transparent}.stat:hover{border-color:rgba(252,213,53,.25);transform:translateY(-2px)}.stat b{font-family:'Changa';font-size:1.05rem;font-weight:700;direction:ltr;display:block;line-height:1.3}.stat small{color:var(--muted);font-size:.63rem;font-weight:700}.stat.gold b{color:var(--yellow)}.stat.grn b{color:var(--green)}
+.lrow{display:flex;align-items:center;gap:12px;padding:13px 6px;border-bottom:1px solid var(--line);cursor:default;transition:.18s;animation:vin .3s}.lrow:last-child{border:none}.lrow:hover{background:var(--card);border-radius:10px}.lic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}.lic svg{width:17px;height:17px}.lic.y{background:rgba(252,213,53,.12);color:var(--yellow)}.lic.g{background:rgba(14,203,129,.12);color:var(--green)}.lic.m{background:var(--card2);color:var(--muted)}.lin{flex:1;min-width:0}.lin b{font-size:.83rem;display:block;font-weight:700}.lin small{color:var(--muted);font-size:.66rem}.lamt{text-align:left;direction:ltr;flex-shrink:0}.lamt b{font-family:'Changa';font-size:.9rem;display:block}.lamt small{color:var(--muted);font-size:.62rem;display:block}
+.pts-hero{text-align:center;padding:28px 18px;background:linear-gradient(180deg,#242930,#1E2329);border:1px solid var(--line)}.coin3d{width:74px;height:74px;margin:0 auto 12px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#FFE98A,#FCD535 45%,#D9A914);display:grid;place-items:center;font-family:'Changa';font-weight:800;font-size:1.5rem;color:#7A5E00;box-shadow:0 10px 30px rgba(252,213,53,.35),inset 0 -4px 10px rgba(0,0,0,.18);animation:bob 3.2s ease-in-out infinite}.pts-hero .big{font-family:'Changa';font-weight:800;font-size:2.6rem;direction:ltr;line-height:1.2}.pts-hero small{color:var(--muted);font-size:.75rem}.rate-line{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;font-size:.72rem;color:var(--muted)}.rate-line b{color:var(--yellow);font-family:'Changa';direction:ltr;display:inline-block}
+.how{display:flex;flex-direction:column;gap:9px}.how .hi{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:12px;padding:13px 15px;transition:.2s;border:1px solid transparent}.how .hi:hover{border-color:rgba(252,213,53,.25)}.how .hi span{font-size:1.15rem}.how .hi b{font-size:.8rem;display:block}.how .hi small{color:var(--muted);font-size:.66rem}.how .hi .plus{margin-inline-start:auto;color:var(--yellow);font-family:'Changa';font-weight:700;font-size:.85rem;direction:ltr}
+.cv-card{padding:0;overflow:hidden}.cv-side{padding:16px 18px}.cv-side+.cv-side{border-top:1px solid var(--line);background:#1A1E24}.cv-top{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:8px;font-weight:700}.cv-inrow{display:flex;align-items:center;gap:10px}.cv-inrow input{flex:1;background:none;border:none;color:var(--text);font-family:'Changa';font-size:1.7rem;font-weight:700;direction:ltr;text-align:left;outline:none;min-width:0}.cv-inrow input::placeholder{color:var(--muted2)}.cv-tag{display:flex;align-items:center;gap:7px;font-weight:800;font-size:.85rem;color:var(--text);flex-shrink:0}.cv-tag .tk{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.75rem}.max{background:var(--card2);border:none;color:var(--yellow);font-weight:800;font-size:.7rem;padding:5px 12px;border-radius:7px;cursor:pointer;transition:.2s}.max:hover{background:rgba(252,213,53,.18)}.cv-out{font-family:'Changa';font-size:1.7rem;font-weight:700;direction:ltr;text-align:left;color:var(--green);min-height:1.3em}.swap-fl{width:44px;height:44px;border-radius:50%;background:var(--card);border:3px solid var(--bg);display:grid;place-items:center;margin:-22px auto;position:relative;z-index:2;color:var(--yellow)}.swap-fl svg{width:19px;height:19px}
+.info-strip{display:flex;flex-direction:column;gap:9px;background:var(--card);border-radius:13px;padding:14px 16px;margin-top:12px;font-size:.76rem}.info-strip div{display:flex;justify-content:space-between;align-items:center}.info-strip span{color:var(--muted)}.info-strip b{font-weight:700;font-size:.76rem}.info-strip b.num{direction:ltr;color:var(--yellow)}
+.err{font-size:.73rem;color:var(--red);margin-top:9px;display:none;font-weight:700}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{padding:7px 16px;border-radius:99px;border:1px solid var(--line);background:none;color:var(--muted);font-size:.73rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:.2s}.tab:hover{color:var(--text)}.tab.on{background:rgba(252,213,53,.12);border-color:rgba(252,213,53,.4);color:var(--yellow)}
+.me{display:flex;align-items:center;gap:13px;padding:4px 2px 16px}.ava{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FCD535,#D9A914);display:grid;place-items:center;font-family:'Changa';font-weight:800;font-size:1.2rem;color:#181A20;flex-shrink:0}.me b{font-size:.98rem;display:block}.me small{color:var(--muted);font-size:.68rem}.mrow{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:.83rem;font-weight:700}.mrow:last-child{border:none}.mrow .mi{width:34px;height:34px;border-radius:10px;background:var(--card);display:grid;place-items:center;color:var(--yellow)}.mrow .mi svg{width:16px;height:16px}.mrow small{color:var(--muted);font-size:.66rem;display:block;font-weight:400}.mrow .end{margin-inline-start:auto;color:var(--muted)}
+.sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}.sheet.show{display:flex}.panel{width:100%;max-width:480px;background:var(--bg2);border-radius:24px 24px 0 0;padding:16px 22px calc(26px + env(safe-area-inset-bottom));animation:up .35s cubic-bezier(.2,.8,.3,1.1);border-top:1px solid var(--line)}@keyframes up{from{transform:translateY(100%)}}.grab{width:42px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 16px}.panel h3{text-align:center;font-size:1.02rem}.panel .psub{text-align:center;color:var(--muted);font-size:.72rem;margin:5px 0 0}
+.sumrows{background:var(--card);border-radius:13px;padding:6px 16px;margin-top:16px}.sumrows div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.8rem}.sumrows div:last-child{border:none}.sumrows span{color:var(--muted)}.sumrows b{font-family:'Changa';direction:ltr;font-size:.85rem}
+.ok-ic{width:76px;height:76px;border-radius:50%;background:rgba(14,203,129,.13);display:grid;place-items:center;margin:8px auto 14px}.ok-ic svg{width:44px;height:44px}.ok-ic circle{fill:none;stroke:var(--green);stroke-width:2.5;stroke-dasharray:160;stroke-dashoffset:160;animation:draw .7s ease forwards}.ok-ic path{fill:none;stroke:var(--green);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:draw .5s .5s ease forwards}@keyframes draw{to{stroke-dashoffset:0}}
+#toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center;width:max-content;max-width:92vw}.toast{background:var(--card);border:1px solid rgba(252,213,53,.4);color:var(--text);padding:11px 20px;border-radius:11px;font-size:.78rem;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.5);animation:tin .3s;display:flex;gap:8px;align-items:center}.toast.err{border-color:rgba(246,70,93,.5)}@keyframes tin{from{opacity:0;transform:translateY(12px) scale(.95)}}
+footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;line-height:1.9}.empty{text-align:center;color:var(--muted);padding:26px;font-size:.78rem}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="app">
+  <header>
+    <h1><span class="brand-dot"></span>محفظة X Plus</h1>
+    <div class="hdr-x">
+      <button class="icb" onclick="toast('لا إشعارات جديدة')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+      <button class="icb" onclick="go('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="card" id="dbErr" style="display:none;border:1px solid rgba(246,70,93,.4)">
+      <div style="display:flex;gap:10px;align-items:center"><span style="font-size:1.3rem">⚠️</span>
+        <div><b style="font-size:.85rem">تعذر الاتصال بالخادم</b>
+        <small id="dbErrMsg" style="color:var(--muted);display:block;margin-top:4px;font-size:.7rem;line-height:1.7"></small></div>
+      </div>
+      <button class="btn-y big" onclick="init()">إعادة المحاولة</button>
+    </div>
+
+    <!-- الرئيسية -->
+    <section class="view active" id="v-home">
+      <div class="card bal-card">
+        <div class="b-lbl">رصيد الأرباح
+          <button id="eyeBtn" onclick="toggleEye()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="b-total" id="balNum"><small>$</small> 0.00</div>
+        <div class="b-sub">
+          <span class="b-chip">✦ نقاطك: <b id="chipPts">0</b></span>
+          <span class="b-chip">سعر التحويل: <b id="chipRate">—</b></span>
+        </div>
+        <div class="acts">
+          <button class="act" onclick="claim()"><span class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg></span>استلام</button>
+          <button class="act" onclick="go('convert')"><span class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>تحويل</button>
+          <button class="act" onclick="go('points')"><span class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1 1.3-1.8 3-1.8s3 .8 3 1.8-1.3 1.6-3 1.8-3 .8-3 1.8 1.3 1.8 3 1.8 3-.8 3-1.8"/></svg></span>نقاطي</button>
+          <button class="act" onclick="go('history')"><span class="ac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>السجل</button>
+        </div>
+      </div>
+
+      <div class="claim" id="claimCard">
+        <span class="ci">🎁</span>
+        <div class="ct"><b>نقاط اليوم جاهزة <em id="claimAmt">+0</em></b><small id="claimSub">جارٍ القراءة من الخادم…</small></div>
+        <button class="btn-y" id="claimBtn" onclick="claim()">استلام</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat gold"><b id="stPts">0</b><small>رصيد النقاط</small></div>
+        <div class="stat grn"><b id="stToday">$0.00</b><small>أرباح اليوم</small></div>
+        <div class="stat"><b id="stConv">0</b><small>نقاط حوّلتها</small></div>
+      </div>
+
+      <h3 class="sec-h">آخر النشاطات <button class="more" onclick="go('history')">عرض الكل ←</button></h3>
+      <div id="recentList"><div class="empty">جارٍ التحميل…</div></div>
+    </section>
+
+    <!-- النقاط -->
+    <section class="view" id="v-points">
+      <div class="card pts-hero">
+        <div class="coin3d">X+</div>
+        <small>رصيد نقاطك الحالي</small>
+        <div class="big" id="ptsBig">0</div>
+        <div class="rate-line">سعر التحويل الحالي: <b id="rateLine">—</b> · تُحدده الإدارة</div>
+      </div>
+      <div class="stats">
+        <div class="stat gold"><b id="pToday">0</b><small>نقاط اليوم</small></div>
+        <div class="stat"><b id="pWeek">0</b><small>هذا الأسبوع</small></div>
+        <div class="stat"><b id="pConv">0</b><small>إجمالي المحوَّل</small></div>
+      </div>
+      <h3 class="sec-h">كيف تجمع النقاط؟</h3>
+      <div class="how">
+        <div class="hi"><span>📅</span><div><b>الاستلام اليومي</b><small>نقاط مجانية كل يوم من بطاقة الاستلام</small></div><span class="plus" id="howDaily">+0</span></div>
+        <div class="hi"><span>🎯</span><div><b>إكمال المهام</b><small>مهام المنصة الأسبوعية</small></div><span class="plus">+150</span></div>
+        <div class="hi"><span>👥</span><div><b>دعوة الأصدقاء</b><small>عن كل صديق ينضم للمنصة</small></div><span class="plus">+500</span></div>
+      </div>
+      <button class="btn-y big" onclick="go('convert')">حوّل نقاطك إلى أرباح الآن ←</button>
+    </section>
+
+    <!-- التحويل -->
+    <section class="view" id="v-convert">
+      <div class="card cv-card">
+        <div class="cv-side">
+          <div class="cv-top"><span>من — نقاطك</span><span>المتاح: <b class="num" id="cvAvail" style="color:var(--yellow)">0</b></span></div>
+          <div class="cv-inrow">
+            <input type="number" id="cvIn" placeholder="0" min="0" step="1" oninput="cvCalc()">
+            <button class="max" onclick="if(S)cvIn.value=Math.floor(S.points);cvCalc()">MAX</button>
+            <span class="cv-tag"><span class="tk" style="background:var(--yellow);color:#7A5E00">✦</span>نقاط</span>
+          </div>
+        </div>
+        <div class="cv-side">
+          <div class="cv-top"><span>إلى — رصيد الأرباح</span><span class="num" style="direction:ltr" id="cvRate2"></span></div>
+          <div class="cv-out" id="cvOut">$0.00</div>
+          <div style="display:flex;justify-content:flex-end;margin-top:2px"><span class="cv-tag"><span class="tk" style="background:var(--green);color:#fff">$</span>USDT</span></div>
+        </div>
+      </div>
+      <div class="swap-fl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14m0 0 5-5m-5 5-5-5"/></svg></div>
+      <div class="info-strip">
+        <div><span>سعر التحويل</span><b class="num" id="cvRate">—</b></div>
+        <div><span>الحد الأدنى</span><b class="num" id="cvMin">—</b></div>
+        <div><span>رسوم التحويل</span><b style="color:var(--green)">مجاني</b></div>
+        <div><span>الوصول</span><b>فوري داخل المحفظة</b></div>
+      </div>
+      <div class="err" id="cvErr"></div>
+      <button class="btn-y big" id="cvBtn" onclick="cvConfirm()">تحويل النقاط إلى أرباح</button>
+      <footer>التحويل عملية داخلية نهائية — تُضاف الأرباح لرصيدك فوراً<br>سعر التحويل مُحدد من إدارة المنصة</footer>
+    </section>
+
+    <!-- السجل -->
+    <section class="view" id="v-history">
+      <div class="sec-h" style="margin-top:4px">سجل النشاطات</div>
+      <div class="tabs" id="hTabs">
+        <button class="tab on" data-f="all">الكل</button>
+        <button class="tab" data-f="points">النقاط</button>
+        <button class="tab" data-f="convert">التحويلات</button>
+        <button class="tab" data-f="earn">الأرباح</button>
+      </div>
+      <div id="hList" style="margin-top:12px"><div class="empty">جارٍ التحميل…</div></div>
+    </section>
+
+    <!-- الحساب -->
+    <section class="view" id="v-account">
+      <div class="sec-h" style="margin-top:4px">الحساب</div>
+      <div class="me">
+        <div class="ava" id="avaTxt">؟</div>
+        <div><b id="meName">—</b><small id="meUid">—</small></div>
+      </div>
+      <div class="card" style="padding:6px 16px">
+        <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>
+          <div>سعر التحويل الحالي<small>مُحدد من الإدارة</small></div><span class="end num" id="accRate">—</span></div>
+        <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+          <div>إجمالي النشاطات<small>استلام + تحويل + أرباح</small></div><span class="end num" id="accOps">0</span></div>
+        <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg></span>
+          <div>نوع المحفظة<small>داخلية — مرتبطة بحسابك</small></div><span class="end" style="color:var(--green);font-size:.72rem;font-weight:800">آمنة ✓</span></div>
+      </div>
+      <button class="btn-ghost" style="width:100%;padding:13px" onclick="logout()">تسجيل الخروج</button>
+      <footer>جميع الأرصدة والنقاط محفوظة في قاعدة بيانات المنصة<br>X Plus © 2026</footer>
+    </section>
+  </main>
+
+  <nav class="bnav">
+    <button class="bn on" data-v="home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>الرئيسية</button>
+    <button class="bn" data-v="points" onclick="go('points')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1 1.3-1.8 3-1.8s3 .8 3 1.8-1.3 1.6-3 1.8-3 .8-3 1.8 1.3 1.8 3 1.8 3-.8 3-1.8"/></svg>النقاط</button>
+    <button class="bn bn-mid" data-v="convert" onclick="go('convert')"><span class="mc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>تحويل</button>
+    <button class="bn" data-v="history" onclick="go('history')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>السجل</button>
+    <button class="bn" data-v="account" onclick="go('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>الحساب</button>
+  </nav>
+</div>
+
+<!-- ورقة تأكيد التحويل -->
+<div class="sheet" id="confirmSheet">
+  <div class="panel">
+    <div class="grab"></div>
+    <h3>تأكيد التحويل</h3>
+    <p class="psub">راجع التفاصيل قبل التأكيد — العملية نهائية</p>
+    <div class="sumrows">
+      <div><span>النقاط المحوّلة</span><b id="cPts" style="color:var(--yellow)">0</b></div>
+      <div><span>سعر التحويل</span><b id="cRate">—</b></div>
+      <div><span>ستستلم</span><b id="cGet" style="color:var(--green)">$0.00</b></div>
+      <div><span>رصيد نقاطك بعد التحويل</span><b id="cLeft">0</b></div>
+    </div>
+    <button class="btn-y big" id="doCvBtn" onclick="doConvert()">تأكيد التحويل ✓</button>
+    <button class="btn-ghost" style="width:100%;margin-top:9px;padding:13px" onclick="confirmSheet.classList.remove('show')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ورقة النجاح -->
+<div class="sheet" id="okSheet">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="ok-ic"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-17"/></svg></div>
+    <h3>تم التحويل بنجاح!</h3>
+    <p class="psub">أُضيفت الأرباح إلى رصيدك داخل المحفظة</p>
+    <div class="sumrows">
+      <div><span>حوّلت</span><b id="oPts" style="color:var(--yellow)">0</b></div>
+      <div><span>استلمت</span><b id="oGet" style="color:var(--green)">$0.00</b></div>
+      <div><span>رصيدك الجديد</span><b id="oBal">$0.00</b></div>
+    </div>
+    <button class="btn-y big" onclick="okSheet.classList.remove('show')">رائع 👍</button>
+  </div>
+</div>
+<div id="toasts"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   🔗 الاتصال يتم عبر السيرفر فقط - لا يوجد مفتاح قاعدة بيانات هنا
+   ═══════════════════════════════════════════════════════════ */
+const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000/api'
+  : '/api';
+
+/* ═══════════ أدوات عامة ═══════════ */
+const $=id=>document.getElementById(id);
+const fmt=(n,d=2)=>new Intl.NumberFormat('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const fmt0=n=>new Intl.NumberFormat('en-US').format(Math.round(n));
+const today=()=>new Date().toISOString().slice(0,10);
+let S=null, hidden=false;
+
+function toast(m,err){const t=document.createElement('div');t.className='toast'+(err?' err':'');
+  t.textContent=(err?'⚠️ ':'✓ ')+m;$('toasts').appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='.4s';setTimeout(()=>t.remove(),400)},2600)}
+function busy(btn,on,label){if(!btn)return;
+  if(on){btn.dataset.t=btn.textContent;btn.textContent=label||'جارٍ التنفيذ…';btn.disabled=true}
+  else{if(btn.dataset.t)btn.textContent=btn.dataset.t;btn.disabled=false}}
+function countUp(el,target,dur=800,pre='',suf='',dec=0){const t0=performance.now();
+  (function f(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=pre+fmt(target*e,dec)+suf;if(p<1)requestAnimationFrame(f)})(t0)}
+function dateLabel(iso){const d=new Date(iso),n=new Date(),y=new Date(n-864e5);
+  const t=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  if(isNaN(d))return['—','—'];
+  if(d.toDateString()===n.toDateString())return['اليوم',t];
+  if(d.toDateString()===y.toDateString())return['أمس',t];
+  return[d.toLocaleDateString('ar-EG-u-nu-latn',{day:'numeric',month:'short'}),t]}
+
+/* ═══════════ الاتصال بالسيرفر (مع التوكن) ═══════════ */
+async function apiFetch(url, options = {}) {
+  const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+  if (!token) {
+    toast('يرجى تسجيل الدخول أولاً', 1);
+    setTimeout(() => location.href = 'login.html', 1200);
+    throw new Error('no_token');
+  }
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(url, { ...options, headers });
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth_token');
+    toast('انتهت صلاحية الجلسة', 1);
+    setTimeout(() => location.href = 'login.html', 1200);
+    throw new Error('auth');
+  }
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || 'فشل العملية');
+  return data;
+}
+
+/* ═══════════ تحميل الحالة من السيرفر ═══════════ */
+async function loadState() {
+  const data = await apiFetch(`${API_URL}/wallet/state`);
+  const hist = (data.history || []).map(h => {
+    const [d, t] = dateLabel(h.created_at);
+    return { type: h.type, title: h.title, sub: h.sub, amt: h.amount, unit: h.unit, sign: h.sign, d, t };
+  });
+  return { ...data.wallet, history: hist };
+}
+
+async function init() {
+  try {
+    S = await loadState();
+    $('dbErr').style.display = 'none';
+    renderAll();
+    toast('تم الاتصال بالمحفظة ✓');
+  } catch (e) {
+    if (e.message !== 'auth' && e.message !== 'no_token') {
+      $('dbErr').style.display = 'block';
+      $('dbErrMsg').textContent = e.message;
+    }
+  }
+}
+
+/* ═══════════ العرض ═══════════ */
+function renderAll() {
+  if (!S) return;
+  const mask = v => hidden ? '••••' : v;
+  $('balNum').innerHTML = hidden ? '<small>$</small> ••••' : '<small>$</small> ' + fmt(S.balance);
+  $('chipPts').textContent = mask(fmt0(S.points));
+  $('chipRate').textContent = S.rate + ' = $1';
+  $('stPts').textContent = mask(fmt0(S.points));
+  $('stConv').textContent = mask(fmt0(S.totalConverted));
+  const todayEarn = S.history.filter(h => h.type === 'earn' && h.d === 'اليوم').reduce((s, h) => s + h.amt, 0);
+  $('stToday').textContent = hidden ? '••••' : '$' + fmt(todayEarn);
+  const claimed = S.lastClaim === today();
+  $('claimAmt').textContent = '+' + fmt0(S.dailyPts);
+  $('claimBtn').textContent = claimed ? 'تم الاستلام ✓' : 'استلام';
+  $('claimBtn').disabled = claimed;
+  $('claimSub').textContent = claimed ? 'عُد غداً لاستلام نقاط جديدة' : 'استلمها قبل نهاية اليوم';
+  $('claimCard').style.opacity = claimed ? '.6' : '1';
+  if (!hidden) countUp($('ptsBig'), S.points, 700); else $('ptsBig').textContent = '••••';
+  $('rateLine').textContent = S.rate + ' نقطة = $1.00';
+  $('pToday').textContent = mask(fmt0(S.lastClaim === today() ? S.dailyPts : 0));
+  $('pWeek').textContent = mask(fmt0(S.points * 0.35));
+  $('pConv').textContent = mask(fmt0(S.totalConverted));
+  $('howDaily').textContent = '+' + fmt0(S.dailyPts);
+  $('cvAvail').textContent = fmt0(S.points);
+  $('cvRate').textContent = S.rate + ' نقطة = $1.00';
+  $('cvRate2').textContent = '1 نقطة = $' + (1 / S.rate).toFixed(4);
+  $('cvMin').textContent = S.rate + ' نقطة';
+  cvCalc();
+  $('avaTxt').textContent = (S.name || 'م')[0];
+  $('meName').textContent = S.name; $('meUid').textContent = S.uid;
+  $('accRate').textContent = S.rate + ' = $1'; $('accOps').textContent = fmt0(S.history.length);
+  renderRecent();
+  if ($('v-history').classList.contains('active')) renderHistory(hF);
+}
+function toggleEye() { hidden = !hidden; renderAll(); toast(hidden ? 'تم الإخفاء 🔒' : 'تم الإظهار'); }
+function go(v) {
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  $('v-' + v).classList.add('active');
+  document.querySelectorAll('.bn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  document.querySelector('main').scrollTop = 0;
+  if (v === 'history') renderHistory(hF);
+}
+function logout() {
+  if (confirm('تسجيل الخروج من المحفظة؟')) {
+    try { localStorage.removeItem('token'); localStorage.removeItem('auth_token'); } catch {}
+    toast('تم تسجيل الخروج');
+    setTimeout(() => location.href = 'login.html', 600);
+  }
+}
+
+/* ═══════════ الاستلام ═══════════ */
+async function claim() {
+  if (!S) { toast('بانتظار الاتصال…', 1); return; }
+  if (S.lastClaim === today()) { toast('استلمت نقاط اليوم بالفعل', 1); return; }
+  busy($('claimBtn'), true);
+  try {
+    const data = await apiFetch(`${API_URL}/wallet/claim`, { method: 'POST' });
+    S = await loadState();
+    renderAll();
+    toast('تم استلام +' + fmt0(data.claimed) + ' نقطة ✦');
+  } catch (e) {
+    if (e.message !== 'auth' && e.message !== 'no_token') toast(e.message, 1);
+  } finally { busy($('claimBtn'), false); }
+}
+
+/* ═══════════ التحويل ═══════════ */
+function cvCalc() {
+  if (!S) return;
+  const p = Math.max(0, Math.floor(+$('cvIn').value || 0));
+  $('cvOut').textContent = '$' + fmt(p / S.rate);
+}
+function cvConfirm() {
+  if (!S) { toast('بانتظار الاتصال…', 1); return; }
+  const p = Math.floor(+$('cvIn').value || 0), err = $('cvErr');
+  err.style.display = 'block';
+  if (p < S.rate) { err.textContent = '⚠️ الحد الأدنى للتحويل ' + S.rate + ' نقطة'; return; }
+  if (p > S.points) { err.textContent = '⚠️ رصيد نقاطك غير كافٍ'; return; }
+  err.style.display = 'none';
+  $('cPts').textContent = fmt0(p) + ' نقطة';
+  $('cRate').textContent = S.rate + ' = $1.00';
+  $('cGet').textContent = '$' + fmt(p / S.rate);
+  $('cLeft').textContent = fmt0(S.points - p) + ' نقطة';
+  $('confirmSheet').classList.add('show');
+}
+async function doConvert() {
+  const p = Math.floor(+$('cvIn').value || 0);
+  busy($('doCvBtn'), true);
+  try {
+    const data = await apiFetch(`${API_URL}/wallet/convert`, {
+      method: 'POST',
+      body: JSON.stringify({ amount: p })
+    });
+    S = await loadState();
+    $('confirmSheet').classList.remove('show');
+    $('oPts').textContent = fmt0(p) + ' نقطة';
+    $('oGet').textContent = '$' + fmt(data.got);
+    $('oBal').textContent = '$' + fmt(S.balance);
+    $('okSheet').classList.add('show');
+    $('cvIn').value = ''; renderAll();
+  } catch (e) {
+    if (e.message !== 'auth' && e.message !== 'no_token') toast(e.message, 1);
+  } finally { busy($('doCvBtn'), false); }
+}
+
+/* ═══════════ السجل ═══════════ */
+let hF = 'all';
+$('hTabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  hF = b.dataset.f; renderHistory(hF);
+});
+const ICONS = {
+  points: ['y', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7"/></svg>'],
+  convert: ['m', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg>'],
+  earn: ['g', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1 1.3-1.8 3-1.8s3 .8 3 1.8-1.3 1.6-3 1.8-3 .8-3 1.8 1.3 1.8 3 1.8 3-.8 3-1.8"/></svg>']
+};
+function row(h) {
+  const ic = ICONS[h.type] || ICONS.points;
+  const col = h.unit === '$' ? (h.sign > 0 ? 'var(--green)' : 'var(--red)') : (h.sign > 0 ? 'var(--yellow)' : 'var(--muted)');
+  return `<div class="lrow"><span class="lic ${ic[0]}">${ic[1]}</span>
+    <span class="lin"><b>${h.title}</b><small>${h.sub} · ${h.d} · ${h.t}</small></span>
+    <span class="lamt"><b style="color:${col}">${h.sign > 0 ? '+' : '−'}${h.unit === '$' ? '$' + fmt(h.amt) : fmt0(h.amt)}</b>
+    <small>${h.unit === '$' ? 'USDT' : 'نقطة'}</small></span></div>`;
+}
+function renderRecent() { if (!S) return; $('recentList').innerHTML = S.history.slice(0, 4).map(row).join('') || '<div class="empty">لا نشاطات بعد</div>'; }
+function renderHistory(f) { if (!S) return; const list = f === 'all' ? S.history : S.history.filter(h => h.type === f); $('hList').innerHTML = list.map(row).join('') || '<div class="empty">لا توجد عمليات من هذا النوع</div>'; }
+
+init();
+</script>
+</body>
+</html>

@@ -2,6 +2,44 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const Otp = require("../models/Otp");
+
+const nodemailer = require("nodemailer");
+
+
+
+
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+});
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+
+async function sendOTPEmail(email, otp, username) {
+
+    await transporter.sendMail({
+        from: process.env.SMTP_FROM,
+        to: email,
+        subject: "رمز التحقق X Plus",
+        html: `
+            <h2>مرحباً ${username}</h2>
+            <p>رمز التحقق الخاص بك:</p>
+            <h1>${otp}</h1>
+            <p>صلاحية الرمز 10 دقائق</p>
+        `
+    });
+
+}
+
 
 
 // =======================
@@ -21,6 +59,10 @@ exports.register = async (req, res) => {
     }
 
 
+
+
+
+
     // التأكد من عدم وجود المستخدم
     const existingUser = await User.findByEmail(email);
 
@@ -36,24 +78,32 @@ exports.register = async (req, res) => {
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 10);
 
+const otp = generateOTP();
 
-    // إنشاء المستخدم في قاعدة البيانات
-    const user = await User.create(
-      username.trim(),
-      email.trim().toLowerCase(),
-      hashedPassword
-    );
+const otpHash = await bcrypt.hash(otp, 10);
+
+await Otp.save(
+  email.trim().toLowerCase(),
+  otpHash,
+  {
+    username: username.trim(),
+    email: email.trim().toLowerCase(),
+    password: hashedPassword
+  },
+  new Date(Date.now() + 10 * 60 * 1000)
+);
+
+await sendOTPEmail(
+  email.trim().toLowerCase(),
+  otp,
+  username.trim()
+);
 
 
-    return res.status(201).json({
-
-      success: true,
-
-      message: "تم إنشاء الحساب بنجاح",
-
-      user
-
-    });
+    return res.status(200).json({
+  success: true,
+  message: "تم إرسال رمز التحقق إلى البريد الإلكتروني"
+});
 
 
   } catch (err) {
@@ -212,6 +262,170 @@ exports.login = async (req, res) => {
 
     });
 
+
+  }
+
+};
+
+
+// =======================
+// التحقق من OTP
+// =======================
+exports.verifyOTP = async (req, res) => {
+
+  try {
+
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "البريد والرمز مطلوبان"
+      });
+    }
+
+    const otpData = await Otp.findByEmail(
+      email.trim().toLowerCase()
+    );
+
+    if (!otpData) {
+      return res.status(400).json({
+        success: false,
+        message: "لا يوجد رمز تحقق"
+      });
+    }
+
+    if (new Date() > new Date(otpData.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        message: "انتهت صلاحية الرمز"
+      });
+    }
+
+    const match = await bcrypt.compare(
+      otp,
+      otpData.otp_hash
+    );
+
+    if (!match) {
+      await Otp.increaseAttempts(
+        email.trim().toLowerCase()
+      );
+
+      return res.status(400).json({
+        success:false,
+        message:"رمز التحقق غير صحيح"
+      });
+    }
+
+
+// هنا تضعه
+const data = typeof otpData.user_data === "string"
+  ? JSON.parse(otpData.user_data)
+  : otpData.user_data;
+
+const user = await User.create(
+  data.username,
+  data.email,
+  data.password
+);
+
+await Otp.delete(
+  email.trim().toLowerCase()
+);
+
+    res.json({
+      success:true,
+      message:"تم تفعيل الحساب بنجاح",
+      user
+    });
+
+  } catch(err) {
+
+    console.error("VERIFY OTP ERROR:", err);
+
+    res.status(500).json({
+      success:false,
+      message:"خطأ في الخادم",
+      error:err.message
+    });
+
+  }
+
+};
+
+
+// =======================
+// إعادة إرسال OTP
+// =======================
+exports.resendOTP = async (req, res) => {
+
+  try {
+
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success:false,
+        message:"البريد مطلوب"
+      });
+    }
+
+
+    const otpData = await Otp.findByEmail(
+      email.trim().toLowerCase()
+    );
+
+
+    if (!otpData) {
+      return res.status(400).json({
+        success:false,
+        message:"لا يوجد طلب تسجيل بهذا البريد"
+      });
+    }
+
+
+    const otp = generateOTP();
+
+    const otpHash = await bcrypt.hash(otp, 10);
+
+
+    await Otp.save(
+      email.trim().toLowerCase(),
+      otpHash,
+      typeof otpData.user_data === "string"
+        ? JSON.parse(otpData.user_data)
+        : otpData.user_data,
+      new Date(Date.now() + 10 * 60 * 1000)
+    );
+
+
+const userData = typeof otpData.user_data === "string"
+  ? JSON.parse(otpData.user_data)
+  : otpData.user_data;
+
+await sendOTPEmail(
+  email.trim().toLowerCase(),
+  otp,
+  userData.username
+);
+
+
+    res.json({
+      success:true,
+      message:"تم إرسال رمز جديد"
+    });
+
+
+  } catch(err) {
+
+    console.error("RESEND OTP ERROR:", err);
+
+    res.status(500).json({
+      success:false,
+      message:"خطأ في الخادم",
+      error:err.message
+    });
 
   }
 

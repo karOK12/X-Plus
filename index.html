@@ -14,7 +14,8 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
 
   <style>
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { overflow-x: hidden; overflow-y: auto; min-height: 100vh; }
     .logo-icon-svg { width: 28px; height: 28px; color: #3b82f6; }
     .mining-card-wrapper { width: 100%; max-width: 520px; margin: 0 auto; }
     .mining-card { padding: 24px; border-radius: 22px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%); box-shadow: 0 20px 50px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1); backdrop-filter: blur(10px); position: relative; color: white; }
@@ -24,7 +25,16 @@
     .mining-right { flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; min-width: 200px; }
     .progress-ring { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
     .progress-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 6; }
-    .progress-bar { fill: none; stroke: #3b82f6; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+    .progress-bar { fill: none; stroke: #3b82f6; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.2s linear; }
+    .progress-dot {
+      fill: #3b82f6;
+      filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.9));
+      animation: dotGlow 2s ease-in-out infinite;
+    }
+    @keyframes dotGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8)); }
+      50%      { filter: drop-shadow(0 0 11px rgba(59, 130, 246, 1)); }
+    }
     .timer { font-size: 20px; font-weight: bold; color: #3b82f6; font-variant-numeric: tabular-nums; direction: ltr; }
     .sub { font-size: 10px; opacity: 0.6; letter-spacing: 1px; }
     .balance-container, .power-container, .rate-container, .points-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
@@ -40,7 +50,6 @@
     .mineBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(59, 130, 246, 0.5); }
     .mineBtn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
     
-    /* تنسيق صندوق الإيداع ليتناسق مع التصميم الأصلي تماماً */
     .deposit-section { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px dashed rgba(59, 130, 246, 0.3); text-align: center; }
     .deposit-title { font-size: 14px; color: #94a3b8; margin-bottom: 10px; }
     .deposit-address { background: #0f172a; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 13px; color: #3b82f6; word-break: break-all; margin-bottom: 10px; direction: ltr; }
@@ -115,13 +124,14 @@
                 <svg class="progress-ring" width="140" height="140">
                   <circle class="progress-bg" cx="70" cy="70" r="62"></circle>
                   <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
+                  <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
                 </svg>
                 <div class="timer" id="timer">00:00:00</div>
                 <div class="sub">MINING</div>
               </div>
 
               <div class="mining-right">
-                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.000000</div></div>
+                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.00000000</div></div>
                 <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
                 <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
                 <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
@@ -131,20 +141,13 @@
             </div>
             <button id="startBtn" class="mineBtn" onclick="startMining()">⛏️ ابدأ التعدين الآن</button>
 
-            <!-- قسم الإيداع الحقيقي المدمج بتصميم متناسق -->
-            <div class="deposit-section">
-              <div class="deposit-title">عنوان إيداع Ethereum (ERC-20)</div>
-              <div class="deposit-address" id="depositAddress">جاري التحميل...</div>
-              <button class="copy-btn" onclick="copyAddress()">نسخ العنوان</button>
-              <div class="deposit-status" id="depositStatus">بانتظار رصد الإيداع من الشبكة...</div>
-            </div>
+
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- (تم الاحتفاظ بأقسام Features, About, FAQ, Footer كما هي تماماً لضمان عدم تغيير التصميم) -->
   <section id="features" class="features section" style="padding: 40px 0;">
     <div class="container">
       <div class="section-header"><div class="section-badge">لماذا X Plus؟</div><h2 class="section-title">مزايا تجعلنا الخيار الأول</h2></div>
@@ -168,28 +171,85 @@
   </div>
 
   <script>
-    // ==========================================
-    // رابط الخادم الخلفي الحقيقي (قم بتغييره لرابط Vercel أو Neon الخاص بك)
-    // ==========================================
-    const API_URL = 'http://localhost:3000/api'; 
+    /* ═══════════════════════════════════════════════════════════════
+       🐝 نظام التعدين - الرصيد يعد من رقم 1 ويصعد ببطء مع التوقيت
+       ✅ 00:00:01 → 0.00000001
+       ✅ 00:00:02 → 0.00000002
+       ✅ يصعد وحدة وحدة كل ثانية - بطيء ومتزامن مع المؤقت
+    ═══════════════════════════════════════════════════════════════ */
+
+    const RING_CX = 70;
+    const RING_CY = 70;
+    const RING_R  = 62;
+    const RING_CIRC = 2 * Math.PI * RING_R;
+    
+    const CYCLE_SECONDS = 86400;  // ⏱️ مدة الدورة الكاملة: 24 ساعة
+    const RING_CYCLE    = 60;
+    const SCALE = 100000000;      // 8 خانات عشرية
+    
+    let balanceScaled = 0;
+    let currentPower = 150.50;
+    let isMining = false;
+    let sessionDone = false;
+    let startTime = 0;
+    let timerInterval = null;
+    let balanceInterval = null;
+    let lastSecond = -1;
+    let lastBalanceSecond = -1;
+
+    function formatScaled(scaled) {
+      const isNeg = scaled < 0;
+      const abs = Math.abs(scaled);
+      const intPart = Math.floor(abs / SCALE);
+      const fracPart = (abs % SCALE).toString().padStart(8, '0');
+      return (isNeg ? '-' : '') + intPart + '.' + fracPart;
+    }
+
+    /* ──  معدل بطيء: +1 وحدة (آخر خانة) كل ثانية تقريباً ── */
+    function profitPerMsScaled() {
+      return (currentPower * 0.00000024 * SCALE) / 3600000;
+    }
+
+    async function apiFetch(url, options = {}) {
+      const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+      const headers = { 'Content-Type': 'application/json', ...options.headers };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      
+      const response = await fetch(url, { ...options, headers });
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth_token');
+        if (window.location.pathname !== '/login.html') window.location.href = 'login.html';
+        throw new Error('انتهت صلاحية الجلسة');
+      }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'خطأ في الخادم' }));
+        throw new Error(error.message || `HTTP ${response.status}`);
+      }
+      return response;
+    }
+    
+    const API_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:3000/api'
+      : '/api';
 
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
     if (mobileToggle && navMenu) {
       mobileToggle.addEventListener('click', () => { navMenu.classList.toggle('active'); });
-      document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { navMenu.classList.remove('active'); }); });
+      document.querySelectorAll('.nav-link').forEach(link => { 
+        link.addEventListener('click', () => { navMenu.classList.remove('active'); }); 
+      });
     }
 
     document.querySelectorAll('.faq-question').forEach(question => {
-      question.addEventListener('click', () => { question.parentElement.classList.toggle('active'); });
+      question.addEventListener('click', () => { 
+        question.parentElement.classList.toggle('active'); 
+      });
     });
 
-    let isMining = false;
-    let startTime = 0;
-    let timerInterval = null;
-    let lastSecond = -1;
-
     const circle = document.getElementById('progressCircle');
+    const dot = document.getElementById('progressDot');
     const radius = 62;
     const circumference = 2 * Math.PI * radius;
     circle.style.strokeDasharray = circumference;
@@ -204,54 +264,152 @@
     const startBtn = document.getElementById('startBtn');
     const adBtn = document.getElementById('adBtn');
 
-    // جلب بيانات المستخدم وعنوان الإيداع عند تحميل الصفحة
-    async function initPage() {
-  try {
-    const res = await fetch(`${API_URL}/user/init`);
-    const data = await res.json();
-
-    console.log(data); // للتأكد من وصول البيانات
-
-    if (data.success) {
-      document.getElementById('depositAddress').innerText = data.depositAddress;
-      balanceEl.textContent = parseFloat(data.balance).toFixed(6);
-      pointsEl.textContent = data.points;
-      powerEl.textContent = parseFloat(data.power).toFixed(2);
-      rateEl.textContent = `↗️ +${(data.power * 0.5).toFixed(2)}/h`;
+    function resetRing() {
+      circle.style.strokeDasharray  = RING_CIRC;
+      circle.style.strokeDashoffset = RING_CIRC;
+      dot.setAttribute('cx', (RING_CX + RING_R).toFixed(3));
+      dot.setAttribute('cy', RING_CY);
     }
-  } catch (e) {
-    console.error("فشل الاتصال بالخادم", e);
-  }
-}
 
-initPage();
+    function stopMining() {
+      isMining = false;
+      if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
+      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+      startBtn.disabled = false;
+      startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+      profitInfoEl.textContent = "⏱️ جاهز للبدء";
+    }
 
-    async function startMining() {
-      if (isMining) return;
-      startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
-      startBtn.disabled = true;
+    /* ═══════════════════════════════════════════════════════════════
+       🐝 عداد الرصيد - يبدأ من 1 ويصعد ببطء مع كل ثانية
+    ═══════════════════════════════════════════════════════════════ */
+    function startLocalCounter() {
+      if (balanceInterval) {
+        clearInterval(balanceInterval);
+        balanceInterval = null;
+      }
 
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      const profitPerMs = profitPerMsScaled();
+
+      function tick() {
+        if (!isMining) return;
+
+        const now = Date.now();
+        const elapsedMs = now - startTime;
+
+        balanceScaled = profitPerMs * elapsedMs;
+
+        /* 🎯 العرض يتحدث مرة كل ثانية فقط - بنفس نبضة المؤقت */
+        const sec = Math.floor(elapsedMs / 1000);
+        if (sec !== lastBalanceSecond) {
+          lastBalanceSecond = sec;
+          balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+        }
+      }
+
+      tick();
+
+      balanceInterval = setInterval(tick, 100);
+
+      timerInterval = setInterval(() => {
+        updateTimer();
+      }, 100);
+    }
+
+    function updateRing(elapsedSeconds) {
+      const t = Math.max(0, Math.min(elapsedSeconds, CYCLE_SECONDS));
+      const done = elapsedSeconds >= CYCLE_SECONDS;
+
+      const speedFactor = 0.1;
+      const fill = done ? 1 : ((t * speedFactor) % RING_CYCLE) / RING_CYCLE;
+
+      circle.style.strokeDasharray = RING_CIRC;
+      circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
+
+      const angle = fill * 2 * Math.PI;
+      dot.setAttribute('cx', (RING_CX + RING_R * Math.cos(angle)).toFixed(3));
+      dot.setAttribute('cy', (RING_CY + RING_R * Math.sin(angle)).toFixed(3));
+    }
+
+    async function initPage() {
+      resetRing();
+      
       try {
-        const response = await fetch(`${API_URL}/mining/start`, { method: 'POST' });
-        const data = await response.json();
+        const res = await apiFetch(`${API_URL}/user/init`);
+        const data = await res.json();
 
         if (data.success) {
-          isMining = true;
-          startTime = Date.now();
-          lastSecond = -1;
+          document.getElementById('depositAddress').innerText = data.depositAddress;
+          
+          balanceScaled = 0;
+          balanceEl.textContent = '0.00000000';
+          
+          pointsEl.textContent = data.points;
+          
+          currentPower = parseFloat(data.power) || 150.50;
+          powerEl.textContent = currentPower.toFixed(2);
+          rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+          
+          profitInfoEl.textContent = '⏱️ جاهز للبدء';
+        }
+      } catch (e) {
+        console.error("فشل الاتصال بالخادم:", e.message);
+        balanceEl.textContent = '0.00000000';
+        powerEl.textContent = currentPower.toFixed(2);
+        rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+      }
+    }
+
+    initPage();
+
+    async function startMining() {
+      if (isMining || timerInterval || balanceInterval) return;
+      
+      startBtn.disabled = true;
+      startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
+      
+      startTime     = Date.now();
+      isMining      = true;
+      sessionDone   = false;
+      balanceScaled = 0;
+      lastSecond    = -1;
+      lastBalanceSecond = -1;
+      
+      balanceEl.textContent = '0.00000000';
+      timerEl.textContent = '00:00:00';
+      resetRing();
+      updateTimer();
+      updateRing(0);
+      startLocalCounter();
+      
+      try {
+        const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
+        const data = await response.json();
+        
+        if (data.success) {
           startBtn.innerText = "⛏️ جاري التعدين (متصل)";
-          profitInfoEl.textContent = "✅ متصل بالخادم - البيانات حقيقية";
+          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
           
-          if (timerInterval) clearInterval(timerInterval);
-          timerInterval = setInterval(updateTimer, 1000);
-          updateTimer();
-          
-          // تحديث الرصيد والنقاط من الخادم كل 15 ثانية
-          setInterval(initPage, 15000);
+          if (!window._pointsUpdater) {
+            window._pointsUpdater = setInterval(async () => {
+              try {
+                const res = await apiFetch(`${API_URL}/user/init`);
+                const data = await res.json();
+                if (data.success) pointsEl.textContent = data.points;
+              } catch(e) {}
+            }, 30000);
+          }
+        } else {
+          stopMining();
         }
       } catch (error) {
-        startBtn.innerText = "⛏️ فشل الاتصال";
-        startBtn.disabled = false;
+        console.error("فشل بدء التعدين:", error);
+        stopMining();
         profitInfoEl.textContent = "❌ تأكد من تشغيل server.js";
       }
     }
@@ -260,13 +418,13 @@ initPage();
       adBtn.innerHTML = "⏳ جاري عرض الإعلان...";
       adBtn.disabled = true;
       
-      // هنا يمكنك دمج كود Google AdSense أو AdMob الحقيقي
       setTimeout(async () => {
         try {
-          const res = await fetch(`${API_URL}/ad/watch`, { method: 'POST' });
+          const res = await apiFetch(`${API_URL}/ad/watch`, { method: 'POST' });
           const data = await res.json();
+          
           if(data.success) {
-            pointsEl.textContent = data.newPoints;
+            pointsEl.textContent = data.points;
             adBtn.innerHTML = "✅ تمت إضافة 10 نقاط!";
             adBtn.style.background = "rgba(34, 197, 94, 0.2)";
             adBtn.style.borderColor = "#22c55e";
@@ -277,46 +435,63 @@ initPage();
               adBtn.style.borderColor = "";
             }, 3000);
           }
-        } catch(e) { console.error(e); }
-      }, 3000); // محاكاة مدة الإعلان 3 ثوانٍ
+        } catch(e) { 
+          console.error("فشل مشاهدة الإعلان:", e.message);
+          adBtn.innerHTML = "📺 شاهد إعلان (+10 نقاط)";
+          adBtn.disabled = false;
+        }
+      }, 3000);
     }
 
     function updateTimer() {
       if (!isMining) return;
-      const now = Date.now();
-      const elapsedTime = (now - startTime) / 1000;
-      const currentSecond = Math.floor(elapsedTime);
       
-      if (currentSecond !== lastSecond) {
-        lastSecond = currentSecond;
-        let h = String(Math.floor(elapsedTime / 3600)).padStart(2, '0');
-        let m = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, '0');
-        let s = String(Math.floor(elapsedTime % 60)).padStart(2, '0');
-        timerEl.textContent = `${h}:${m}:${s}`;
+      const now            = Date.now();
+      const elapsedMs      = now - startTime;
+      const elapsedSeconds = elapsedMs / 1000;
+      const elapsed        = Math.min(elapsedSeconds, CYCLE_SECONDS);
+      
+      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const s = String(Math.floor(elapsed % 60)).padStart(2, '0');
+      timerEl.textContent = `${h}:${m}:${s}`;
+      
+      updateRing(elapsedSeconds);
+      
+      if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
+        sessionDone = true;
+        isMining    = false;
+        
+        if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
+        if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+        
+        timerEl.textContent   = '24:00:00';
+        balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+        updateRing(CYCLE_SECONDS);
+        profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
+        startBtn.disabled = false;
+        startBtn.innerText = '⛏️ بدء دورة جديدة';
       }
-
-      const progress = Math.min(elapsedTime / 28800, 1);
-      circle.style.strokeDashoffset = circumference - (progress * circumference);
     }
 
-    function copyAddress() {
-      const addr = document.getElementById('depositAddress').innerText;
-      navigator.clipboard.writeText(addr).then(() => {
-        document.getElementById('depositStatus').innerText = "✅ تم نسخ العنوان بنجاح!";
-        setTimeout(() => { document.getElementById('depositStatus').innerText = "بانتظار رصد الإيداع من الشبكة..."; }, 2000);
-      });
-    }
 
     const termsContent = {
       terms: `<h2>📋 الشروط والأحكام</h2><p>يتم جمع النقاط والإيداعات لتحضير توزيع عملة X Plus الرسمية.</p>`,
       privacy: `<h2>🔐 سياسة الخصوصية</h2><p>نحترم خصوصيتك ونحمي بياناتك.</p>`
     };
+    
     function openTerms(type) {
       document.getElementById('termsBody').innerHTML = termsContent[type];
       document.getElementById('termsModal').classList.add('active');
     }
-    function closeTerms() { document.getElementById('termsModal').classList.remove('active'); }
-    document.getElementById('termsModal').addEventListener('click', (e) => { if (e.target.id === 'termsModal') closeTerms(); });
+    
+    function closeTerms() { 
+      document.getElementById('termsModal').classList.remove('active'); 
+    }
+    
+    document.getElementById('termsModal').addEventListener('click', (e) => { 
+      if (e.target.id === 'termsModal') closeTerms(); 
+    });
   </script>
 </body>
 </html>

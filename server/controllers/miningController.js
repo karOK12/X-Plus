@@ -5,46 +5,19 @@ exports.startMining = async (req, res) => {
   try {
     const { userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        message: "معرف المستخدم مطلوب"
-      });
-    }
-
-    const user = await db.query(
-      "SELECT id FROM users WHERE id = $1",
-      [userId]
+    const result = await db.query(
+      `UPDATE users
+       SET mining_start_time = $1
+       WHERE id = $2
+       RETURNING id`,
+      [Date.now(), userId]
     );
 
-    if (user.rows.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "المستخدم غير موجود"
       });
-    }
-
-    const mining = await db.query(
-      "SELECT * FROM mining WHERE user_id = $1",
-      [userId]
-    );
-
-    if (mining.rows.length === 0) {
-      await db.query(
-        `INSERT INTO mining
-        (user_id, balance, power, is_mining, started_at, updated_at)
-        VALUES ($1, 0, 150.50, true, NOW(), NOW())`,
-        [userId]
-      );
-    } else {
-      await db.query(
-        `UPDATE mining
-         SET is_mining = true,
-             started_at = NOW(),
-             updated_at = NOW()
-         WHERE user_id = $1`,
-        [userId]
-      );
     }
 
     res.json({
@@ -62,48 +35,47 @@ exports.startMining = async (req, res) => {
   }
 };
 
+
 // حالة التعدين
 exports.getMiningStatus = async (req, res) => {
   try {
+
     const { userId } = req.query;
 
     const result = await db.query(
-      "SELECT * FROM mining WHERE user_id = $1",
+      `SELECT
+        balance,
+        power,
+        mining_start_time
+       FROM users
+       WHERE id = $1`,
       [userId]
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "لا توجد بيانات تعدين"
+        message: "المستخدم غير موجود"
       });
     }
 
-    const mining = result.rows[0];
+    const user = result.rows[0];
 
-    if (mining.is_mining && mining.started_at) {
+    let balance = Number(user.balance);
+
+    if (user.mining_start_time) {
 
       const hours =
-        (Date.now() - new Date(mining.started_at).getTime()) / 3600000;
+        (Date.now() - Number(user.mining_start_time)) / 3600000;
 
-      const earned = hours * mining.power * 0.5;
-
-      await db.query(
-        `UPDATE mining
-         SET balance = $1,
-             updated_at = NOW()
-         WHERE user_id = $2`,
-        [earned, userId]
-      );
-
-      mining.balance = earned;
+      balance += hours * Number(user.power) * 0.5;
     }
 
     res.json({
       success: true,
-      balance: Number(mining.balance),
-      power: Number(mining.power),
-      isMining: mining.is_mining
+      balance,
+      power: Number(user.power),
+      isMining: !!user.mining_start_time
     });
 
   } catch (err) {
