@@ -40,6 +40,19 @@ app.use(
 
 
 // ══════════════════════════════════════════════════════
+// HOME PAGE
+// ══════════════════════════════════════════════════════
+
+app.get("/", (req, res) => {
+
+    res.sendFile(
+        path.join(__dirname, "index.html")
+    );
+
+});
+
+
+// ══════════════════════════════════════════════════════
 // Environment
 // ══════════════════════════════════════════════════════
 
@@ -162,7 +175,6 @@ async function initDatabase() {
 }
 
 
-// لا نمنع تشغيل Vercel إذا تأخر اتصال قاعدة البيانات
 initDatabase().catch((error) => {
 
     console.error(
@@ -325,11 +337,8 @@ app.post("/api/mining/start", auth, async (req, res) => {
 
 
         res.json({
-
             success: true,
-
             message: "تم بدء التعدين"
-
         });
 
 
@@ -341,11 +350,8 @@ app.post("/api/mining/start", auth, async (req, res) => {
         );
 
         res.status(500).json({
-
             success: false,
-
             error: error.message
-
         });
 
     }
@@ -375,22 +381,16 @@ app.post("/api/ad/watch", auth, async (req, res) => {
         if (result.rows.length === 0) {
 
             return res.status(404).json({
-
                 success: false,
-
                 message: "المستخدم غير موجود"
-
             });
 
         }
 
 
         res.json({
-
             success: true,
-
             points: result.rows[0].points
-
         });
 
 
@@ -402,11 +402,8 @@ app.post("/api/ad/watch", auth, async (req, res) => {
         );
 
         res.status(500).json({
-
             success: false,
-
             error: error.message
-
         });
 
     }
@@ -484,6 +481,7 @@ app.use("/api", (req, res) => {
 
 });
 
+
 // ══════════════════════════════════════════════════════
 // Error Handler
 // ══════════════════════════════════════════════════════
@@ -497,9 +495,7 @@ app.use((error, req, res, next) => {
 
 
     if (res.headersSent) {
-
         return next(error);
-
     }
 
 
