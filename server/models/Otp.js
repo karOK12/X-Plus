@@ -2,33 +2,45 @@ const db = require("../config/database");
 
 const Otp = {
 
-  // إنشاء أو تحديث رمز OTP
+  // ===============================
+  // إنشاء أو تحديث OTP
+  // ===============================
   async save(email, otpHash, userData, expiresAt) {
+
+    const normalizedEmail =
+      email.trim().toLowerCase();
 
     const result = await db.query(
       `
-      INSERT INTO otp_codes
-      (
+      INSERT INTO otp_codes (
         email,
         otp_hash,
         user_data,
+        attempts,
+        created_at,
         expires_at
       )
-      VALUES ($1,$2,$3,$4)
+      VALUES (
+        $1,
+        $2,
+        $3,
+        0,
+        NOW(),
+        $4
+      )
 
-      ON CONFLICT(email)
+      ON CONFLICT (email)
       DO UPDATE SET
-
-      otp_hash = EXCLUDED.otp_hash,
-      user_data = EXCLUDED.user_data,
-      attempts = 0,
-      created_at = NOW(),
-      expires_at = EXCLUDED.expires_at
+        otp_hash = EXCLUDED.otp_hash,
+        user_data = EXCLUDED.user_data,
+        attempts = 0,
+        created_at = NOW(),
+        expires_at = EXCLUDED.expires_at
 
       RETURNING *;
       `,
       [
-        email,
+        normalizedEmail,
         otpHash,
         JSON.stringify(userData),
         expiresAt
@@ -39,51 +51,66 @@ const Otp = {
   },
 
 
-
-  // البحث عن رمز OTP
+  // ===============================
+  // البحث عن OTP
+  // ===============================
   async findByEmail(email) {
+
+    const normalizedEmail =
+      email.trim().toLowerCase();
 
     const result = await db.query(
       `
       SELECT *
       FROM otp_codes
       WHERE email = $1
+      LIMIT 1
       `,
-      [email]
+      [normalizedEmail]
     );
 
-    return result.rows[0];
+    return result.rows[0] || null;
   },
 
 
-
-  // حذف الرمز
+  // ===============================
+  // حذف OTP
+  // ===============================
   async delete(email) {
+
+    const normalizedEmail =
+      email.trim().toLowerCase();
 
     await db.query(
       `
       DELETE FROM otp_codes
       WHERE email = $1
       `,
-      [email]
+      [normalizedEmail]
     );
 
   },
 
 
-
-  // زيادة عدد المحاولات
+  // ===============================
+  // زيادة محاولات OTP
+  // ===============================
   async increaseAttempts(email) {
 
-    await db.query(
+    const normalizedEmail =
+      email.trim().toLowerCase();
+
+    const result = await db.query(
       `
       UPDATE otp_codes
       SET attempts = attempts + 1
       WHERE email = $1
+      RETURNING attempts
       `,
-      [email]
+      [normalizedEmail]
     );
 
+    return result.rows[0] || null;
   }
 
 };

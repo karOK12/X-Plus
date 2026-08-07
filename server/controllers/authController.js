@@ -7,108 +7,217 @@ const Otp = require("../models/Otp");
 const nodemailer = require("nodemailer");
 
 
-
+// =====================================================
+// SMTP
+// =====================================================
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
 });
 
+
+// =====================================================
+// OTP
+// =====================================================
+
 function generateOTP() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 
 async function sendOTPEmail(email, otp, username) {
 
-    await transporter.sendMail({
-        from: process.env.SMTP_FROM,
-        to: email,
-        subject: "رمز التحقق X Plus",
-        html: `
-            <h2>مرحباً ${username}</h2>
-            <p>رمز التحقق الخاص بك:</p>
-            <h1>${otp}</h1>
-            <p>صلاحية الرمز 10 دقائق</p>
-        `
-    });
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: email,
+    subject: "رمز التحقق X Plus",
+
+    html: `
+      <div dir="rtl" style="font-family:Arial,sans-serif">
+
+        <h2>مرحباً ${username}</h2>
+
+        <p>رمز التحقق الخاص بك في X Plus:</p>
+
+        <h1 style="
+          letter-spacing:8px;
+          color:#3b82f6;
+        ">
+          ${otp}
+        </h1>
+
+        <p>صلاحية الرمز 10 دقائق.</p>
+
+      </div>
+    `
+  });
 
 }
 
 
+// =====================================================
+// JWT
+// =====================================================
 
-// =======================
-// تسجيل مستخدم جديد
-// =======================
+function createToken(user) {
+
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET غير موجود في Environment Variables");
+  }
+
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d"
+    }
+  );
+}
+
+
+// =====================================================
+// REGISTER
+// =====================================================
+
 exports.register = async (req, res) => {
+
   try {
 
     const { username, email, password } = req.body;
 
 
+    // -------------------------
+    // التحقق من البيانات
+    // -------------------------
+
     if (!username || !email || !password) {
+
       return res.status(400).json({
         success: false,
-        message: "جميع الحقول مطلوبة",
+        message: "جميع الحقول مطلوبة"
       });
+
     }
 
 
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
 
+    if (cleanUsername.length < 3) {
+
+      return res.status(400).json({
+        success: false,
+        message: "اسم المستخدم يجب أن يكون 3 أحرف على الأقل"
+      });
+
+    }
 
 
+    if (password.length < 6) {
+
+      return res.status(400).json({
+        success: false,
+        message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+      });
+
+    }
+
+
+    // -------------------------
     // التأكد من عدم وجود المستخدم
-    const existingUser = await User.findByEmail(email);
+    // -------------------------
+
+    const existingUser = await User.findByEmail(cleanEmail);
 
 
     if (existingUser) {
+
       return res.status(400).json({
         success: false,
-        message: "البريد الإلكتروني مستخدم مسبقاً",
+        message: "البريد الإلكتروني مستخدم مسبقاً"
       });
+
     }
 
 
+    // -------------------------
     // تشفير كلمة المرور
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // -------------------------
 
-const otp = generateOTP();
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
 
-const otpHash = await bcrypt.hash(otp, 10);
 
-await Otp.save(
-  email.trim().toLowerCase(),
-  otpHash,
-  {
-    username: username.trim(),
-    email: email.trim().toLowerCase(),
-    password: hashedPassword
-  },
-  new Date(Date.now() + 10 * 60 * 1000)
-);
+    // -------------------------
+    // إنشاء OTP
+    // -------------------------
 
-await sendOTPEmail(
-  email.trim().toLowerCase(),
-  otp,
-  username.trim()
-);
+    const otp = generateOTP();
+
+    const otpHash =
+      await bcrypt.hash(otp, 10);
+
+
+    // -------------------------
+    // حفظ طلب التسجيل المؤقت
+    // -------------------------
+
+    await Otp.save(
+      cleanEmail,
+
+      otpHash,
+
+      {
+        username: cleanUsername,
+        email: cleanEmail,
+        password: hashedPassword
+      },
+
+      new Date(
+        Date.now() + 10 * 60 * 1000
+      )
+    );
+
+
+    // -------------------------
+    // إرسال OTP
+    // -------------------------
+
+    await sendOTPEmail(
+      cleanEmail,
+      otp,
+      cleanUsername
+    );
 
 
     return res.status(200).json({
-  success: true,
-  message: "تم إرسال رمز التحقق إلى البريد الإلكتروني"
-});
+
+      success: true,
+
+      message:
+        "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+
+      email: cleanEmail
+
+    });
 
 
   } catch (err) {
 
-    console.error("REGISTER ERROR:", err);
+    console.error(
+      "REGISTER ERROR:",
+      err
+    );
 
 
     return res.status(500).json({
@@ -117,19 +226,22 @@ await sendOTPEmail(
 
       message: "حدث خطأ في الخادم",
 
-      error: err.message
+      error:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : err.message
 
     });
 
   }
+
 };
 
 
+// =====================================================
+// LOGIN
+// =====================================================
 
-
-// =======================
-// تسجيل الدخول
-// =======================
 exports.login = async (req, res) => {
 
   try {
@@ -137,24 +249,34 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
 
+    // -------------------------
+    // التحقق
+    // -------------------------
+
     if (!email || !password) {
 
       return res.status(400).json({
 
         success: false,
 
-        message: "البريد وكلمة المرور مطلوبة"
+        message:
+          "البريد الإلكتروني وكلمة المرور مطلوبة"
 
       });
 
     }
 
 
+    const cleanEmail =
+      email.trim().toLowerCase();
 
+
+    // -------------------------
     // البحث عن المستخدم
-    const user = await User.findByEmail(
-      email.trim().toLowerCase()
-    );
+    // -------------------------
+
+    const user =
+      await User.findByEmail(cleanEmail);
 
 
     if (!user) {
@@ -170,12 +292,15 @@ exports.login = async (req, res) => {
     }
 
 
-
+    // -------------------------
     // مقارنة كلمة المرور
-    const match = await bcrypt.compare(
-      password,
-      user.password
-    );
+    // -------------------------
+
+    const match =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
 
 
     if (!match) {
@@ -191,44 +316,24 @@ exports.login = async (req, res) => {
     }
 
 
+    // -------------------------
+    // إنشاء JWT
+    // -------------------------
 
-    if (!process.env.JWT_SECRET) {
-
-      return res.status(500).json({
-
-        success: false,
-
-        message: "JWT_SECRET غير موجود"
-
-      });
-
-    }
+    const token =
+      createToken(user);
 
 
-
-    // إنشاء التوكن
-    const token = jwt.sign(
-
-      {
-        id: user.id,
-        email: user.email
-      },
-
-      process.env.JWT_SECRET,
-
-      {
-        expiresIn: "7d"
-      }
-
-    );
-
-
+    // -------------------------
+    // الرد
+    // -------------------------
 
     return res.json({
 
       success: true,
 
-      message: "تم تسجيل الدخول بنجاح",
+      message:
+        "تم تسجيل الدخول بنجاح",
 
       token,
 
@@ -245,11 +350,12 @@ exports.login = async (req, res) => {
     });
 
 
-
   } catch (err) {
 
-
-    console.error("LOGIN ERROR:", err);
+    console.error(
+      "LOGIN ERROR:",
+      err
+    );
 
 
     return res.status(500).json({
@@ -258,96 +364,230 @@ exports.login = async (req, res) => {
 
       message: "حدث خطأ في الخادم",
 
-      error: err.message
+      error:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : err.message
 
     });
-
 
   }
 
 };
 
 
-// =======================
-// التحقق من OTP
-// =======================
+// =====================================================
+// VERIFY OTP
+// =====================================================
+
 exports.verifyOTP = async (req, res) => {
 
   try {
 
     const { email, otp } = req.body;
 
+
+    // -------------------------
+    // التحقق من البيانات
+    // -------------------------
+
     if (!email || !otp) {
+
       return res.status(400).json({
+
         success: false,
-        message: "البريد والرمز مطلوبان"
+
+        message:
+          "البريد الإلكتروني والرمز مطلوبان"
+
       });
+
     }
 
-    const otpData = await Otp.findByEmail(
-      email.trim().toLowerCase()
-    );
+
+    const cleanEmail =
+      email.trim().toLowerCase();
+
+    const cleanOtp =
+      String(otp).trim();
+
+
+    // -------------------------
+    // البحث عن OTP
+    // -------------------------
+
+    const otpData =
+      await Otp.findByEmail(cleanEmail);
+
 
     if (!otpData) {
+
       return res.status(400).json({
+
         success: false,
-        message: "لا يوجد رمز تحقق"
+
+        message:
+          "لا يوجد رمز تحقق لهذا البريد"
+
       });
+
     }
 
-    if (new Date() > new Date(otpData.expires_at)) {
+
+    // -------------------------
+    // التحقق من انتهاء الصلاحية
+    // -------------------------
+
+    if (
+      new Date() >
+      new Date(otpData.expires_at)
+    ) {
+
       return res.status(400).json({
+
         success: false,
-        message: "انتهت صلاحية الرمز"
+
+        message:
+          "انتهت صلاحية رمز التحقق، أرسل رمزاً جديداً"
+
       });
+
     }
 
-    const match = await bcrypt.compare(
-      otp,
-      otpData.otp_hash
-    );
 
-    if (!match) {
-      await Otp.increaseAttempts(
-        email.trim().toLowerCase()
+    // -------------------------
+    // التحقق من الرمز
+    // -------------------------
+
+    const match =
+      await bcrypt.compare(
+        cleanOtp,
+        otpData.otp_hash
       );
 
+
+    if (!match) {
+
+      await Otp.increaseAttempts(
+        cleanEmail
+      );
+
+
       return res.status(400).json({
-        success:false,
-        message:"رمز التحقق غير صحيح"
+
+        success: false,
+
+        message:
+          "رمز التحقق غير صحيح"
+
       });
+
     }
 
 
-// هنا تضعه
-const data = typeof otpData.user_data === "string"
-  ? JSON.parse(otpData.user_data)
-  : otpData.user_data;
+    // -------------------------
+    // قراءة بيانات المستخدم
+    // -------------------------
 
-const user = await User.create(
-  data.username,
-  data.email,
-  data.password
-);
+    const data =
+      typeof otpData.user_data === "string"
+        ? JSON.parse(otpData.user_data)
+        : otpData.user_data;
 
-await Otp.delete(
-  email.trim().toLowerCase()
-);
 
-    res.json({
-      success:true,
-      message:"تم تفعيل الحساب بنجاح",
-      user
+    if (
+      !data ||
+      !data.username ||
+      !data.email ||
+      !data.password
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "بيانات التسجيل غير مكتملة"
+
+      });
+
+    }
+
+
+    // -------------------------
+    // إنشاء المستخدم
+    // -------------------------
+
+    const user =
+      await User.create(
+        data.username,
+        data.email,
+        data.password
+      );
+
+
+    // -------------------------
+    // حذف OTP
+    // -------------------------
+
+    await Otp.delete(
+      cleanEmail
+    );
+
+
+    // -------------------------
+    // إنشاء JWT مباشرة
+    // -------------------------
+
+    const token =
+      createToken(user);
+
+
+    // -------------------------
+    // الرد
+    // -------------------------
+
+    return res.json({
+
+      success: true,
+
+      message:
+        "تم تفعيل الحساب وتسجيل الدخول بنجاح",
+
+      token,
+
+      user: {
+
+        id: user.id,
+
+        username: user.username,
+
+        email: user.email
+
+      }
+
     });
 
-  } catch(err) {
 
-    console.error("VERIFY OTP ERROR:", err);
+  } catch (err) {
 
-    res.status(500).json({
-      success:false,
-      message:"خطأ في الخادم",
-      error:err.message
+    console.error(
+      "VERIFY OTP ERROR:",
+      err
+    );
+
+
+    return res.status(500).json({
+
+      success: false,
+
+      message: "خطأ في الخادم",
+
+      error:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : err.message
+
     });
 
   }
@@ -355,76 +595,158 @@ await Otp.delete(
 };
 
 
-// =======================
-// إعادة إرسال OTP
-// =======================
+// =====================================================
+// RESEND OTP
+// =====================================================
+
 exports.resendOTP = async (req, res) => {
 
   try {
 
     const { email } = req.body;
 
+
     if (!email) {
+
       return res.status(400).json({
-        success:false,
-        message:"البريد مطلوب"
+
+        success: false,
+
+        message: "البريد الإلكتروني مطلوب"
+
       });
+
     }
 
 
-    const otpData = await Otp.findByEmail(
-      email.trim().toLowerCase()
-    );
+    const cleanEmail =
+      email.trim().toLowerCase();
+
+
+    // -------------------------
+    // البحث عن الطلب
+    // -------------------------
+
+    const otpData =
+      await Otp.findByEmail(cleanEmail);
 
 
     if (!otpData) {
+
       return res.status(400).json({
-        success:false,
-        message:"لا يوجد طلب تسجيل بهذا البريد"
+
+        success: false,
+
+        message:
+          "لا يوجد طلب تسجيل بهذا البريد"
+
       });
+
     }
 
 
-    const otp = generateOTP();
+    // -------------------------
+    // بيانات المستخدم
+    // -------------------------
 
-    const otpHash = await bcrypt.hash(otp, 10);
-
-
-    await Otp.save(
-      email.trim().toLowerCase(),
-      otpHash,
+    const userData =
       typeof otpData.user_data === "string"
         ? JSON.parse(otpData.user_data)
-        : otpData.user_data,
-      new Date(Date.now() + 10 * 60 * 1000)
+        : otpData.user_data;
+
+
+    if (!userData) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "بيانات التسجيل غير موجودة"
+
+      });
+
+    }
+
+
+    // -------------------------
+    // إنشاء OTP جديد
+    // -------------------------
+
+    const otp =
+      generateOTP();
+
+
+    const otpHash =
+      await bcrypt.hash(
+        otp,
+        10
+      );
+
+
+    // -------------------------
+    // حفظ OTP الجديد
+    // -------------------------
+
+    await Otp.save(
+
+      cleanEmail,
+
+      otpHash,
+
+      userData,
+
+      new Date(
+        Date.now() + 10 * 60 * 1000
+      )
+
     );
 
 
-const userData = typeof otpData.user_data === "string"
-  ? JSON.parse(otpData.user_data)
-  : otpData.user_data;
+    // -------------------------
+    // إرسال البريد
+    // -------------------------
 
-await sendOTPEmail(
-  email.trim().toLowerCase(),
-  otp,
-  userData.username
-);
+    await sendOTPEmail(
+
+      cleanEmail,
+
+      otp,
+
+      userData.username
+
+    );
 
 
-    res.json({
-      success:true,
-      message:"تم إرسال رمز جديد"
+    return res.json({
+
+      success: true,
+
+      message:
+        "تم إرسال رمز تحقق جديد"
+
     });
 
 
-  } catch(err) {
+  } catch (err) {
 
-    console.error("RESEND OTP ERROR:", err);
+    console.error(
+      "RESEND OTP ERROR:",
+      err
+    );
 
-    res.status(500).json({
-      success:false,
-      message:"خطأ في الخادم",
-      error:err.message
+
+    return res.status(500).json({
+
+      success: false,
+
+      message: "خطأ في الخادم",
+
+      error:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : err.message
+
     });
 
   }
