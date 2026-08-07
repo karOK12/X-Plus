@@ -176,9 +176,8 @@ async function login() {
             return;
         }
 
-        if (!localStorage.getItem("token")) {
-    localStorage.setItem("token", data.token);
-}
+localStorage.setItem("token", data.token);
+localStorage.removeItem("auth_token");
 
 window.location.href = "/";
 

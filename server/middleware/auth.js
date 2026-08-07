@@ -2,26 +2,6 @@ const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
 
-  // ===============================
-  // وضع التطوير (Development)
-  // تجاوز التحقق من JWT مؤقتًا
-  // ===============================
-
-  if (process.env.NODE_ENV !== "production") {
-
-    req.user = {
-      id: 1,
-      username: "demo",
-      email: "demo@xplus.com"
-    };
-
-    return next();
-  }
-
-  // ===============================
-  // وضع الإنتاج (Production)
-  // ===============================
-
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -31,12 +11,28 @@ module.exports = (req, res, next) => {
     });
   }
 
-  const token = authHeader.split(" ")[1];
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      success: false,
+      message: "صيغة التوكن غير صحيحة"
+    });
+  }
+
+  const token = authHeader.substring(7).trim();
 
   if (!token) {
     return res.status(401).json({
       success: false,
       message: "التوكن غير موجود"
+    });
+  }
+
+  if (!process.env.JWT_SECRET) {
+    console.error("❌ JWT_SECRET غير موجود");
+
+    return res.status(500).json({
+      success: false,
+      message: "إعدادات المصادقة غير مكتملة"
     });
   }
 
@@ -47,15 +43,24 @@ module.exports = (req, res, next) => {
       process.env.JWT_SECRET
     );
 
+    if (!decoded.id) {
+      return res.status(401).json({
+        success: false,
+        message: "هوية المستخدم غير موجودة في التوكن"
+      });
+    }
+
     req.user = decoded;
 
     next();
 
   } catch (error) {
 
+    console.error("❌ JWT ERROR:", error.message);
+
     return res.status(401).json({
       success: false,
-      message: "التوكن غير صالح"
+      message: "جلسة الدخول غير صالحة أو منتهية"
     });
 
   }
