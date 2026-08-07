@@ -158,24 +158,15 @@
   }
   button:hover:not(:disabled) { background: #166fe0; transform: translateY(-1px); }
   button:disabled { opacity: 0.6; cursor: not-allowed; }
-  button.secondary {
-    background: #6c757d;
-  }
+  button.secondary { background: #6c757d; }
   button.secondary:hover:not(:disabled) { background: #5a6268; }
   button.success { background: #28a745; }
   button.success:hover:not(:disabled) { background: #218838; }
   
-  .btn-row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 6px;
-  }
+  .btn-row { display: flex; gap: 6px; margin-bottom: 6px; }
   .btn-row > * { flex: 1; }
   
-  .hidden-fields {
-    display: none;
-    animation: slideDown 0.3s ease;
-  }
+  .hidden-fields { display: none; animation: slideDown 0.3s ease; }
   .hidden-fields.show { display: block; }
   @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }
@@ -189,17 +180,8 @@
     padding: 12px;
     margin: 12px 0;
   }
-  .otp-section h3 {
-    font-size: 14px;
-    color: #1a2b4a;
-    margin-bottom: 8px;
-  }
-  .otp-inputs {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    margin: 10px 0;
-  }
+  .otp-section h3 { font-size: 14px; color: #1a2b4a; margin-bottom: 8px; }
+  .otp-inputs { display: flex; gap: 6px; justify-content: center; margin: 10px 0; }
   .otp-inputs input {
     width: 40px;
     height: 45px;
@@ -217,21 +199,9 @@
     display: none;
   }
   .alert.show { display: block; }
-  .alert.error {
-    background: #fee;
-    color: #c33;
-    border: 1px solid #fcc;
-  }
-  .alert.success {
-    background: #efe;
-    color: #3c3;
-    border: 1px solid #cfc;
-  }
-  .alert.info {
-    background: #eef;
-    color: #36c;
-    border: 1px solid #ccf;
-  }
+  .alert.error { background: #fee; color: #c33; border: 1px solid #fcc; }
+  .alert.success { background: #efe; color: #3c3; border: 1px solid #cfc; }
+  .alert.info { background: #eef; color: #36c; border: 1px solid #ccf; }
   
   .error-msg {
     font-size: 11px;
@@ -242,11 +212,7 @@
   }
   .error-msg.show { display: block; }
   
-  .divider {
-    height: 1px;
-    background: #e0e6ed;
-    margin: 14px 0;
-  }
+  .divider { height: 1px; background: #e0e6ed; margin: 14px 0; }
   
   .loading {
     display: inline-block;
@@ -280,7 +246,8 @@
     <div class="add-icon">+</div>
   </div>
   
-  <input id="profileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/*" capture style="display:none">
+  <!-- ✅ تم إزالة capture لفتح الاستوديو بدلاً من الكاميرا -->
+  <input id="profileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">
   
   <div class="field">
     <input id="fullName" placeholder="الاسم الكامل" autocomplete="name">
@@ -367,7 +334,8 @@
   <div class="row">
     <input id="imageLink" readonly placeholder="رابط صورة الهوية (اختياري)">
     <button type="button" onclick="document.getElementById('fileInput').click()" style="flex: 0 0 30%">رفع</button>
-    <input id="fileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/*" capture style="display:none">
+    <!-- ✅ تم إزالة capture لفتح الاستوديو بدلاً من الكاميرا -->
+    <input id="fileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">
   </div>
   
   <div class="divider"></div>
@@ -449,7 +417,7 @@ const API_URL = window.location.hostname === 'localhost'
   : '/api';
 
 // ============================================
-// 🌐 دالة API محسّنة - تضيف التوكن تلقائياً
+// 🌐 دالة API محسّنة
 // ============================================
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
@@ -481,7 +449,7 @@ async function apiFetch(url, options = {}) {
 }
 
 // ============================================
-// 📅 تحميل البيانات المحفوظة سابقاً
+// 📅 تحميل البيانات المحفوظة
 // ============================================
 async function loadUserData() {
   try {
@@ -509,7 +477,6 @@ async function loadUserData() {
         }
       }
       
-      // تعبئة الحقول
       Object.keys(state.form).forEach(key => {
         const el = document.getElementById(key);
         if (el && state.form[key]) el.value = state.form[key];
@@ -519,7 +486,6 @@ async function loadUserData() {
         document.getElementById('idFields').classList.add('show');
       }
       
-      // عرض الصور إذا كانت روابط محفوظة مسبقاً
       if (u.profile_image || u.profileImage) {
         const imgUrl = u.profile_image || u.profileImage;
         state.form.profileImage = imgUrl;
@@ -540,7 +506,7 @@ async function loadUserData() {
 }
 
 // ============================================
-// POPULATE BIRTH DATE SELECTS
+// 📅 تعبئة قوائم التاريخ
 // ============================================
 function populateBirthSelects() {
   const daySelect = document.getElementById('birthDay');
@@ -553,9 +519,7 @@ function populateBirthSelects() {
     daySelect.appendChild(option);
   }
   
-  const currentYear = 2010;
-  const minYear = 1940;
-  for (let i = currentYear; i >= minYear; i--) {
+  for (let i = 2010; i >= 1940; i--) {
     const option = document.createElement('option');
     option.value = i;
     option.textContent = i;
@@ -566,7 +530,7 @@ function populateBirthSelects() {
 populateBirthSelects();
 
 // ============================================
-// INPUT BINDING
+// 🔗 ربط الحقول
 // ============================================
 const inputFields = [
   'fullName', 'lastName',
@@ -611,7 +575,7 @@ function select2FA(type) {
 }
 
 // ============================================
-// 📸 PROFILE PIC UPLOAD
+// 📸 رفع صورة البروفايل من الاستوديو
 // ============================================
 function uploadProfilePic() {
   document.getElementById('profileInput').click();
@@ -647,7 +611,7 @@ document.getElementById('profileInput').addEventListener('change', (e) => {
 });
 
 // ============================================
-// 📸 ID IMAGE UPLOAD
+// 📸 رفع صورة الهوية من الاستوديو
 // ============================================
 document.getElementById('fileInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -677,7 +641,7 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
 });
 
 // ============================================
-// OTP INPUTS
+// 🔢 OTP
 // ============================================
 const otpBoxes = document.querySelectorAll('.otp-box');
 otpBoxes.forEach((box, idx) => {
@@ -713,7 +677,7 @@ function clearOTPInputs() {
 }
 
 // ============================================
-// VALIDATION HELPERS
+// ✅ Validation Helpers
 // ============================================
 function showError(id, msg) {
   const el = document.getElementById('err-' + id);
@@ -770,7 +734,7 @@ function validateBirthDate() {
 }
 
 // ============================================
-// SEND OTP
+// 📧 إرسال OTP
 // ============================================
 async function sendOTP() {
   if (state.cooldown > 0) return;
@@ -888,7 +852,7 @@ function startCooldown(seconds) {
 }
 
 // ============================================
-// VERIFY OTP
+// ✅ التحقق من OTP
 // ============================================
 async function verifyOTP() {
   const code = state.form.otpCode;
@@ -960,18 +924,15 @@ async function verifyOTP() {
 }
 
 // ══════════════════════════════════════════════════════════
-// 📤 رفع صورة إلى السيرفر واسترجاع الرابط
+// 📤 رفع صورة إلى السيرفر
 // ══════════════════════════════════════════════════════════
 async function uploadImage(base64Data) {
-  // إذا كانت فارغة أو null → لا ترفع
   if (!base64Data) return null;
   
-  // إذا كانت رابط مرفوع مسبقاً → استخدمه كما هو
   if (base64Data.startsWith('/uploads/') || base64Data.startsWith('http')) {
     return base64Data;
   }
   
-  // إذا كانت Base64 → ارفعها
   if (base64Data.startsWith('data:image/')) {
     try {
       const data = await apiFetch(`${API_URL}/upload`, {
@@ -989,12 +950,11 @@ async function uploadImage(base64Data) {
     }
   }
   
-  // أي قيمة أخرى → أعدها كما هي
   return base64Data;
 }
 
 // ══════════════════════════════════════════════════════════
-// 💾 حفظ البيانات في السيرفر (مع رفع الصور أولاً)
+// 💾 حفظ البيانات
 // ══════════════════════════════════════════════════════════
 async function saveData() {
   if (!state.otpVerified) {
@@ -1007,11 +967,9 @@ async function saveData() {
   btn.innerHTML = 'جاري رفع الصور <span class="loading"></span>';
   
   try {
-    // ─── الخطوة 1: رفع الصور أولاً ───
     let profileImageUrl = null;
     let idImageUrl = null;
     
-    // رفع صورة البروفايل إذا كانت Base64
     if (state.form.profileImage) {
       try {
         btn.innerHTML = 'جاري رفع صورة البروفايل <span class="loading"></span>';
@@ -1022,7 +980,6 @@ async function saveData() {
       }
     }
     
-    // رفع صورة الهوية إذا كانت Base64
     if (state.form.imageLink) {
       try {
         btn.innerHTML = 'جاري رفع صورة الهوية <span class="loading"></span>';
@@ -1033,12 +990,10 @@ async function saveData() {
       }
     }
     
-    // ─── الخطوة 2: تجهيز بيانات الحفظ ───
     const birthDate = (state.form.birthYear && state.form.birthMonth && state.form.birthDay)
       ? `${state.form.birthYear}-${String(state.form.birthMonth).padStart(2,'0')}-${String(state.form.birthDay).padStart(2,'0')}`
       : null;
     
-    // ─── الخطوة 3: إرسال البيانات مع الروابط فقط ───
     btn.innerHTML = 'جاري حفظ البيانات <span class="loading"></span>';
     
     await apiFetch(`${API_URL}/user/profile`, {
@@ -1055,8 +1010,8 @@ async function saveData() {
         idType: state.form.idType,
         idName: state.form.idName,
         idNumber: state.form.idNumber,
-        idImage: idImageUrl,              // ← رابط الصورة فقط (ليس Base64)
-        profileImage: profileImageUrl,    // ← رابط الصورة فقط (ليس Base64)
+        idImage: idImageUrl,
+        profileImage: profileImageUrl,
         email: state.form.email,
         phone2: state.form.phone2
       })
@@ -1078,22 +1033,6 @@ async function saveData() {
     btn.disabled = false;
     btn.innerHTML = '💾 حفظ البيانات';
   }
-}
-
-// ============================================
-// HELPERS
-// ============================================
-function showError2(id, msg) {
-  const el = document.getElementById('err-' + id);
-  if (el) {
-    if (msg) el.textContent = msg;
-    el.classList.add('show');
-  }
-}
-
-function clearError2(id) {
-  const el = document.getElementById('err-' + id);
-  if (el) el.classList.remove('show');
 }
 
 // ══════════════════════════════════════════════════════════
