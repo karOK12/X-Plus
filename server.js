@@ -1,59 +1,98 @@
 require("dotenv").config();
 
-
 const express = require("express");
 const cors = require("cors");
-
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+const path = require("path");
 
 const pool = require("./server/config/database");
-
 const auth = require("./server/middleware/auth");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
 
-const path = require("path");
+// ══════════════════════════════════════════════════════
+// Middleware
+// ══════════════════════════════════════════════════════
+
+app.use(cors());
+
+app.use(express.json({
+    limit: "10mb"
+}));
+
+app.use(express.urlencoded({
+    extended: true,
+    limit: "10mb"
+}));
+
+
+// ══════════════════════════════════════════════════════
+// Static Files
+// ══════════════════════════════════════════════════════
 
 app.use(express.static(path.join(__dirname)));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "uploads"))
+);
 
 
+// ══════════════════════════════════════════════════════
+// Environment
+// ══════════════════════════════════════════════════════
 
-const JWT_SECRET = process.env.JWT_SECRET || "xplus_secret_key_2026";
+const JWT_SECRET =
+    process.env.JWT_SECRET || "xplus_secret_key_2026";
 
-// إعداد إرسال البريد
+
+// ══════════════════════════════════════════════════════
+// SMTP
+// ══════════════════════════════════════════════════════
+
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT || 587),
     secure: false,
     auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
-
-// التحقق من إعداد SMTP
-transporter.verify()
-.then(() => {
-    console.log("✅ SMTP Ready");
-})
-.catch((err) => {
-    console.log("❌ SMTP Error:", err.message);
+        pass: process.env.SMTP_PASS
+    }
 });
 
 
+if (
+    process.env.SMTP_HOST &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASS
+) {
 
-// إنشاء الجداول
+    transporter.verify()
+        .then(() => {
+            console.log("✅ SMTP Ready");
+        })
+        .catch((error) => {
+            console.log(
+                "❌ SMTP Error:",
+                error.message
+            );
+        });
+
+} else {
+
+    console.log(
+        "⚠️ SMTP environment variables are not configured"
+    );
+
+}
+
+
+// ══════════════════════════════════════════════════════
+// Database Initialization
+// ══════════════════════════════════════════════════════
+
 async function initDatabase() {
-  
-
-
-
 
     try {
 
@@ -76,9 +115,6 @@ async function initDatabase() {
         `);
 
 
-        // ══════════════════════════════════════════════════════
-        // 📝 إضافة أعمدة بيانات الملف الشخصي إذا لم تكن موجودة
-        // ══════════════════════════════════════════════════════
         await pool.query(`
             ALTER TABLE users
             ADD COLUMN IF NOT EXISTS full_name TEXT,
@@ -98,56 +134,102 @@ async function initDatabase() {
 
         await pool.query(`
             INSERT INTO platform_config
-            (id, deposit_address)
+            (
+                id,
+                deposit_address
+            )
             VALUES
             (
                 1,
                 '0xA1B2C3D4E5F678901234567890ABCDEF12345678'
             )
-            ON CONFLICT (id) DO NOTHING;
+            ON CONFLICT (id)
+            DO NOTHING;
         `);
 
 
         console.log("✅ Neon Database Connected");
 
+    } catch (error) {
 
-    } catch(error){
-
-        console.log("❌ Database Error:", error.message);
+        console.error(
+            "❌ Database Error:",
+            error.message
+        );
 
     }
 
 }
 
 
-initDatabase();
+// لا نمنع تشغيل Vercel إذا تأخر اتصال قاعدة البيانات
+initDatabase().catch((error) => {
+
+    console.error(
+        "❌ Database initialization failed:",
+        error.message
+    );
+
+});
 
 
+// ══════════════════════════════════════════════════════
+// Health Check
+// ══════════════════════════════════════════════════════
 
-// جلب بيانات المستخدم
-app.get("/api/user/init", auth, async(req,res)=>{
+app.get("/api/health", async (req, res) => {
+
+    try {
+
+        await pool.query("SELECT 1");
+
+        res.json({
+            success: true,
+            server: "online",
+            database: "connected"
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            server: "online",
+            database: "error",
+            error: error.message
+        });
+
+    }
+
+});
+
+
+// ══════════════════════════════════════════════════════
+// User Init
+// ══════════════════════════════════════════════════════
+
+app.get("/api/user/init", auth, async (req, res) => {
 
     try {
 
         const user = await pool.query(
-        `
-        SELECT 
-        balance,
-        points,
-        power,
-        mining_start_time
-        FROM users
-        WHERE id=$1
-        `,
-        [req.user.id]
+            `
+            SELECT
+                balance,
+                points,
+                power,
+                mining_start_time
+            FROM users
+            WHERE id = $1
+            `,
+            [req.user.id]
         );
 
 
-        if(user.rows.length === 0){
+        if (user.rows.length === 0) {
 
             return res.status(404).json({
-                success:false,
-                message:"المستخدم غير موجود"
+                success: false,
+                message: "المستخدم غير موجود"
             });
 
         }
@@ -155,18 +237,18 @@ app.get("/api/user/init", auth, async(req,res)=>{
 
         const data = user.rows[0];
 
+        let balance = Number(data.balance || 0);
 
-        let balance = data.balance;
 
-
-        if(data.mining_start_time){
+        if (data.mining_start_time) {
 
             const seconds =
-            (Date.now() - data.mining_start_time) / 1000;
+                (Date.now() -
+                Number(data.mining_start_time)) / 1000;
 
 
             const profit =
-            (data.power * 0.5) / 3600;
+                (Number(data.power || 0) * 0.5) / 3600;
 
 
             balance += seconds * profit;
@@ -174,34 +256,96 @@ app.get("/api/user/init", auth, async(req,res)=>{
         }
 
 
-
         const config = await pool.query(
-        `
-        SELECT deposit_address
-        FROM platform_config
-        WHERE id=1
-        `
+            `
+            SELECT deposit_address
+            FROM platform_config
+            WHERE id = 1
+            `
+        );
+
+
+        const depositAddress =
+            config.rows.length > 0
+                ? config.rows[0].deposit_address
+                : null;
+
+
+        res.json({
+
+            success: true,
+
+            balance,
+
+            points: Number(data.points || 0),
+
+            power: Number(data.power || 0),
+
+            depositAddress
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ /api/user/init:",
+            error
+        );
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+
+    }
+
+});
+
+
+// ══════════════════════════════════════════════════════
+// Start Mining
+// ══════════════════════════════════════════════════════
+
+app.post("/api/mining/start", auth, async (req, res) => {
+
+    try {
+
+        await pool.query(
+            `
+            UPDATE users
+            SET mining_start_time = $1
+            WHERE id = $2
+            `,
+            [
+                Date.now(),
+                req.user.id
+            ]
         );
 
 
         res.json({
 
-            success:true,
-            balance,
-            points:data.points,
-            power:data.power,
-            depositAddress:
-            config.rows[0].deposit_address
+            success: true,
+
+            message: "تم بدء التعدين"
 
         });
 
 
+    } catch (error) {
 
-    }catch(error){
+        console.error(
+            "❌ /api/mining/start:",
+            error
+        );
 
         res.status(500).json({
-            success:false,
-            error:error.message
+
+            success: false,
+
+            error: error.message
+
         });
 
     }
@@ -209,75 +353,60 @@ app.get("/api/user/init", auth, async(req,res)=>{
 });
 
 
+// ══════════════════════════════════════════════════════
+// Watch Advertisement
+// ══════════════════════════════════════════════════════
 
+app.post("/api/ad/watch", auth, async (req, res) => {
 
-// بدء التعدين
-app.post("/api/mining/start", auth, async(req,res)=>{
-
-    try{
-
-        await pool.query(
-        `
-        UPDATE users
-        SET mining_start_time=$1
-        WHERE id=$2
-        `,
-        [
-            Date.now(),
-            req.user.id
-        ]);
-
-
-        res.json({
-            success:true,
-            message:"تم بدء التعدين"
-        });
-
-
-    }catch(error){
-
-        res.status(500).json({
-            success:false,
-            error:error.message
-        });
-
-    }
-
-});
-
-
-
-
-// مشاهدة إعلان
-app.post("/api/ad/watch", auth, async(req,res)=>{
-
-    try{
+    try {
 
         const result = await pool.query(
-        `
-        UPDATE users
-        SET points = points + 10
-        WHERE id=$1
-        RETURNING points
-        `,
-        [
-            req.user.id
-        ]);
+            `
+            UPDATE users
+            SET points = points + 10
+            WHERE id = $1
+            RETURNING points
+            `,
+            [req.user.id]
+        );
+
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "المستخدم غير موجود"
+
+            });
+
+        }
 
 
         res.json({
 
-            success:true,
-            points:result.rows[0].points
+            success: true,
+
+            points: result.rows[0].points
 
         });
 
 
-    }catch(error){
+    } catch (error) {
+
+        console.error(
+            "❌ /api/ad/watch:",
+            error
+        );
 
         res.status(500).json({
-            success:false,
-            error:error.message
+
+            success: false,
+
+            error: error.message
+
         });
 
     }
@@ -285,28 +414,130 @@ app.post("/api/ad/watch", auth, async(req,res)=>{
 });
 
 
-const authRoutes = require("./server/routes/auth");
-app.use("/api/auth", authRoutes);
+// ══════════════════════════════════════════════════════
+// Authentication Routes
+// ══════════════════════════════════════════════════════
+
+const authRoutes =
+    require("./server/routes/auth");
+
+app.use(
+    "/api/auth",
+    authRoutes
+);
 
 
 // ══════════════════════════════════════════════════════
-// 📝 Profile API
+// Profile Routes
 // ══════════════════════════════════════════════════════
-const profileRoutes = require("./server/routes/profile");
-app.use("/api", profileRoutes);
+
+const profileRoutes =
+    require("./server/routes/profile");
+
+app.use(
+    "/api",
+    profileRoutes
+);
 
 
-// Upload API
-const uploadRoutes = require("./api/index");
-app.use("/api", uploadRoutes);
+// ══════════════════════════════════════════════════════
+// Upload Routes
+// ══════════════════════════════════════════════════════
 
-// تشغيل السيرفر
-const PORT = process.env.PORT || 3000;
+const uploadRoutes =
+    require("./api/index");
+
+app.use(
+    "/api",
+    uploadRoutes
+);
+
+
+// ══════════════════════════════════════════════════════
+// Wallet Routes
+// ══════════════════════════════════════════════════════
+
+const walletRoutes =
+    require("./server/routes/wallet");
+
+app.use(
+    "/api/wallet",
+    walletRoutes
+);
+
+
+// ══════════════════════════════════════════════════════
+// 404 API
+// ══════════════════════════════════════════════════════
+
+app.use("/api", (req, res) => {
+
+    res.status(404).json({
+
+        success: false,
+
+        message: "API endpoint غير موجود",
+
+        path: req.path
+
+    });
+
+});
+
+// ══════════════════════════════════════════════════════
+// Error Handler
+// ══════════════════════════════════════════════════════
+
+app.use((error, req, res, next) => {
+
+    console.error(
+        "❌ Server Error:",
+        error
+    );
+
+
+    if (res.headersSent) {
+
+        return next(error);
+
+    }
+
+
+    res.status(500).json({
+
+        success: false,
+
+        message: "خطأ داخلي في الخادم",
+
+        error:
+            process.env.NODE_ENV === "production"
+                ? undefined
+                : error.message
+
+    });
+
+});
+
+
+// ══════════════════════════════════════════════════════
+// Vercel / Local Server
+// ══════════════════════════════════════════════════════
+
+const PORT =
+    process.env.PORT || 3000;
+
 
 if (require.main === module) {
+
     app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
+
+        console.log(
+            `🚀 Server running on port ${PORT}`
+        );
+
     });
+
 }
+
 
 module.exports = app;

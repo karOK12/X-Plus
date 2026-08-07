@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+  
   body {
     background: #e9eef5;
     min-height: 100vh;
@@ -15,6 +16,7 @@
     align-items: flex-start;
     padding: 60px 10px 20px;
   }
+  
   .container {
     background: #fff;
     padding: 14px;
@@ -25,20 +27,27 @@
     overflow-y: auto;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   }
+  
+  .container::-webkit-scrollbar { width: 6px; }
+  .container::-webkit-scrollbar-thumb { background: #1877f2; border-radius: 3px; }
+  
   h2 {
     text-align: center;
     margin-bottom: 20px;
     color: #1a2b4a;
     font-size: 20px;
   }
+  
   .profile-pic {
-    width: 100px; height: 100px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: #ddd;
     margin: 0 auto 14px;
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    transition: transform 0.2s;
   }
   .profile-pic:hover { transform: scale(1.05); }
   .profile-pic img { width: 100%; height: 100%; object-fit: cover; }
@@ -60,9 +69,11 @@
     font-weight: bold;
     box-shadow: 0 2px 6px rgba(24,119,242,0.4);
   }
+  
   .field { margin-bottom: 6px; }
   .row { display: flex; gap: 6px; margin-bottom: 6px; }
   .row > * { flex: 1; min-width: 0; }
+  
   input, select {
     width: 100%;
     padding: 6px 9px;
@@ -70,27 +81,68 @@
     border: 1px solid #ccc;
     font-size: 13px;
     outline: none;
+    transition: border-color 0.2s;
     background: #fff;
     font-family: 'Cairo', sans-serif;
     color: #333;
   }
   input:focus, select:focus { border-color: #1877f2; }
   input::placeholder { color: #999; }
-  input[readonly] { background: #f5f5f5; }
+  input[readonly] { background: #f5f5f5; cursor: default; }
+  
   select {
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: left 8px center;
     background-size: 14px;
     padding-left: 28px;
   }
+  
+  select option[value=""] { color: #999; }
+  
+  input.error, select.error {
+    border-color: #e74c3c;
+    background: #fff5f5;
+  }
+  
   .birth-label {
     font-size: 12px;
     color: #666;
     margin-bottom: 4px;
     font-weight: 600;
   }
+  
+  .radio-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .radio-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .radio-option:hover { border-color: #1877f2; }
+  .radio-option.selected {
+    border-color: #1877f2;
+    background: rgba(24,119,242,0.05);
+  }
+  .radio-option input[type="radio"] { width: auto; margin: 0; }
+  .radio-option input[type="text"],
+  .radio-option input[type="email"] {
+    border: none; padding: 0; flex: 1;
+  }
+  .radio-option input[type="text"]:focus,
+  .radio-option input[type="email"]:focus { border: none; }
+  
   button {
     background: #1877f2;
     color: #fff;
@@ -101,16 +153,35 @@
     font-size: 13px;
     font-weight: 600;
     font-family: 'Cairo', sans-serif;
+    transition: all 0.2s;
     width: 100%;
   }
-  button:hover:not(:disabled) { background: #166fe0; }
+  button:hover:not(:disabled) { background: #166fe0; transform: translateY(-1px); }
   button:disabled { opacity: 0.6; cursor: not-allowed; }
-  button.secondary { background: #6c757d; }
+  button.secondary {
+    background: #6c757d;
+  }
+  button.secondary:hover:not(:disabled) { background: #5a6268; }
   button.success { background: #28a745; }
-  .btn-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  button.success:hover:not(:disabled) { background: #218838; }
+  
+  .btn-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
   .btn-row > * { flex: 1; }
-  .hidden-fields { display: none; }
+  
+  .hidden-fields {
+    display: none;
+    animation: slideDown 0.3s ease;
+  }
   .hidden-fields.show { display: block; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
   .otp-section {
     background: #f8f9fa;
     border: 1px solid #e0e6ed;
@@ -122,17 +193,6 @@
     font-size: 14px;
     color: #1a2b4a;
     margin-bottom: 8px;
-    text-align: center;
-  }
-  .otp-email {
-    background: #e3f2fd;
-    color: #1565c0;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: 600;
   }
   .otp-inputs {
     display: flex;
@@ -148,6 +208,7 @@
     font-weight: bold;
     padding: 0;
   }
+  
   .alert {
     padding: 10px 12px;
     border-radius: 7px;
@@ -156,24 +217,41 @@
     display: none;
   }
   .alert.show { display: block; }
-  .alert.error { background: #fee; color: #c33; border: 1px solid #fcc; }
-  .alert.success { background: #efe; color: #3c3; border: 1px solid #cfc; }
-  .alert.info { background: #eef; color: #36c; border: 1px solid #ccf; }
+  .alert.error {
+    background: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+  }
+  .alert.success {
+    background: #efe;
+    color: #3c3;
+    border: 1px solid #cfc;
+  }
+  .alert.info {
+    background: #eef;
+    color: #36c;
+    border: 1px solid #ccf;
+  }
+  
   .error-msg {
     font-size: 11px;
     color: #e74c3c;
     margin-top: 2px;
+    padding-right: 4px;
     display: none;
   }
   .error-msg.show { display: block; }
+  
   .divider {
     height: 1px;
     background: #e0e6ed;
     margin: 14px 0;
   }
+  
   .loading {
     display: inline-block;
-    width: 12px; height: 12px;
+    width: 12px;
+    height: 12px;
     border: 2px solid #fff;
     border-top-color: transparent;
     border-radius: 50%;
@@ -182,12 +260,17 @@
     vertical-align: middle;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  
+  @media (max-width: 480px) {
+    body { padding: 20px 8px; }
+    .otp-inputs input { width: 35px; height: 40px; font-size: 16px; }
+  }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>📝 بيانات المستخدم</h2>
+  <h2>بيانات المستخدم</h2>
   
   <div class="alert" id="alert"></div>
   
@@ -196,62 +279,74 @@
     <img id="profileImg" style="display:none" alt="profile">
     <div class="add-icon">+</div>
   </div>
-  <input id="profileInput" type="file" accept="image/*" capture style="display:none">
+  
+  <input id="profileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/*" capture style="display:none">
   
   <div class="field">
-    <input id="fullName" placeholder="الاسم الكامل">
+    <input id="fullName" placeholder="الاسم الكامل" autocomplete="name">
     <div class="error-msg" id="err-fullName">الاسم الكامل مطلوب</div>
   </div>
   
   <div class="field">
-    <input id="lastName" placeholder="اللقب">
+    <input id="lastName" placeholder="اللقب" autocomplete="family-name">
     <div class="error-msg" id="err-lastName">اللقب مطلوب</div>
   </div>
   
   <div class="birth-label">📅 تاريخ الميلاد</div>
   <div class="row">
-    <select id="birthDay"><option value="">اليوم</option></select>
+    <select id="birthDay">
+      <option value="">اليوم</option>
+    </select>
     <select id="birthMonth">
       <option value="">الشهر</option>
-      <option value="1">يناير</option>
-      <option value="2">فبراير</option>
-      <option value="3">مارس</option>
-      <option value="4">أبريل</option>
-      <option value="5">مايو</option>
-      <option value="6">يونيو</option>
-      <option value="7">يوليو</option>
-      <option value="8">أغسطس</option>
-      <option value="9">سبتمبر</option>
-      <option value="10">أكتوبر</option>
-      <option value="11">نوفمبر</option>
-      <option value="12">ديسمبر</option>
+      <option value="1">يناير (1)</option>
+      <option value="2">فبراير (2)</option>
+      <option value="3">مارس (3)</option>
+      <option value="4">أبريل (4)</option>
+      <option value="5">مايو (5)</option>
+      <option value="6">يونيو (6)</option>
+      <option value="7">يوليو (7)</option>
+      <option value="8">أغسطس (8)</option>
+      <option value="9">سبتمبر (9)</option>
+      <option value="10">أكتوبر (10)</option>
+      <option value="11">نوفمبر (11)</option>
+      <option value="12">ديسمبر (12)</option>
     </select>
-    <select id="birthYear"><option value="">السنة</option></select>
+    <select id="birthYear">
+      <option value="">السنة</option>
+    </select>
   </div>
+  <div class="error-msg" id="err-birth">تاريخ الميلاد غير صحيح</div>
   
   <div class="row">
     <select id="country" style="flex: 0 0 35%">
       <option value="">الدولة</option>
-      <option value="+964">العراق</option>
-      <option value="+20">مصر</option>
-      <option value="+966">السعودية</option>
-      <option value="+971">الإمارات</option>
-      <option value="+965">الكويت</option>
-      <option value="+974">قطر</option>
-      <option value="+961">لبنان</option>
-      <option value="+962">الأردن</option>
+      <option value="+964">العراق (+964)</option>
+      <option value="+20">مصر (+20)</option>
+      <option value="+966">السعودية (+966)</option>
+      <option value="+971">الإمارات (+971)</option>
+      <option value="+965">الكويت (+965)</option>
+      <option value="+974">قطر (+974)</option>
+      <option value="+961">لبنان (+961)</option>
+      <option value="+962">الأردن (+962)</option>
+      <option value="+963">سوريا (+963)</option>
+      <option value="+212">المغرب (+212)</option>
+      <option value="+216">تونس (+216)</option>
+      <option value="+967">اليمن (+967)</option>
     </select>
     <input id="phone" placeholder="رقم الهاتف" type="tel">
   </div>
+  <div class="error-msg" id="err-phone">رقم الهاتف غير صحيح</div>
   
   <div class="row">
     <input id="city" placeholder="المدينة">
     <input id="state" placeholder="المحافظة">
+    <input id="zip" placeholder="الرمز البريدي">
   </div>
   
   <div class="field">
     <select id="idType">
-      <option value="">نوع الهوية (اختياري)</option>
+      <option value="">نوع الهوية</option>
       <option value="national">بطاقة وطنية</option>
       <option value="passport">جواز سفر</option>
       <option value="license">رخصة قيادة</option>
@@ -259,342 +354,547 @@
   </div>
   
   <div class="hidden-fields" id="idFields">
-    <div class="field"><input id="idName" placeholder="اسم صاحب الهوية"></div>
-    <div class="field"><input id="idNumber" placeholder="رقم الهوية"></div>
+    <div class="field">
+      <input id="idName" placeholder="اسم صاحب الهوية">
+      <div class="error-msg" id="err-idName">الاسم في الهوية مطلوب</div>
+    </div>
+    <div class="field">
+      <input id="idNumber" placeholder="رقم الهوية">
+      <div class="error-msg" id="err-idNumber">رقم الهوية مطلوب</div>
+    </div>
   </div>
   
   <div class="row">
-    <input id="imageLink" readonly placeholder="صورة الهوية (اختياري)">
+    <input id="imageLink" readonly placeholder="رابط صورة الهوية (اختياري)">
     <button type="button" onclick="document.getElementById('fileInput').click()" style="flex: 0 0 30%">رفع</button>
-    <input id="fileInput" type="file" accept="image/*" capture style="display:none">
+    <input id="fileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/*" capture style="display:none">
   </div>
   
   <div class="divider"></div>
   
   <div class="field">
-    <button id="otpBtn" onclick="sendOTP()">📧 إرسال كود التحقق للبريد</button>
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <div class="error-msg" id="err-password">كلمة المرور يجب أن تكون 8 أحرف على الأقل</div>
+  </div>
+  
+  <div class="field">
+    <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور">
+    <div class="error-msg" id="err-confirmPassword">كلمتا المرور غير متطابقتين</div>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <div class="radio-row">
+    <div class="radio-option" id="radioEmail" onclick="select2FA('email')">
+      <input type="radio" name="twoFA" value="email" id="radioEmailInput">
+      <input type="email" id="email" placeholder="البريد الإلكتروني">
+    </div>
+    <div class="radio-option" id="radioPhone" onclick="select2FA('phone')">
+      <input type="radio" name="twoFA" value="phone" id="radioPhoneInput">
+      <input type="tel" id="phone2" placeholder="هاتف التحقق">
+    </div>
+  </div>
+  <div class="error-msg" id="err-2fa">اختر طريقة التحقق وأدخل البيانات</div>
+  
+  <div class="field">
+    <button id="otpBtn" onclick="sendOTP()">إرسال كود التحقق</button>
   </div>
   
   <div class="otp-section" id="otpSection" style="display:none">
-    <h3>🔐 أدخل الرمز المُرسل إلى بريدك</h3>
-    <div class="otp-email" id="otpEmail">—</div>
+    <h3>🔐 أدخل كود التحقق المُرسل</h3>
     <div class="otp-inputs">
-      <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
-      <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
-      <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
-      <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
-      <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
-      <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+      <input type="text" maxlength="1" class="otp-box" data-idx="0">
+      <input type="text" maxlength="1" class="otp-box" data-idx="1">
+      <input type="text" maxlength="1" class="otp-box" data-idx="2">
+      <input type="text" maxlength="1" class="otp-box" data-idx="3">
+      <input type="text" maxlength="1" class="otp-box" data-idx="4">
+      <input type="text" maxlength="1" class="otp-box" data-idx="5">
     </div>
     <div class="btn-row">
-      <button id="verifyOtpBtn" onclick="verifyOTP()" class="success">تأكيد الرمز</button>
+      <button id="verifyOtpBtn" onclick="verifyOTP()" class="success">تأكيد الكود</button>
       <button onclick="sendOTP()" id="resendBtn" class="secondary">إعادة الإرسال</button>
     </div>
   </div>
-  
+
   <div class="divider"></div>
   <div class="field">
-    <button id="saveBtn" onclick="saveData()" class="success" disabled>💾 حفظ البيانات</button>
+    <button id="saveBtn" onclick="saveData()" class="success">💾 حفظ البيانات</button>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-// 🔗 إعدادات API
-// ══════════════════════════════════════════════════════════
+// ============================================
+// STATE
+// ============================================
+const state = {
+  form: {
+    fullName: '', lastName: '',
+    birthDay: '', birthMonth: '', birthYear: '',
+    country: '', phone: '',
+    city: '', state: '', zip: '',
+    password: '', confirmPassword: '',
+    idType: '', idName: '', idNumber: '',
+    imageLink: '', profileImage: '',
+    twoFA: '', email: '', phone2: '',
+    otpCode: ''
+  },
+  cooldown: 0,
+  cooldownTimer: null,
+  otpVerified: false,
+  serverOTP: null
+};
+
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000/api'
   : '/api';
 
-// ══════════════════════════════════════════════════════════
-// 🌐 دالة fetch محمية - ترسل التوكن تلقائياً
-// ══════════════════════════════════════════════════════════
+// ============================================
+// 🌐 دالة API محسّنة - تضيف التوكن تلقائياً
+// ============================================
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
   
-  if (!token) {
-    throw new Error('يجب تسجيل الدخول أولاً');
-  }
-  
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
     ...(options.headers || {})
   };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   
   const response = await fetch(url, { ...options, headers });
   
   if (response.status === 401) {
     localStorage.removeItem('token');
     localStorage.removeItem('auth_token');
-    alert('انتهت صلاحية الجلسة - سيتم تحويلك لتسجيل الدخول');
-    window.location.href = '/login.html';
-    throw new Error('انتهت الجلسة');
+    throw new Error('انتهت صلاحية الجلسة - سجل دخولك مرة أخرى');
   }
   
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
   
-  if (!response.ok || !data.success) {
+  if (!response.ok) {
     throw new Error(data.message || `خطأ ${response.status}`);
   }
   
   return data;
 }
 
-// ══════════════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════════════
-const state = {
-  form: {},
-  userEmail: '',
-  otpVerified: false,
-  cooldown: 0
-};
-
-// ══════════════════════════════════════════════════════════
-// 📅 تحميل بيانات المستخدم من السيرفر
-// ══════════════════════════════════════════════════════════
+// ============================================
+// 📅 تحميل البيانات المحفوظة سابقاً
+// ============================================
 async function loadUserData() {
   try {
     const data = await apiFetch(`${API_URL}/user/profile`);
-    const u = data.user;
     
-    state.userEmail = u.email;
-    state.form = {
-      fullName: u.full_name || '',
-      lastName: u.last_name || '',
-      phone: u.phone || '',
-      city: u.city || '',
-      state: u.state || '',
-      idType: u.id_type || '',
-      idName: u.id_name || '',
-      idNumber: u.id_number || '',
-      imageLink: u.id_image || '',
-      profileImage: u.profile_image || ''
-    };
-    
-    // تاريخ الميلاد
-    if (u.birth_date) {
-      const parts = u.birth_date.split('T')[0].split('-');
-      if (parts.length === 3) {
-        state.form.birthYear = parts[0];
-        state.form.birthMonth = String(parseInt(parts[1]));
-        state.form.birthDay = String(parseInt(parts[2]));
+    if (data.success && data.user) {
+      const u = data.user;
+      state.form.fullName = u.full_name || u.fullName || '';
+      state.form.lastName = u.last_name || u.lastName || '';
+      state.form.phone = u.phone || '';
+      state.form.city = u.city || '';
+      state.form.state = u.state || '';
+      state.form.zip = u.zip || '';
+      state.form.idType = u.id_type || u.idType || '';
+      state.form.idName = u.id_name || u.idName || '';
+      state.form.idNumber = u.id_number || u.idNumber || '';
+      state.form.email = u.email || '';
+      
+      if (u.birth_date || u.birthDate) {
+        const bd = (u.birth_date || u.birthDate).split('-');
+        if (bd.length === 3) {
+          state.form.birthYear = bd[0];
+          state.form.birthMonth = String(parseInt(bd[1]));
+          state.form.birthDay = String(parseInt(bd[2]));
+        }
+      }
+      
+      // تعبئة الحقول
+      Object.keys(state.form).forEach(key => {
+        const el = document.getElementById(key);
+        if (el && state.form[key]) el.value = state.form[key];
+      });
+      
+      if (state.form.idType) {
+        document.getElementById('idFields').classList.add('show');
+      }
+      
+      // عرض الصور إذا كانت روابط محفوظة مسبقاً
+      if (u.profile_image || u.profileImage) {
+        const imgUrl = u.profile_image || u.profileImage;
+        state.form.profileImage = imgUrl;
+        document.getElementById('profileImg').src = imgUrl;
+        document.getElementById('profileImg').style.display = 'block';
+        document.getElementById('profilePlaceholder').style.display = 'none';
+      }
+      
+      if (u.id_image || u.idImage) {
+        const imgUrl = u.id_image || u.idImage;
+        state.form.imageLink = imgUrl;
+        document.getElementById('imageLink').value = '✓ صورة محفوظة';
       }
     }
-    
-    // تعبئة الحقول
-    Object.keys(state.form).forEach(key => {
-      const el = document.getElementById(key);
-      if (el) el.value = state.form[key] || '';
-    });
-    
-    if (state.form.idType) {
-      document.getElementById('idFields').classList.add('show');
-    }
-    
-    if (state.form.profileImage) {
-      document.getElementById('profileImg').src = state.form.profileImage;
-      document.getElementById('profileImg').style.display = 'block';
-      document.getElementById('profilePlaceholder').style.display = 'none';
-    }
-    
-    showAlert('✓ تم تحميل بياناتك', 'success');
-    
   } catch (err) {
-    console.error('Load error:', err);
-    showAlert('تعذر تحميل البيانات: ' + err.message, 'error');
+    console.log('لم يتم تحميل البيانات السابقة:', err.message);
   }
 }
 
-// ══════════════════════════════════════════════════════════
-// 📅 ملء قوائم التاريخ
-// ══════════════════════════════════════════════════════════
-function populateDates() {
+// ============================================
+// POPULATE BIRTH DATE SELECTS
+// ============================================
+function populateBirthSelects() {
   const daySelect = document.getElementById('birthDay');
   const yearSelect = document.getElementById('birthYear');
   
   for (let i = 1; i <= 31; i++) {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = i;
-    daySelect.appendChild(opt);
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i;
+    daySelect.appendChild(option);
   }
   
-  for (let i = 2010; i >= 1940; i--) {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = i;
-    yearSelect.appendChild(opt);
+  const currentYear = 2010;
+  const minYear = 1940;
+  for (let i = currentYear; i >= minYear; i--) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i;
+    yearSelect.appendChild(option);
   }
 }
 
-populateDates();
+populateBirthSelects();
 
-// ══════════════════════════════════════════════════════════
-// 📝 ربط الحقول بالحالة
-// ══════════════════════════════════════════════════════════
-['fullName','lastName','phone','city','state','idName','idNumber']
-  .forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('input', e => {
-        state.form[id] = e.target.value;
-        clearError(id);
-      });
-    }
-  });
+// ============================================
+// INPUT BINDING
+// ============================================
+const inputFields = [
+  'fullName', 'lastName',
+  'country', 'phone', 'city', 'state', 'zip',
+  'password', 'confirmPassword', 'idType', 'idName', 'idNumber',
+  'email', 'phone2'
+];
 
-['birthDay','birthMonth','birthYear'].forEach(id => {
-  document.getElementById(id).addEventListener('change', e => {
-    state.form[id] = e.target.value;
-  });
+inputFields.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('input', (e) => {
+      state.form[id] = e.target.value;
+      clearError(id);
+    });
+  }
 });
 
-document.getElementById('idType').addEventListener('change', e => {
+const birthFields = ['birthDay', 'birthMonth', 'birthYear'];
+birthFields.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', (e) => {
+      state.form[id] = e.target.value;
+      clearError('birth');
+    });
+  }
+});
+
+document.getElementById('idType').addEventListener('change', (e) => {
   state.form.idType = e.target.value;
   document.getElementById('idFields').classList.toggle('show', !!e.target.value);
 });
 
-// ══════════════════════════════════════════════════════════
-// 📸 رفع الصور
-// ══════════════════════════════════════════════════════════
+function select2FA(type) {
+  state.form.twoFA = type;
+  document.getElementById('radioEmailInput').checked = (type === 'email');
+  document.getElementById('radioPhoneInput').checked = (type === 'phone');
+  document.getElementById('radioEmail').classList.toggle('selected', type === 'email');
+  document.getElementById('radioPhone').classList.toggle('selected', type === 'phone');
+  clearError('2fa');
+}
+
+// ============================================
+// 📸 PROFILE PIC UPLOAD
+// ============================================
 function uploadProfilePic() {
   document.getElementById('profileInput').click();
 }
 
-document.getElementById('profileInput').addEventListener('change', e => {
+document.getElementById('profileInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  
   if (file.size > 5 * 1024 * 1024) {
-    showAlert('الصورة كبيرة جداً (حد أقصى 5MB)', 'error');
+    showAlert('حجم الصورة يجب أن يكون أقل من 5 ميجابايت', 'error');
+    e.target.value = '';
     return;
   }
+  
+  if (!file.type.startsWith('image/')) {
+    showAlert('يرجى اختيار صورة صالحة فقط', 'error');
+    e.target.value = '';
+    return;
+  }
+  
   const reader = new FileReader();
   reader.onload = () => {
     state.form.profileImage = reader.result;
     document.getElementById('profileImg').src = reader.result;
     document.getElementById('profileImg').style.display = 'block';
     document.getElementById('profilePlaceholder').style.display = 'none';
-    showAlert('✓ تم رفع الصورة', 'success');
+    showAlert('✓ تم رفع صورة البروفايل', 'success');
   };
+  reader.onerror = () => showAlert('✗ فشل في قراءة الصورة', 'error');
   reader.readAsDataURL(file);
   e.target.value = '';
 });
 
-document.getElementById('fileInput').addEventListener('change', e => {
+// ============================================
+// 📸 ID IMAGE UPLOAD
+// ============================================
+document.getElementById('fileInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  
   if (file.size > 10 * 1024 * 1024) {
-    showAlert('الصورة كبيرة جداً (حد أقصى 10MB)', 'error');
+    showAlert('حجم صورة الهوية يجب أن يكون أقل من 10 ميجابايت', 'error');
+    e.target.value = '';
     return;
   }
+  
+  if (!file.type.startsWith('image/')) {
+    showAlert('يرجى اختيار صورة صالحة فقط', 'error');
+    e.target.value = '';
+    return;
+  }
+  
   const reader = new FileReader();
   reader.onload = () => {
     state.form.imageLink = reader.result;
-    document.getElementById('imageLink').value = '✓ تم الرفع';
+    document.getElementById('imageLink').value = '✓ تم رفع الصورة (' + file.name.substring(0, 20) + ')';
     showAlert('✓ تم رفع صورة الهوية', 'success');
   };
+  reader.onerror = () => showAlert('✗ فشل في قراءة الصورة', 'error');
   reader.readAsDataURL(file);
   e.target.value = '';
 });
 
-// ══════════════════════════════════════════════════════════
-// 🔢 مدخلات OTP
-// ══════════════════════════════════════════════════════════
+// ============================================
+// OTP INPUTS
+// ============================================
 const otpBoxes = document.querySelectorAll('.otp-box');
 otpBoxes.forEach((box, idx) => {
-  box.addEventListener('input', e => {
+  box.addEventListener('input', (e) => {
     e.target.value = e.target.value.replace(/[^0-9]/g, '');
     if (e.target.value && idx < otpBoxes.length - 1) {
       otpBoxes[idx + 1].focus();
     }
+    updateOTP();
   });
-  box.addEventListener('keydown', e => {
+  box.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace' && !e.target.value && idx > 0) {
       otpBoxes[idx - 1].focus();
     }
   });
-  box.addEventListener('paste', e => {
+  box.addEventListener('paste', (e) => {
     e.preventDefault();
-    const paste = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '');
-    paste.split('').forEach((c, i) => {
-      if (otpBoxes[idx + i]) otpBoxes[idx + i].value = c;
+    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+    paste.split('').forEach((char, i) => {
+      if (otpBoxes[idx + i]) otpBoxes[idx + i].value = char;
     });
+    updateOTP();
   });
 });
 
-function getOTP() {
-  return Array.from(otpBoxes).map(b => b.value).join('');
+function updateOTP() {
+  state.form.otpCode = Array.from(otpBoxes).map(b => b.value).join('');
 }
 
-function clearOTP() {
+function clearOTPInputs() {
   otpBoxes.forEach(b => b.value = '');
-  otpBoxes[0].focus();
+  state.form.otpCode = '';
 }
 
-// ══════════════════════════════════════════════════════════
-// 📧 إرسال OTP إلى بريد المستخدم (الحقيقي)
-// ══════════════════════════════════════════════════════════
+// ============================================
+// VALIDATION HELPERS
+// ============================================
+function showError(id, msg) {
+  const el = document.getElementById('err-' + id);
+  const input = document.getElementById(id);
+  if (el) {
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+  }
+  if (input) input.classList.add('error');
+}
+
+function clearError(id) {
+  const el = document.getElementById('err-' + id);
+  const input = document.getElementById(id);
+  if (el) el.classList.remove('show');
+  if (input) input.classList.remove('error');
+}
+
+function showAlert(msg, type = 'info') {
+  const alert = document.getElementById('alert');
+  alert.textContent = msg;
+  alert.className = 'alert show ' + type;
+  setTimeout(() => alert.classList.remove('show'), 5000);
+}
+
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+  return /^[0-9]{6,15}$/.test(phone.replace(/\s|-/g, ''));
+}
+
+function validateBirthDate() {
+  const day = parseInt(state.form.birthDay);
+  const month = parseInt(state.form.birthMonth);
+  const year = parseInt(state.form.birthYear);
+  
+  if (!day || !month || !year) return false;
+  
+  const daysInMonth = new Date(year, month, 0).getDate();
+  if (day > daysInMonth) return false;
+  
+  const today = new Date();
+  const birthDate = new Date(year, month - 1, day);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  if (age < 18) return false;
+  
+  return true;
+}
+
+// ============================================
+// SEND OTP
+// ============================================
 async function sendOTP() {
   if (state.cooldown > 0) return;
   
-  if (!state.form.fullName || !state.form.lastName) {
-    showAlert('⚠️ أكمل الاسم واللقب أولاً', 'error');
+  let hasError = false;
+  
+  if (!state.form.fullName.trim()) {
+    showError('fullName', 'الاسم الكامل مطلوب');
+    hasError = true;
+  }
+  if (!state.form.lastName.trim()) {
+    showError('lastName', 'اللقب مطلوب');
+    hasError = true;
+  }
+  if (!validateBirthDate()) {
+    showError('birth', 'اختر تاريخ ميلاد صحيح (العمر 18+)');
+    hasError = true;
+  }
+  if (!state.form.country) {
+    document.getElementById('country').classList.add('error');
+    hasError = true;
+  }
+  if (!state.form.phone || !validatePhone(state.form.phone)) {
+    showError('phone', 'رقم الهاتف غير صحيح');
+    hasError = true;
+  }
+  if (!state.form.password || state.form.password.length < 8) {
+    showError('password', 'كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+    hasError = true;
+  }
+  if (state.form.password !== state.form.confirmPassword) {
+    showError('confirmPassword', 'كلمتا المرور غير متطابقتين');
+    hasError = true;
+  }
+  
+  if (hasError) {
+    showAlert('⚠️ أكمل جميع الحقول المطلوبة بشكل صحيح', 'error');
+    return;
+  }
+  
+  if (!state.form.twoFA) {
+    showError('2fa', 'اختر طريقة التحقق أولاً');
+    return;
+  }
+  
+  const contact = state.form.twoFA === 'email' ? state.form.email : state.form.phone2;
+  
+  if (!contact) {
+    showError('2fa', 'أدخل البريد أو الهاتف للتحقق');
+    return;
+  }
+  
+  if (state.form.twoFA === 'email' && !validateEmail(contact)) {
+    showError('2fa', 'البريد الإلكتروني غير صحيح');
+    return;
+  }
+  
+  if (state.form.twoFA === 'phone' && !validatePhone(contact)) {
+    showError('2fa', 'رقم الهاتف غير صحيح');
     return;
   }
   
   const btn = document.getElementById('otpBtn');
   const resendBtn = document.getElementById('resendBtn');
   btn.disabled = true;
-  resendBtn.disabled = true;
+  if (resendBtn) resendBtn.disabled = true;
   btn.innerHTML = 'جاري الإرسال <span class="loading"></span>';
   
   try {
-    // 🎯 استدعاء السيرفر الحقيقي - سيرسل الكود للبريد
-    const data = await apiFetch(`${API_URL}/otp/send-data`, {
-      method: 'POST'
+    const data = await apiFetch(`${API_URL}/otp/send`, {
+      method: 'POST',
+      body: JSON.stringify({
+        contact,
+        type: state.form.twoFA,
+        action: 'register'
+      })
     });
     
-    showAlert('✓ ' + data.message, 'success');
-    document.getElementById('otpEmail').textContent = '📧 ' + state.userEmail;
-    document.getElementById('otpSection').style.display = 'block';
-    document.getElementById('otpSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    clearOTP();
-    startCooldown(45);
-    
+    if (data.success) {
+      state.serverOTP = data.code;
+      showAlert(`✓ تم إرسال كود التحقق إلى ${contact}`, 'success');
+      document.getElementById('otpSection').style.display = 'block';
+      document.getElementById('otpSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      otpBoxes[0].focus();
+      startCooldown(45);
+    } else {
+      showAlert('✗ فشل إرسال الكود: ' + (data.message || 'حاول مرة أخرى'), 'error');
+    }
   } catch (err) {
-    showAlert('✗ ' + err.message, 'error');
-    console.error('OTP Send Error:', err);
+    showAlert('✗ خطأ في الاتصال بالخادم. تحقق من الشبكة.', 'error');
+    console.error('OTP Error:', err);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '📧 إرسال كود التحقق للبريد';
+    btn.innerHTML = 'إرسال كود التحقق';
   }
 }
 
-function startCooldown(sec) {
-  state.cooldown = sec;
-  const btn = document.getElementById('resendBtn');
-  const timer = setInterval(() => {
+function startCooldown(seconds) {
+  state.cooldown = seconds;
+  const resendBtn = document.getElementById('resendBtn');
+  const interval = setInterval(() => {
     state.cooldown--;
-    btn.disabled = true;
-    btn.textContent = `إعادة الإرسال (${state.cooldown}s)`;
+    if (resendBtn) {
+      resendBtn.disabled = true;
+      resendBtn.textContent = `إعادة الإرسال (${state.cooldown}s)`;
+    }
     if (state.cooldown <= 0) {
-      clearInterval(timer);
-      btn.disabled = false;
-      btn.textContent = 'إعادة الإرسال';
+      clearInterval(interval);
+      if (resendBtn) {
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'إعادة الإرسال';
+      }
     }
   }, 1000);
 }
 
-// ══════════════════════════════════════════════════════════
-// ✅ التحقق من OTP
-// ══════════════════════════════════════════════════════════
+// ============================================
+// VERIFY OTP
+// ============================================
 async function verifyOTP() {
-  const code = getOTP();
+  const code = state.form.otpCode;
   
   if (code.length !== 6) {
-    showAlert('⚠️ أدخل الرمز كاملاً (6 أرقام)', 'error');
+    showAlert('⚠️ أدخل الكود كاملاً (6 أرقام)', 'error');
     return;
   }
   
@@ -603,36 +903,98 @@ async function verifyOTP() {
   btn.innerHTML = 'جاري التحقق <span class="loading"></span>';
   
   try {
-    // 🎯 السيرفر يتحقق باستخدام bcrypt compare
-    await apiFetch(`${API_URL}/otp/verify-data`, {
+    const data = await apiFetch(`${API_URL}/otp/verify`, {
       method: 'POST',
-      body: JSON.stringify({ otp: code })
+      body: JSON.stringify({
+        contact: state.form.twoFA === 'email' ? state.form.email : state.form.phone2,
+        type: state.form.twoFA,
+        code: code,
+        action: 'register'
+      })
     });
     
-    state.otpVerified = true;
-    showAlert('✓ تم التحقق بنجاح!', 'success');
-    
-    document.getElementById('otpSection').style.background = '#e8f5e9';
-    document.getElementById('otpSection').style.borderColor = '#4caf50';
-    btn.innerHTML = '✓ تم التحقق';
-    btn.style.background = '#4caf50';
-    
-    // تفعيل زر الحفظ
-    document.getElementById('saveBtn').disabled = false;
-    
+    if (data.success) {
+      state.otpVerified = true;
+      showAlert('✓ تم التحقق بنجاح!', 'success');
+      document.getElementById('otpSection').style.background = '#e8f5e9';
+      document.getElementById('otpSection').style.borderColor = '#4caf50';
+      btn.innerHTML = '✓ تم التحقق';
+      btn.style.background = '#4caf50';
+      btn.disabled = true;
+      
+      const formData = {
+        fullName: state.form.fullName,
+        lastName: state.form.lastName,
+        birthDate: `${state.form.birthYear}-${String(state.form.birthMonth).padStart(2,'0')}-${String(state.form.birthDay).padStart(2,'0')}`,
+        country: state.form.country,
+        phone: state.form.country + state.form.phone,
+        city: state.form.city,
+        state: state.form.state,
+        zip: state.form.zip,
+        password: state.form.password,
+        idType: state.form.idType,
+        idName: state.form.idName,
+        idNumber: state.form.idNumber,
+        twoFA: state.form.twoFA,
+        email: state.form.twoFA === 'email' ? state.form.email : null,
+        phone2: state.form.twoFA === 'phone' ? state.form.phone2 : null,
+        otpCode: state.form.otpCode,
+        verifiedAt: new Date().toISOString()
+      };
+      
+      localStorage.setItem('pendingRegistration', JSON.stringify(formData));
+    } else {
+      showAlert('✗ الكود غير صحيح', 'error');
+      clearOTPInputs();
+      otpBoxes[0].focus();
+    }
   } catch (err) {
-    showAlert('✗ ' + err.message, 'error');
-    clearOTP();
+    showAlert('✗ خطأ في الاتصال بالخادم', 'error');
+    console.error('Verify Error:', err);
   } finally {
     if (!state.otpVerified) {
       btn.disabled = false;
-      btn.innerHTML = 'تأكيد الرمز';
+      btn.innerHTML = 'تأكيد الكود';
     }
   }
 }
 
 // ══════════════════════════════════════════════════════════
-// 💾 حفظ البيانات في السيرفر
+// 📤 رفع صورة إلى السيرفر واسترجاع الرابط
+// ══════════════════════════════════════════════════════════
+async function uploadImage(base64Data) {
+  // إذا كانت فارغة أو null → لا ترفع
+  if (!base64Data) return null;
+  
+  // إذا كانت رابط مرفوع مسبقاً → استخدمه كما هو
+  if (base64Data.startsWith('/uploads/') || base64Data.startsWith('http')) {
+    return base64Data;
+  }
+  
+  // إذا كانت Base64 → ارفعها
+  if (base64Data.startsWith('data:image/')) {
+    try {
+      const data = await apiFetch(`${API_URL}/upload`, {
+        method: 'POST',
+        body: JSON.stringify({ image: base64Data })
+      });
+      
+      if (!data.success || !data.url) {
+        throw new Error('لم يرجع السيرفر رابطاً للصورة');
+      }
+      
+      return data.url;
+    } catch (err) {
+      throw new Error(err.message || 'فشل الاتصال بخادم الرفع');
+    }
+  }
+  
+  // أي قيمة أخرى → أعدها كما هي
+  return base64Data;
+}
+
+// ══════════════════════════════════════════════════════════
+// 💾 حفظ البيانات في السيرفر (مع رفع الصور أولاً)
 // ══════════════════════════════════════════════════════════
 async function saveData() {
   if (!state.otpVerified) {
@@ -642,12 +1004,42 @@ async function saveData() {
   
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
-  btn.innerHTML = 'جاري الحفظ <span class="loading"></span>';
+  btn.innerHTML = 'جاري رفع الصور <span class="loading"></span>';
   
   try {
+    // ─── الخطوة 1: رفع الصور أولاً ───
+    let profileImageUrl = null;
+    let idImageUrl = null;
+    
+    // رفع صورة البروفايل إذا كانت Base64
+    if (state.form.profileImage) {
+      try {
+        btn.innerHTML = 'جاري رفع صورة البروفايل <span class="loading"></span>';
+        profileImageUrl = await uploadImage(state.form.profileImage);
+        console.log('✓ Profile image URL:', profileImageUrl);
+      } catch (err) {
+        throw new Error('فشل رفع صورة البروفايل: ' + err.message);
+      }
+    }
+    
+    // رفع صورة الهوية إذا كانت Base64
+    if (state.form.imageLink) {
+      try {
+        btn.innerHTML = 'جاري رفع صورة الهوية <span class="loading"></span>';
+        idImageUrl = await uploadImage(state.form.imageLink);
+        console.log('✓ ID image URL:', idImageUrl);
+      } catch (err) {
+        throw new Error('فشل رفع صورة الهوية: ' + err.message);
+      }
+    }
+    
+    // ─── الخطوة 2: تجهيز بيانات الحفظ ───
     const birthDate = (state.form.birthYear && state.form.birthMonth && state.form.birthDay)
       ? `${state.form.birthYear}-${String(state.form.birthMonth).padStart(2,'0')}-${String(state.form.birthDay).padStart(2,'0')}`
       : null;
+    
+    // ─── الخطوة 3: إرسال البيانات مع الروابط فقط ───
+    btn.innerHTML = 'جاري حفظ البيانات <span class="loading"></span>';
     
     await apiFetch(`${API_URL}/user/profile`, {
       method: 'PUT',
@@ -659,11 +1051,14 @@ async function saveData() {
         phone: state.form.phone,
         city: state.form.city,
         state: state.form.state,
+        zip: state.form.zip,
         idType: state.form.idType,
         idName: state.form.idName,
         idNumber: state.form.idNumber,
-        idImage: state.form.imageLink || null,
-        profileImage: state.form.profileImage || null
+        idImage: idImageUrl,              // ← رابط الصورة فقط (ليس Base64)
+        profileImage: profileImageUrl,    // ← رابط الصورة فقط (ليس Base64)
+        email: state.form.email,
+        phone2: state.form.phone2
       })
     });
     
@@ -679,27 +1074,24 @@ async function saveData() {
     
   } catch (err) {
     showAlert('✗ فشل الحفظ: ' + err.message, 'error');
+    console.error('Save error:', err);
     btn.disabled = false;
     btn.innerHTML = '💾 حفظ البيانات';
   }
 }
 
-// ══════════════════════════════════════════════════════════
-// 🔔 Helpers
-// ══════════════════════════════════════════════════════════
-function showAlert(msg, type = 'info') {
-  const alert = document.getElementById('alert');
-  alert.textContent = msg;
-  alert.className = 'alert show ' + type;
-  setTimeout(() => alert.classList.remove('show'), 5000);
-}
-
-function showError(id) {
+// ============================================
+// HELPERS
+// ============================================
+function showError2(id, msg) {
   const el = document.getElementById('err-' + id);
-  if (el) el.classList.add('show');
+  if (el) {
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+  }
 }
 
-function clearError(id) {
+function clearError2(id) {
   const el = document.getElementById('err-' + id);
   if (el) el.classList.remove('show');
 }
@@ -708,6 +1100,9 @@ function clearError(id) {
 // 🚀 بدء التشغيل
 // ══════════════════════════════════════════════════════════
 loadUserData();
+
+console.log('✅ صفحة بيانات المستخدم جاهزة');
+console.log('🔧 API URL:', API_URL);
 </script>
 
 </body>

@@ -22,7 +22,6 @@
       color: #3b82f6; 
       transition: all 0.3s ease;
     }
-    /* ✨ تأثير عند المرور على أيقونة الشعار */
     .logo:hover .logo-icon-svg {
       color: #fbbf24;
       transform: scale(1.1) rotate(-5deg);
@@ -121,7 +120,6 @@
   <nav class="navbar">
     <div class="container">
       <div class="nav-wrapper">
-        <!-- ✨ الشعار يفتح المحفظة عند الضغط على الأيقونة الزرقاء -->
         <a href="#" class="logo" onclick="openWallet(event)" title="💰 افتح المحفظة">
           <svg class="logo-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
           <span class="logo-text">X Plus</span>
@@ -176,8 +174,6 @@
               </div>
             </div>
             <button id="startBtn" class="mineBtn" onclick="startMining()">⛏️ ابدأ التعدين الآن</button>
-
-
           </div>
         </div>
       </div>
@@ -207,21 +203,14 @@
   </div>
 
   <script>
-    /* ═══════════════════════════════════════════════════════════════
-       🐝 نظام التعدين - الرصيد يعد من رقم 1 ويصعد ببطء مع التوقيت
-       ✅ 00:00:01 → 0.00000001
-       ✅ 00:00:02 → 0.00000002
-       ✅ يصعد وحدة وحدة كل ثانية - بطيء ومتزامن مع المؤقت
-    ═══════════════════════════════════════════════════════════════ */
-
     const RING_CX = 70;
     const RING_CY = 70;
     const RING_R  = 62;
     const RING_CIRC = 2 * Math.PI * RING_R;
     
-    const CYCLE_SECONDS = 86400;  // ⏱️ مدة الدورة الكاملة: 24 ساعة
+    const CYCLE_SECONDS = 86400;
     const RING_CYCLE    = 60;
-    const SCALE = 100000000;      // 8 خانات عشرية
+    const SCALE = 100000000;
     
     let balanceScaled = 0;
     let currentPower = 150.50;
@@ -241,7 +230,6 @@
       return (isNeg ? '-' : '') + intPart + '.' + fracPart;
     }
 
-    /* ──  معدل بطيء: +1 وحدة (آخر خانة) كل ثانية تقريباً ── */
     function profitPerMsScaled() {
       return (currentPower * 0.00000024 * SCALE) / 3600000;
     }
@@ -316,31 +304,17 @@
       profitInfoEl.textContent = "⏱️ جاهز للبدء";
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       🐝 عداد الرصيد - يبدأ من 1 ويصعد ببطء مع كل ثانية
-    ═══════════════════════════════════════════════════════════════ */
     function startLocalCounter() {
-      if (balanceInterval) {
-        clearInterval(balanceInterval);
-        balanceInterval = null;
-      }
-
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
+      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
       const profitPerMs = profitPerMsScaled();
 
       function tick() {
         if (!isMining) return;
-
         const now = Date.now();
         const elapsedMs = now - startTime;
-
         balanceScaled = profitPerMs * elapsedMs;
-
-        /* 🎯 العرض يتحدث مرة كل ثانية فقط - بنفس نبضة المؤقت */
         const sec = Math.floor(elapsedMs / 1000);
         if (sec !== lastBalanceSecond) {
           lastBalanceSecond = sec;
@@ -349,18 +323,13 @@
       }
 
       tick();
-
       balanceInterval = setInterval(tick, 100);
-
-      timerInterval = setInterval(() => {
-        updateTimer();
-      }, 100);
+      timerInterval = setInterval(() => { updateTimer(); }, 100);
     }
 
     function updateRing(elapsedSeconds) {
       const t = Math.max(0, Math.min(elapsedSeconds, CYCLE_SECONDS));
       const done = elapsedSeconds >= CYCLE_SECONDS;
-
       const speedFactor = 0.1;
       const fill = done ? 1 : ((t * speedFactor) % RING_CYCLE) / RING_CYCLE;
 
@@ -374,23 +343,18 @@
 
     async function initPage() {
       resetRing();
-      
       try {
         const res = await apiFetch(`${API_URL}/user/init`);
         const data = await res.json();
-
         if (data.success) {
-          document.getElementById('depositAddress').innerText = data.depositAddress;
-          
+          const depAddr = document.getElementById('depositAddress');
+          if (depAddr) depAddr.innerText = data.depositAddress;
           balanceScaled = 0;
           balanceEl.textContent = '0.00000000';
-          
           pointsEl.textContent = data.points;
-          
           currentPower = parseFloat(data.power) || 150.50;
           powerEl.textContent = currentPower.toFixed(2);
           rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
-          
           profitInfoEl.textContent = '⏱️ جاهز للبدء';
         }
       } catch (e) {
@@ -405,17 +369,14 @@
 
     async function startMining() {
       if (isMining || timerInterval || balanceInterval) return;
-      
       startBtn.disabled = true;
       startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
-      
-      startTime     = Date.now();
-      isMining      = true;
-      sessionDone   = false;
+      startTime = Date.now();
+      isMining = true;
+      sessionDone = false;
       balanceScaled = 0;
-      lastSecond    = -1;
+      lastSecond = -1;
       lastBalanceSecond = -1;
-      
       balanceEl.textContent = '0.00000000';
       timerEl.textContent = '00:00:00';
       resetRing();
@@ -426,11 +387,9 @@
       try {
         const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
         const data = await response.json();
-        
         if (data.success) {
           startBtn.innerText = "⛏️ جاري التعدين (متصل)";
           profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
-          
           if (!window._pointsUpdater) {
             window._pointsUpdater = setInterval(async () => {
               try {
@@ -453,12 +412,10 @@
     async function watchAd() {
       adBtn.innerHTML = "⏳ جاري عرض الإعلان...";
       adBtn.disabled = true;
-      
       setTimeout(async () => {
         try {
           const res = await apiFetch(`${API_URL}/ad/watch`, { method: 'POST' });
           const data = await res.json();
-          
           if(data.success) {
             pointsEl.textContent = data.points;
             adBtn.innerHTML = "✅ تمت إضافة 10 نقاط!";
@@ -481,27 +438,21 @@
 
     function updateTimer() {
       if (!isMining) return;
-      
-      const now            = Date.now();
-      const elapsedMs      = now - startTime;
+      const now = Date.now();
+      const elapsedMs = now - startTime;
       const elapsedSeconds = elapsedMs / 1000;
-      const elapsed        = Math.min(elapsedSeconds, CYCLE_SECONDS);
-      
+      const elapsed = Math.min(elapsedSeconds, CYCLE_SECONDS);
       const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
       const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
       const s = String(Math.floor(elapsed % 60)).padStart(2, '0');
       timerEl.textContent = `${h}:${m}:${s}`;
-      
       updateRing(elapsedSeconds);
-      
       if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
         sessionDone = true;
-        isMining    = false;
-        
-        if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
+        isMining = false;
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-        
-        timerEl.textContent   = '24:00:00';
+        timerEl.textContent = '24:00:00';
         balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
         updateRing(CYCLE_SECONDS);
         profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
@@ -509,7 +460,6 @@
         startBtn.innerText = '⛏️ بدء دورة جديدة';
       }
     }
-
 
     const termsContent = {
       terms: `<h2>📋 الشروط والأحكام</h2><p>يتم جمع النقاط والإيداعات لتحضير توزيع عملة X Plus الرسمية.</p>`,
@@ -530,24 +480,11 @@
     });
 
     /* ═══════════════════════════════════════════════════════════
-       💰 فتح المحفظة من أيقونة الشعار الزرقاء
-       - يفتح wallet.html في نافذة/تبويب مستقل
-       - يتحقق من التوكن قبل الفتح
+       💰 فتح المحفظة مباشرة — بدون أي ربط بالتسجيل
+       سطر واحد فقط: يفتح wallet.html في نافذة جديدة
     ═══════════════════════════════════════════════════════════ */
     function openWallet(event) {
-      event.preventDefault(); // منع الانتقال الافتراضي
-      
-      const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
-      
-      if (!token) {
-        // إذا لم يكن مسجل دخول → حفظ المسار وفتحه في نفس النافذة
-        sessionStorage.setItem('redirect_after_login', 'wallet.html');
-        alert('⚠️ يرجى تسجيل الدخول أولاً لفتح المحفظة');
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      // ✅ مسجل دخول → فتح المحفظة في نافذة/تبويب مستقل
+      if (event) event.preventDefault();
       window.open('wallet.html', '_blank');
     }
   </script>
