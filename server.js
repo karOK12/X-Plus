@@ -300,10 +300,13 @@ app.use("/api", profileRoutes);
 const uploadRoutes = require("./api/index");
 app.use("/api", uploadRoutes);
 
-
 // تشغيل السيرفر
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
