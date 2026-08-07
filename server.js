@@ -76,6 +76,26 @@ async function initDatabase() {
         `);
 
 
+        // ══════════════════════════════════════════════════════
+        // 📝 إضافة أعمدة بيانات الملف الشخصي إذا لم تكن موجودة
+        // ══════════════════════════════════════════════════════
+        await pool.query(`
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS full_name TEXT,
+            ADD COLUMN IF NOT EXISTS last_name TEXT,
+            ADD COLUMN IF NOT EXISTS birth_date DATE,
+            ADD COLUMN IF NOT EXISTS country TEXT,
+            ADD COLUMN IF NOT EXISTS phone TEXT,
+            ADD COLUMN IF NOT EXISTS city TEXT,
+            ADD COLUMN IF NOT EXISTS state TEXT,
+            ADD COLUMN IF NOT EXISTS id_type TEXT,
+            ADD COLUMN IF NOT EXISTS id_name TEXT,
+            ADD COLUMN IF NOT EXISTS id_number TEXT,
+            ADD COLUMN IF NOT EXISTS id_image TEXT,
+            ADD COLUMN IF NOT EXISTS profile_image TEXT;
+        `);
+
+
         await pool.query(`
             INSERT INTO platform_config
             (id, deposit_address)
@@ -267,6 +287,13 @@ app.post("/api/ad/watch", auth, async(req,res)=>{
 
 const authRoutes = require("./server/routes/auth");
 app.use("/api/auth", authRoutes);
+
+
+// ══════════════════════════════════════════════════════
+// 📝 Profile API
+// ══════════════════════════════════════════════════════
+const profileRoutes = require("./server/routes/profile");
+app.use("/api", profileRoutes);
 
 
 // Upload API

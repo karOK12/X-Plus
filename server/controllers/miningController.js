@@ -3,7 +3,7 @@ const db = require("../config/database");
 // بدء التعدين
 exports.startMining = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     const result = await db.query(
       `UPDATE users
@@ -35,12 +35,11 @@ exports.startMining = async (req, res) => {
   }
 };
 
-
 // حالة التعدين
 exports.getMiningStatus = async (req, res) => {
   try {
 
-    const { userId } = req.query;
+    const userId = req.user.id;
 
     const result = await db.query(
       `SELECT
@@ -64,7 +63,6 @@ exports.getMiningStatus = async (req, res) => {
     let balance = Number(user.balance);
 
     if (user.mining_start_time) {
-
       const hours =
         (Date.now() - Number(user.mining_start_time)) / 3600000;
 

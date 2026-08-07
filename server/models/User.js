@@ -20,6 +20,18 @@ const User = {
 
     return result.rows[0];
   },
+
+  async updatePassword(email, password) {
+    const result = await db.query(
+      `UPDATE users
+       SET password = $1
+       WHERE email = $2
+       RETURNING id, username, email`,
+      [password, email]
+    );
+
+    return result.rows[0];
+  },
 };
 
 module.exports = User;

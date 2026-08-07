@@ -176,9 +176,11 @@ async function login() {
             return;
         }
 
-        localStorage.setItem("token", data.token);
+        if (!localStorage.getItem("token")) {
+    localStorage.setItem("token", data.token);
+}
 
-        window.location.href = "/";
+window.location.href = "/";
 
     } catch (error) {
 
