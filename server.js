@@ -8,6 +8,13 @@ const path = require("path");
 const pool = require("./server/config/database");
 const auth = require("./server/middleware/auth");
 
+const {
+    register,
+    login,
+    verifyOTP,
+    resendOTP
+} = require("./server/controllers/authController");
+
 const app = express();
 
 
