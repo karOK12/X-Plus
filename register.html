@@ -887,6 +887,12 @@ async function verifyOTP() {
   btn.innerHTML = 'جاري التحقق <span class="loading"></span>';
   
   try {
+    console.log("🔎 FRONTEND OTP VERIFY:", {
+      email: state.form.email,
+      otpLength: code.length,
+      url: `${API_URL}/otp/verify`
+    });
+
     const data = await apiFetch(`${API_URL}/otp/verify`, {
       method: 'POST',
       body: JSON.stringify({
