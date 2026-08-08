@@ -536,12 +536,35 @@ exports.verifyOTP = async (req, res) => {
     // إنشاء المستخدم
     // -------------------------
 
-    const user =
-      await User.create(
+    console.log("🔎 BEFORE USER CREATE:", {
+      username: data.username,
+      email: data.email
+    });
+
+    let user;
+
+    try {
+      user = await User.create(
         data.username,
         data.email,
         data.password
       );
+
+      console.log("✅ USER CREATED:", {
+        id: user?.id,
+        email: user?.email
+      });
+
+    } catch (userErr) {
+      console.error("❌ USER CREATE ERROR:", {
+        message: userErr.message,
+        code: userErr.code,
+        detail: userErr.detail,
+        constraint: userErr.constraint
+      });
+
+      throw userErr;
+    }
 
 
     // -------------------------
