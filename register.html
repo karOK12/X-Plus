@@ -889,7 +889,9 @@ async function verifyOTP() {
   
   try {
     console.log("🔎 FRONTEND OTP VERIFY:", {
-      email: state.form.email,
+      email: state.otpEmail || state.form.email,
+      formEmail: state.form.email,
+      otpEmail: state.otpEmail,
       otpLength: code.length,
       url: `${API_URL}/otp/verify`
     });
@@ -897,7 +899,7 @@ async function verifyOTP() {
     const data = await apiFetch(`${API_URL}/otp/verify`, {
       method: 'POST',
       body: JSON.stringify({
-        email: state.form.email,
+        email: state.otpEmail || state.form.email,
         otp: code
       })
     });
