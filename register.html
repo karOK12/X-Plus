@@ -870,10 +870,8 @@ async function verifyOTP() {
     const data = await apiFetch(`${API_URL}/otp/verify`, {
       method: 'POST',
       body: JSON.stringify({
-        contact: state.form.twoFA === 'email' ? state.form.email : state.form.phone2,
-        type: state.form.twoFA,
-        code: code,
-        action: 'register'
+        email: state.form.email,
+        otp: code
       })
     });
     
