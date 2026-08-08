@@ -2,18 +2,18 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
 const path = require("path");
+const nodemailer = require("nodemailer");
 
 const pool = require("./server/config/database");
 const auth = require("./server/middleware/auth");
 
-const {
-    register,
-    login,
-    verifyOTP,
-    resendOTP
-} = require("./server/controllers/authController");
+const otpRoutes = require("./server/routes/otp");
+
+const authRoutes = require("./server/routes/auth");
+const profileRoutes = require("./server/routes/profile");
+const walletRoutes = require("./server/routes/wallet");
+const uploadRoutes = require("./api/index");
 
 const app = express();
 
@@ -47,6 +47,26 @@ app.use(
 
 
 // ══════════════════════════════════════════════════════
+// OTP Routes
+// ══════════════════════════════════════════════════════
+//
+// المسارات الناتجة:
+//
+// POST /api/otp/send
+// POST /api/otp/verify
+// POST /api/otp/resend
+//
+// حسب المسارات الموجودة داخل:
+// server/routes/otp.js
+//
+
+app.use(
+    "/api/otp",
+    otpRoutes
+);
+
+
+// ══════════════════════════════════════════════════════
 // HOME PAGE
 // ══════════════════════════════════════════════════════
 
@@ -60,25 +80,27 @@ app.get("/", (req, res) => {
 
 
 // ══════════════════════════════════════════════════════
-// Environment
-// ══════════════════════════════════════════════════════
-
-const JWT_SECRET =
-    process.env.JWT_SECRET || "xplus_secret_key_2026";
-
-
-// ══════════════════════════════════════════════════════
 // SMTP
 // ══════════════════════════════════════════════════════
 
 const transporter = nodemailer.createTransport({
+
     host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
+
+    port: Number(
+        process.env.SMTP_PORT || 587
+    ),
+
     secure: false,
+
     auth: {
+
         user: process.env.SMTP_USER,
+
         pass: process.env.SMTP_PASS
+
     }
+
 });
 
 
@@ -89,14 +111,20 @@ if (
 ) {
 
     transporter.verify()
+
         .then(() => {
+
             console.log("✅ SMTP Ready");
+
         })
+
         .catch((error) => {
+
             console.log(
                 "❌ SMTP Error:",
                 error.message
             );
+
         });
 
 } else {
@@ -182,248 +210,295 @@ async function initDatabase() {
 }
 
 
-initDatabase().catch((error) => {
-
-    console.error(
-        "❌ Database initialization failed:",
-        error.message
-    );
-
-});
+initDatabase();
 
 
 // ══════════════════════════════════════════════════════
 // Health Check
 // ══════════════════════════════════════════════════════
 
-app.get("/api/health", async (req, res) => {
+app.get(
+    "/api/health",
+    async (req, res) => {
 
-    try {
+        try {
 
-        await pool.query("SELECT 1");
+            await pool.query("SELECT 1");
 
-        res.json({
-            success: true,
-            server: "online",
-            database: "connected"
-        });
+            res.json({
 
-    } catch (error) {
+                success: true,
 
-        res.status(500).json({
-            success: false,
-            server: "online",
-            database: "error",
-            error: error.message
-        });
+                server: "online",
+
+                database: "connected"
+
+            });
+
+        } catch (error) {
+
+            res.status(500).json({
+
+                success: false,
+
+                server: "online",
+
+                database: "error",
+
+                error: error.message
+
+            });
+
+        }
 
     }
-
-});
+);
 
 
 // ══════════════════════════════════════════════════════
 // User Init
 // ══════════════════════════════════════════════════════
 
-app.get("/api/user/init", auth, async (req, res) => {
+app.get(
+    "/api/user/init",
+    auth,
+    async (req, res) => {
 
-    try {
+        try {
 
-        const user = await pool.query(
-            `
-            SELECT
+            const user = await pool.query(
+                `
+                SELECT
+                    balance,
+                    points,
+                    power,
+                    mining_start_time
+                FROM users
+                WHERE id = $1
+                `,
+                [req.user.id]
+            );
+
+
+            if (user.rows.length === 0) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "المستخدم غير موجود"
+
+                });
+
+            }
+
+
+            const data = user.rows[0];
+
+            let balance =
+                Number(data.balance || 0);
+
+
+            if (data.mining_start_time) {
+
+                const seconds =
+                    (
+                        Date.now() -
+                        Number(data.mining_start_time)
+                    ) / 1000;
+
+
+                const profit =
+                    (
+                        Number(data.power || 0) *
+                        0.5
+                    ) / 3600;
+
+
+                balance +=
+                    seconds * profit;
+
+            }
+
+
+            const config =
+                await pool.query(
+                    `
+                    SELECT deposit_address
+                    FROM platform_config
+                    WHERE id = 1
+                    `
+                );
+
+
+            const depositAddress =
+                config.rows.length > 0
+                    ? config.rows[0].deposit_address
+                    : null;
+
+
+            res.json({
+
+                success: true,
+
                 balance,
-                points,
-                power,
-                mining_start_time
-            FROM users
-            WHERE id = $1
-            `,
-            [req.user.id]
-        );
 
+                points:
+                    Number(data.points || 0),
 
-        if (user.rows.length === 0) {
+                power:
+                    Number(data.power || 0),
 
-            return res.status(404).json({
+                depositAddress
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "❌ /api/user/init:",
+                error
+            );
+
+            res.status(500).json({
+
                 success: false,
-                message: "المستخدم غير موجود"
+
+                error: error.message
+
             });
 
         }
 
-
-        const data = user.rows[0];
-
-        let balance = Number(data.balance || 0);
-
-
-        if (data.mining_start_time) {
-
-            const seconds =
-                (Date.now() -
-                Number(data.mining_start_time)) / 1000;
-
-
-            const profit =
-                (Number(data.power || 0) * 0.5) / 3600;
-
-
-            balance += seconds * profit;
-
-        }
-
-
-        const config = await pool.query(
-            `
-            SELECT deposit_address
-            FROM platform_config
-            WHERE id = 1
-            `
-        );
-
-
-        const depositAddress =
-            config.rows.length > 0
-                ? config.rows[0].deposit_address
-                : null;
-
-
-        res.json({
-
-            success: true,
-
-            balance,
-
-            points: Number(data.points || 0),
-
-            power: Number(data.power || 0),
-
-            depositAddress
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "❌ /api/user/init:",
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-
     }
-
-});
+);
 
 
 // ══════════════════════════════════════════════════════
 // Start Mining
 // ══════════════════════════════════════════════════════
 
-app.post("/api/mining/start", auth, async (req, res) => {
+app.post(
+    "/api/mining/start",
+    auth,
+    async (req, res) => {
 
-    try {
+        try {
 
-        await pool.query(
-            `
-            UPDATE users
-            SET mining_start_time = $1
-            WHERE id = $2
-            `,
-            [
-                Date.now(),
-                req.user.id
-            ]
-        );
-
-
-        res.json({
-            success: true,
-            message: "تم بدء التعدين"
-        });
+            await pool.query(
+                `
+                UPDATE users
+                SET mining_start_time = $1
+                WHERE id = $2
+                `,
+                [
+                    Date.now(),
+                    req.user.id
+                ]
+            );
 
 
-    } catch (error) {
+            res.json({
 
-        console.error(
-            "❌ /api/mining/start:",
-            error
-        );
+                success: true,
 
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
+                message:
+                    "تم بدء التعدين"
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "❌ /api/mining/start:",
+                error
+            );
+
+            res.status(500).json({
+
+                success: false,
+
+                error: error.message
+
+            });
+
+        }
 
     }
-
-});
+);
 
 
 // ══════════════════════════════════════════════════════
 // Watch Advertisement
 // ══════════════════════════════════════════════════════
 
-app.post("/api/ad/watch", auth, async (req, res) => {
+app.post(
+    "/api/ad/watch",
+    auth,
+    async (req, res) => {
 
-    try {
+        try {
 
-        const result = await pool.query(
-            `
-            UPDATE users
-            SET points = points + 10
-            WHERE id = $1
-            RETURNING points
-            `,
-            [req.user.id]
-        );
+            const result =
+                await pool.query(
+                    `
+                    UPDATE users
+                    SET points = points + 10
+                    WHERE id = $1
+                    RETURNING points
+                    `,
+                    [req.user.id]
+                );
 
 
-        if (result.rows.length === 0) {
+            if (result.rows.length === 0) {
 
-            return res.status(404).json({
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "المستخدم غير موجود"
+
+                });
+
+            }
+
+
+            res.json({
+
+                success: true,
+
+                points:
+                    result.rows[0].points
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "❌ /api/ad/watch:",
+                error
+            );
+
+            res.status(500).json({
+
                 success: false,
-                message: "المستخدم غير موجود"
+
+                error: error.message
+
             });
 
         }
 
-
-        res.json({
-            success: true,
-            points: result.rows[0].points
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "❌ /api/ad/watch:",
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-
     }
-
-});
+);
 
 
 // ══════════════════════════════════════════════════════
 // Authentication Routes
 // ══════════════════════════════════════════════════════
-
-const authRoutes =
-    require("./server/routes/auth");
 
 app.use(
     "/api/auth",
@@ -435,9 +510,6 @@ app.use(
 // Profile Routes
 // ══════════════════════════════════════════════════════
 
-const profileRoutes =
-    require("./server/routes/profile");
-
 app.use(
     "/api",
     profileRoutes
@@ -447,9 +519,6 @@ app.use(
 // ══════════════════════════════════════════════════════
 // Upload Routes
 // ══════════════════════════════════════════════════════
-
-const uploadRoutes =
-    require("./api/index");
 
 app.use(
     "/api",
@@ -461,9 +530,6 @@ app.use(
 // Wallet Routes
 // ══════════════════════════════════════════════════════
 
-const walletRoutes =
-    require("./server/routes/wallet");
-
 app.use(
     "/api/wallet",
     walletRoutes
@@ -474,52 +540,61 @@ app.use(
 // 404 API
 // ══════════════════════════════════════════════════════
 
-app.use("/api", (req, res) => {
+app.use(
+    "/api",
+    (req, res) => {
 
-    res.status(404).json({
+        res.status(404).json({
 
-        success: false,
+            success: false,
 
-        message: "API endpoint غير موجود",
+            message:
+                "API endpoint غير موجود",
 
-        path: req.path
+            path: req.path
 
-    });
+        });
 
-});
+    }
+);
 
 
 // ══════════════════════════════════════════════════════
 // Error Handler
 // ══════════════════════════════════════════════════════
 
-app.use((error, req, res, next) => {
+app.use(
+    (error, req, res, next) => {
 
-    console.error(
-        "❌ Server Error:",
-        error
-    );
+        console.error(
+            "❌ Server Error:",
+            error
+        );
 
 
-    if (res.headersSent) {
-        return next(error);
+        if (res.headersSent) {
+
+            return next(error);
+
+        }
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                "خطأ داخلي في الخادم",
+
+            error:
+                process.env.NODE_ENV === "production"
+                    ? undefined
+                    : error.message
+
+        });
+
     }
-
-
-    res.status(500).json({
-
-        success: false,
-
-        message: "خطأ داخلي في الخادم",
-
-        error:
-            process.env.NODE_ENV === "production"
-                ? undefined
-                : error.message
-
-    });
-
-});
+);
 
 
 // ══════════════════════════════════════════════════════
@@ -532,13 +607,16 @@ const PORT =
 
 if (require.main === module) {
 
-    app.listen(PORT, () => {
+    app.listen(
+        PORT,
+        () => {
 
-        console.log(
-            `🚀 Server running on port ${PORT}`
-        );
+            console.log(
+                `🚀 Server running on port ${PORT}`
+            );
 
-    });
+        }
+    );
 
 }
 
