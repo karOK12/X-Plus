@@ -404,7 +404,8 @@ const state = {
     idType: '', idName: '', idNumber: '',
     imageLink: '', profileImage: '',
     twoFA: '', email: '', phone2: '',
-    otpCode: ''
+    otpCode: '',
+    otpEmail: ''
   },
   cooldown: 0,
   cooldownTimer: null,
@@ -412,9 +413,7 @@ const state = {
   serverOTP: null
 };
 
-const API_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000/api'
-  : '/api';
+const API_URL = '/api';
 
 // ============================================
 // 🌐 دالة API محسّنة
@@ -814,10 +813,31 @@ async function sendOTP() {
     });
     
     if (data.success) {
-      state.serverOTP = data.code;
+      state.otpEmail = contact;
+      state.serverOTP = null;
+      state.otpVerified = false;
+
       showAlert(`✓ تم إرسال كود التحقق إلى ${contact}`, 'success');
-      document.getElementById('otpSection').style.display = 'block';
-      document.getElementById('otpSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      const otpSection = document.getElementById('otpSection');
+      const otpStatus = document.getElementById('otpStatus');
+
+      otpSection.style.display = 'block';
+
+      if (otpStatus) {
+        otpStatus.textContent =
+          `📧 تم إرسال كود التحقق إلى ${contact}. أدخل الرمز المرسل إلى بريدك.`;
+
+        otpStatus.style.background = '#fff3cd';
+        otpStatus.style.color = '#856404';
+      }
+
+      otpSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      clearOTPInputs();
       otpBoxes[0].focus();
       startCooldown(45);
     } else {

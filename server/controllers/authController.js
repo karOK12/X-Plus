@@ -33,8 +33,9 @@ function generateOTP() {
 
 async function sendOTPEmail(email, otp, username) {
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+  console.log("📤 SMTP TRY:", { from: process.env.SMTP_USER, to: email });
+  const info = await transporter.sendMail({
+    from: `"X Plus" <${process.env.SMTP_USER}>`,
     to: email,
     subject: "رمز التحقق X Plus",
 
@@ -56,6 +57,13 @@ async function sendOTPEmail(email, otp, username) {
 
       </div>
     `
+  });
+
+  console.log("📧 SMTP SEND RESULT:", {
+    accepted: info.accepted,
+    rejected: info.rejected,
+    response: info.response,
+    messageId: info.messageId
   });
 
 }
