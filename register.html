@@ -938,8 +938,16 @@ async function verifyOTP() {
       otpBoxes[0].focus();
     }
   } catch (err) {
-    showAlert('✗ خطأ في الاتصال بالخادم', 'error');
-    console.error('Verify Error:', err);
+    console.error('❌ VERIFY FRONTEND ERROR:', {
+      name: err?.name,
+      message: err?.message,
+      stack: err?.stack
+    });
+
+    showAlert(
+      '✗ فشل بعد التحقق: ' + (err?.message || 'خطأ غير معروف'),
+      'error'
+    );
   } finally {
     if (!state.otpVerified) {
       btn.disabled = false;
