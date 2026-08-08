@@ -503,6 +503,7 @@ exports.verifyOTP = async (req, res) => {
 
 
     // -------------------------
+    console.log("✅ OTP CODE MATCHED:", { email: cleanEmail, attempts: otpData.attempts, expiresAt: otpData.expires_at });
     // قراءة بيانات المستخدم
     // -------------------------
 
