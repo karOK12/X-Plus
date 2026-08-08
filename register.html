@@ -844,7 +844,7 @@ async function sendOTP() {
       showAlert('✗ فشل إرسال الكود: ' + (data.message || 'حاول مرة أخرى'), 'error');
     }
   } catch (err) {
-    showAlert('✗ خطأ في الاتصال بالخادم. تحقق من الشبكة.', 'error');
+    showAlert('✗ ' + (err.message || 'خطأ غير معروف'), 'error');
     console.error('OTP Error:', err);
   } finally {
     btn.disabled = false;
