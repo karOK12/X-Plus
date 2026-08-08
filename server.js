@@ -9,7 +9,6 @@ const pool = require("./server/config/database");
 const auth = require("./server/middleware/auth");
 
 const otpRoutes = require("./server/routes/otp");
-
 const authRoutes = require("./server/routes/auth");
 const profileRoutes = require("./server/routes/profile");
 const walletRoutes = require("./server/routes/wallet");
@@ -24,25 +23,33 @@ const app = express();
 
 app.use(cors());
 
-app.use(express.json({
-    limit: "10mb"
-}));
+app.use(
+    express.json({
+        limit: "10mb"
+    })
+);
 
-app.use(express.urlencoded({
-    extended: true,
-    limit: "10mb"
-}));
+app.use(
+    express.urlencoded({
+        extended: true,
+        limit: "10mb"
+    })
+);
 
 
 // ══════════════════════════════════════════════════════
 // Static Files
 // ══════════════════════════════════════════════════════
 
-app.use(express.static(path.join(__dirname)));
+app.use(
+    express.static(path.join(__dirname))
+);
 
 app.use(
     "/uploads",
-    express.static(path.join(__dirname, "uploads"))
+    express.static(
+        path.join(__dirname, "uploads")
+    )
 );
 
 
@@ -50,14 +57,9 @@ app.use(
 // OTP Routes
 // ══════════════════════════════════════════════════════
 //
-// المسارات الناتجة:
-//
 // POST /api/otp/send
 // POST /api/otp/verify
 // POST /api/otp/resend
-//
-// حسب المسارات الموجودة داخل:
-// server/routes/otp.js
 //
 
 app.use(
@@ -83,25 +85,26 @@ app.get("/", (req, res) => {
 // SMTP
 // ══════════════════════════════════════════════════════
 
-const transporter = nodemailer.createTransport({
+const transporter =
+    nodemailer.createTransport({
 
-    host: process.env.SMTP_HOST,
+        host: process.env.SMTP_HOST,
 
-    port: Number(
-        process.env.SMTP_PORT || 587
-    ),
+        port: Number(
+            process.env.SMTP_PORT || 587
+        ),
 
-    secure: false,
+        secure: false,
 
-    auth: {
+        auth: {
 
-        user: process.env.SMTP_USER,
+            user: process.env.SMTP_USER,
 
-        pass: process.env.SMTP_PASS
+            pass: process.env.SMTP_PASS
 
-    }
+        }
 
-});
+    });
 
 
 if (
@@ -114,7 +117,9 @@ if (
 
         .then(() => {
 
-            console.log("✅ SMTP Ready");
+            console.log(
+                "✅ SMTP Ready"
+            );
 
         })
 
@@ -196,7 +201,9 @@ async function initDatabase() {
         `);
 
 
-        console.log("✅ Neon Database Connected");
+        console.log(
+            "✅ Neon Database Connected"
+        );
 
     } catch (error) {
 
@@ -208,7 +215,6 @@ async function initDatabase() {
     }
 
 }
-
 
 initDatabase();
 
@@ -223,7 +229,9 @@ app.get(
 
         try {
 
-            await pool.query("SELECT 1");
+            await pool.query(
+                "SELECT 1"
+            );
 
             res.json({
 
@@ -266,21 +274,24 @@ app.get(
 
         try {
 
-            const user = await pool.query(
-                `
-                SELECT
-                    balance,
-                    points,
-                    power,
-                    mining_start_time
-                FROM users
-                WHERE id = $1
-                `,
-                [req.user.id]
-            );
+            const user =
+                await pool.query(
+                    `
+                    SELECT
+                        balance,
+                        points,
+                        power,
+                        mining_start_time
+                    FROM users
+                    WHERE id = $1
+                    `,
+                    [req.user.id]
+                );
 
 
-            if (user.rows.length === 0) {
+            if (
+                user.rows.length === 0
+            ) {
 
                 return res.status(404).json({
 
@@ -294,24 +305,34 @@ app.get(
             }
 
 
-            const data = user.rows[0];
+            const data =
+                user.rows[0];
+
 
             let balance =
-                Number(data.balance || 0);
+                Number(
+                    data.balance || 0
+                );
 
 
-            if (data.mining_start_time) {
+            if (
+                data.mining_start_time
+            ) {
 
                 const seconds =
                     (
                         Date.now() -
-                        Number(data.mining_start_time)
+                        Number(
+                            data.mining_start_time
+                        )
                     ) / 1000;
 
 
                 const profit =
                     (
-                        Number(data.power || 0) *
+                        Number(
+                            data.power || 0
+                        ) *
                         0.5
                     ) / 3600;
 
@@ -334,7 +355,8 @@ app.get(
 
             const depositAddress =
                 config.rows.length > 0
-                    ? config.rows[0].deposit_address
+                    ? config.rows[0]
+                        .deposit_address
                     : null;
 
 
@@ -345,10 +367,14 @@ app.get(
                 balance,
 
                 points:
-                    Number(data.points || 0),
+                    Number(
+                        data.points || 0
+                    ),
 
                 power:
-                    Number(data.power || 0),
+                    Number(
+                        data.power || 0
+                    ),
 
                 depositAddress
 
@@ -452,7 +478,9 @@ app.post(
                 );
 
 
-            if (result.rows.length === 0) {
+            if (
+                result.rows.length === 0
+            ) {
 
                 return res.status(404).json({
 
@@ -537,7 +565,81 @@ app.use(
 
 
 // ══════════════════════════════════════════════════════
-// 404 API
+// Temporary DB Diagnostic
+// ══════════════════════════════════════════════════════
+
+app.get(
+    "/api/debug-db-config",
+    (req, res) => {
+
+        try {
+
+            const raw =
+                process.env.DATABASE_URL;
+
+
+            if (!raw) {
+
+                return res.json({
+
+                    exists: false
+
+                });
+
+            }
+
+
+            const u =
+                new URL(raw);
+
+
+            res.json({
+
+                exists: true,
+
+                host:
+                    u.hostname,
+
+                user:
+                    u.username,
+
+                database:
+                    u.pathname.slice(1),
+
+                port:
+                    u.port || "5432",
+
+                sslmode:
+                    u.searchParams.get(
+                        "sslmode"
+                    ),
+
+                channel_binding:
+                    u.searchParams.get(
+                        "channel_binding"
+                    )
+
+            });
+
+        } catch (error) {
+
+            res.status(500).json({
+
+                exists: false,
+
+                error:
+                    error.message
+
+            });
+
+        }
+
+    }
+);
+
+
+// ══════════════════════════════════════════════════════
+// 404 API — آخر Route
 // ══════════════════════════════════════════════════════
 
 app.use(
@@ -551,7 +653,8 @@ app.use(
             message:
                 "API endpoint غير موجود",
 
-            path: req.path
+            path:
+                req.path
 
         });
 
@@ -560,7 +663,7 @@ app.use(
 
 
 // ══════════════════════════════════════════════════════
-// Error Handler
+// Error Handler — آخر شيء
 // ══════════════════════════════════════════════════════
 
 app.use(
