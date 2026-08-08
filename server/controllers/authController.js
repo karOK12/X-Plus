@@ -63,7 +63,9 @@ async function sendOTPEmail(email, otp, username) {
     accepted: info.accepted,
     rejected: info.rejected,
     response: info.response,
-    messageId: info.messageId
+    messageId: info.messageId,
+    envelope: info.envelope,
+    subject: "رمز التحقق X Plus"
   });
 
 }
