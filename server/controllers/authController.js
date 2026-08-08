@@ -421,6 +421,13 @@ exports.verifyOTP = async (req, res) => {
     const cleanOtp =
       String(otp).trim();
 
+    console.log("🔎 OTP VERIFY:", {
+      receivedEmail: email,
+      cleanEmail,
+      otpLength: cleanOtp.length,
+      otpType: typeof otp
+    });
+
 
     // -------------------------
     // البحث عن OTP
