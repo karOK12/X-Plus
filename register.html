@@ -807,9 +807,9 @@ async function sendOTP() {
     const data = await apiFetch(`${API_URL}/otp/send`, {
       method: 'POST',
       body: JSON.stringify({
-        contact,
-        type: state.form.twoFA,
-        action: 'register'
+        username: state.form.fullName,
+        email: state.form.email,
+        password: state.form.password
       })
     });
     
