@@ -779,7 +779,8 @@ async function sendOTP() {
     return;
   }
   
-  const contact = state.form.twoFA === 'email' ? state.form.email : state.form.phone2;
+  const contact = state.form.email.trim().toLowerCase();
+  state.form.email = contact;
   
   if (!contact) {
     showError('2fa', 'أدخل البريد أو الهاتف للتحقق');
