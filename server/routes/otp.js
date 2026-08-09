@@ -1,7 +1,7 @@
 const express = require("express");
 
 const {
-    register,
+    sendOTP,
     verifyOTP,
     resendOTP
 } = require("../controllers/authController");
@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post(
     "/send",
-    register
+    sendOTP
 );
 
 
