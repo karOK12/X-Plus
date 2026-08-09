@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 
 const nodemailer = require("nodemailer");
+const dns = require("dns").promises;
 
 
 // =====================================================
@@ -28,6 +29,56 @@ const transporter = nodemailer.createTransport({
 
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+
+// =====================================================
+// فحص دومين البريد قبل إرسال OTP
+// لا يفحص users ولا يشترط أن يكون البريد مسجلاً سابقاً
+// =====================================================
+
+async function verifyEmailDomain(email) {
+
+  const domain = email.split("@")[1]?.trim().toLowerCase();
+
+  if (!domain) {
+    return {
+      valid: false,
+      reason: "صيغة البريد الإلكتروني غير صحيحة"
+    };
+  }
+
+  try {
+
+    const mxRecords = await dns.resolveMx(domain);
+
+    if (!mxRecords || mxRecords.length === 0) {
+      return {
+        valid: false,
+        reason: "دومين البريد لا يحتوي على خادم بريد صالح"
+      };
+    }
+
+    return {
+      valid: true,
+      domain,
+      mx: mxRecords
+    };
+
+  } catch (err) {
+
+    console.error("❌ EMAIL MX CHECK ERROR:", {
+      email,
+      domain,
+      code: err.code,
+      message: err.message
+    });
+
+    return {
+      valid: false,
+      reason: "تعذر التحقق من خادم البريد"
+    };
+  }
 }
 
 
@@ -655,9 +706,36 @@ exports.sendOTP = async (req, res) => {
       });
     }
 
-    // مهم:
-    // لا نفحص users هنا.
-    // إرسال OTP لا يعني إنشاء حساب.
+    // =====================================================
+    // فحص البريد قبل إرسال OTP
+    // لا نفحص users: البريد الجديد مسموح له بالتسجيل
+    // =====================================================
+
+    const emailCheck = await verifyEmailDomain(cleanEmail);
+
+    if (!emailCheck.valid) {
+
+      console.log("❌ EMAIL DOMAIN REJECTED:", {
+        email: cleanEmail,
+        reason: emailCheck.reason
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: emailCheck.reason
+      });
+    }
+
+    console.log("✅ EMAIL DOMAIN VALID:", {
+      email: cleanEmail,
+      domain: emailCheck.domain,
+      mxCount: emailCheck.mx.length
+    });
+
+
+    // =====================================================
+    // إنشاء OTP بعد نجاح فحص البريد
+    // =====================================================
 
     const otp = generateOTP();
 
