@@ -637,6 +637,88 @@ exports.verifyOTP = async (req, res) => {
 
 
 // =====================================================
+// SEND OTP — إرسال الكود فقط بدون إنشاء مستخدم
+// =====================================================
+
+exports.sendOTP = async (req, res) => {
+
+  console.log("🔥 SEND OTP REQUEST RECEIVED:", req.body);
+
+  try {
+
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "جميع الحقول مطلوبة"
+      });
+    }
+
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (cleanUsername.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "اسم المستخدم يجب أن يكون 3 أحرف على الأقل"
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+      });
+    }
+
+    // مهم:
+    // لا نفحص users هنا.
+    // إرسال OTP لا يعني إنشاء حساب.
+
+    const otp = generateOTP();
+
+    const otpHash = await bcrypt.hash(otp, 10);
+
+    await Otp.save(
+      cleanEmail,
+      otpHash,
+      {
+        username: cleanUsername,
+        email: cleanEmail,
+        password: await bcrypt.hash(password, 10)
+      },
+      new Date(Date.now() + 10 * 60 * 1000)
+    );
+
+    await sendOTPEmail(
+      cleanEmail,
+      otp,
+      cleanUsername
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+      email: cleanEmail
+    });
+
+  } catch (err) {
+
+    console.error("SEND OTP ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "خطأ في الخادم",
+      error:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : err.message
+    });
+  }
+};
+
+// =====================================================
 // RESEND OTP
 // =====================================================
 

@@ -46,6 +46,26 @@
       line-height: 1.8;
     }
 
+    .timer {
+      margin: 10px 0 15px;
+      font-size: 13px;
+      color: #1877f2;
+      font-weight: 700;
+    }
+
+    .timer.expired {
+      color: #c33;
+    }
+
+    .resend {
+      margin-top: 10px;
+      background: #28a745;
+    }
+
+    .resend:disabled {
+      opacity: .6;
+    }
+
     .otp-inputs {
       display: flex;
       direction: ltr;
@@ -125,6 +145,10 @@
     أدخل رمز التحقق المرسل إليك
   </div>
 
+  <div class="timer" id="otpTimer">
+    ⏱️ صلاحية الكود: 10:00
+  </div>
+
   <div class="alert" id="alert"></div>
 
   <div class="otp-inputs">
@@ -138,6 +162,15 @@
 
   <button id="verifyBtn" onclick="verifyOTP()">
     تأكيد الكود
+  </button>
+
+  <button
+    id="resendBtn"
+    class="resend"
+    onclick="resendOTP()"
+    disabled
+  >
+    إعادة إرسال الكود
   </button>
 
   <button class="back" onclick="goBack()">
@@ -154,6 +187,11 @@ const boxes = document.querySelectorAll('.otp-box');
 
 const alertBox = document.getElementById('alert');
 const verifyBtn = document.getElementById('verifyBtn');
+const resendBtn = document.getElementById('resendBtn');
+const otpTimer = document.getElementById('otpTimer');
+
+let timerInterval = null;
+let remainingSeconds = 10 * 60;
 
 function showAlert(message, type) {
   alertBox.textContent = message;
@@ -191,6 +229,126 @@ boxes.forEach((box, index) => {
   });
 
 });
+
+function updateTimer() {
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+
+  otpTimer.textContent =
+    `⏱️ صلاحية الكود: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+  if (remainingSeconds <= 0) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+
+    otpTimer.textContent = '⛔ انتهت صلاحية الكود';
+    otpTimer.classList.add('expired');
+
+    verifyBtn.disabled = true;
+    resendBtn.disabled = false;
+
+    showAlert(
+      'انتهت صلاحية رمز التحقق. يمكنك طلب رمز جديد.',
+      'error'
+    );
+
+    return;
+  }
+
+  remainingSeconds--;
+}
+
+function startTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+
+  remainingSeconds = 10 * 60;
+  otpTimer.classList.remove('expired');
+
+  verifyBtn.disabled = false;
+  resendBtn.disabled = true;
+
+  updateTimer();
+
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+async function resendOTP() {
+  const pending = JSON.parse(
+    sessionStorage.getItem('pendingVerification') || 'null'
+  );
+
+  if (!pending || !pending.email) {
+    showAlert(
+      'بيانات التحقق غير موجودة، ارجع وأرسل الكود من جديد',
+      'error'
+    );
+    return;
+  }
+
+  resendBtn.disabled = true;
+  resendBtn.textContent = 'جاري إرسال الكود...';
+
+  try {
+    const token =
+      localStorage.getItem('token') ||
+      localStorage.getItem('auth_token');
+
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/otp/resend`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        email: pending.email
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || 'فشل إعادة إرسال الكود'
+      );
+    }
+
+    showAlert(
+      '✓ تم إرسال رمز تحقق جديد إلى بريدك',
+      'success'
+    );
+
+    boxes.forEach(box => {
+      box.value = '';
+    });
+
+    boxes[0].focus();
+
+    startTimer();
+
+  } catch (error) {
+
+    console.error('Resend OTP error:', error);
+
+    showAlert(
+      '✗ ' + (error.message || 'فشل إعادة إرسال الكود'),
+      'error'
+    );
+
+    resendBtn.disabled = false;
+
+  } finally {
+
+    resendBtn.textContent = 'إعادة إرسال الكود';
+
+  }
+}
 
 async function verifyOTP() {
 
@@ -244,7 +402,21 @@ async function verifyOTP() {
       );
     }
 
+    // حفظ جلسة المستخدم بعد نجاح التحقق
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.removeItem('auth_token');
+    }
+
     sessionStorage.setItem('otpVerified', 'true');
+
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    verifyBtn.disabled = true;
+    resendBtn.disabled = true;
 
     showAlert('✓ تم التحقق بنجاح', 'success');
 
@@ -282,6 +454,8 @@ if (pending && pending.email) {
 }
 
 boxes[0].focus();
+
+startTimer();
 
 </script>
 
