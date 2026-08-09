@@ -1,16 +1,32 @@
 const db = require("../config/database");
 
+// =====================================================
 // بدء التعدين
+// =====================================================
 exports.startMining = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
+
     const userId = req.user.id;
+    const startTime = Date.now();
 
     const result = await db.query(
-      `UPDATE users
-       SET mining_start_time = $1
-       WHERE id = $2
-       RETURNING id`,
-      [Date.now(), userId]
+      `
+      UPDATE users
+      SET mining_start_time = $1
+      WHERE id = $2
+      RETURNING
+        id,
+        balance,
+        power,
+        mining_start_time
+      `,
+      [startTime, userId]
     );
 
     if (result.rows.length === 0) {
@@ -20,34 +36,58 @@ exports.startMining = async (req, res) => {
       });
     }
 
-    res.json({
+    const user = result.rows[0];
+
+    console.log("⛏️ MINING START:", {
+      userId,
+      miningStartTime: user.mining_start_time
+    });
+
+    return res.json({
       success: true,
-      message: "تم بدء التعدين"
+      message: "تم بدء التعدين بنجاح",
+      miningStartTime: Number(user.mining_start_time),
+      balance: Number(user.balance || 0),
+      power: Number(user.power || 0),
+      isMining: true
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ START MINING ERROR:", err);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: err.message
+      message: "فشل بدء التعدين",
+      error: err.message
     });
   }
 };
 
+
+// =====================================================
 // حالة التعدين
+// =====================================================
 exports.getMiningStatus = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
 
     const userId = req.user.id;
 
     const result = await db.query(
-      `SELECT
+      `
+      SELECT
+        id,
         balance,
         power,
         mining_start_time
-       FROM users
-       WHERE id = $1`,
+      FROM users
+      WHERE id = $1
+      `,
       [userId]
     );
 
@@ -60,28 +100,42 @@ exports.getMiningStatus = async (req, res) => {
 
     const user = result.rows[0];
 
-    let balance = Number(user.balance);
+    const storedBalance = Number(user.balance || 0);
+    const power = Number(user.power || 0);
+    const miningStartTime = user.mining_start_time
+      ? Number(user.mining_start_time)
+      : null;
 
-    if (user.mining_start_time) {
-      const hours =
-        (Date.now() - Number(user.mining_start_time)) / 3600000;
+    let balance = storedBalance;
+    let elapsedSeconds = 0;
 
-      balance += hours * Number(user.power) * 0.5;
+    if (miningStartTime) {
+      elapsedSeconds = Math.max(
+        0,
+        Math.floor((Date.now() - miningStartTime) / 1000)
+      );
+
+      const hours = elapsedSeconds / 3600;
+
+      balance += hours * power * 0.5;
     }
 
-    res.json({
+    return res.json({
       success: true,
       balance,
-      power: Number(user.power),
-      isMining: !!user.mining_start_time
+      power,
+      miningStartTime,
+      elapsedSeconds,
+      isMining: !!miningStartTime
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ GET MINING STATUS ERROR:", err);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: err.message
+      message: "فشل جلب حالة التعدين",
+      error: err.message
     });
   }
 };

@@ -111,29 +111,6 @@ const Otp = {
     );
 
     return result.rows[0] || null;
-  },
-
-  // ===============================
-  // عدد محاولات OTP
-  // ===============================
-  async getAttempts(email) {
-
-    const normalizedEmail =
-      email.trim().toLowerCase();
-
-    const result = await db.query(
-      `
-      SELECT attempts
-      FROM otp_codes
-      WHERE email = $1
-      LIMIT 1
-      `,
-      [normalizedEmail]
-    );
-
-    return result.rows[0]
-      ? Number(result.rows[0].attempts || 0)
-      : 0;
   }
 
 };

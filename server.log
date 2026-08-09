@@ -1,0 +1,100 @@
+◇ injected env (7) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+Wallet Controller: {
+  getStatus: [AsyncFunction (anonymous)],
+  connectWallet: [AsyncFunction (anonymous)],
+  disconnectWallet: [AsyncFunction (anonymous)],
+  depositInfo: [AsyncFunction (anonymous)],
+  depositConfirm: [AsyncFunction (anonymous)],
+  withdraw: [AsyncFunction (anonymous)],
+  transfer: [AsyncFunction (anonymous)],
+  history: [AsyncFunction (anonymous)]
+}
+(node:5978) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+🚀 Server running on port 3000
+✅ SMTP Ready
+✅ Neon Database Connected
+📤 SMTP TRY: { from: 'crpturateam@gmail.com', to: 'kararaljanabi812@gmail.com' }
+📧 SMTP SEND RESULT: {
+  accepted: [ 'kararaljanabi812@gmail.com' ],
+  rejected: [],
+  response: '250 2.0.0 OK  1786203120 ffacd0b85a97d-480021fd392sm15177855f8f.31 - gsmtp',
+  messageId: '<3c393c3c-9dbd-3544-738f-0a0e2873b163@gmail.com>'
+}
+❌ Server Error: SyntaxError: Unexpected non-whitespace character after JSON at position 89 (line 1 column 90)
+    at JSON.parse (<anonymous>)
+    at parse (/data/data/com.termux/files/home/X Plus/node_modules/body-parser/lib/types/json.js:91:21)
+    at /data/data/com.termux/files/home/X Plus/node_modules/body-parser/lib/read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:226:14)
+    at invokeCallback (/data/data/com.termux/files/home/X Plus/node_modules/raw-body/index.js:238:16)
+    at done (/data/data/com.termux/files/home/X Plus/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/data/data/com.termux/files/home/X Plus/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:509:20)
+    at endReadableNT (node:internal/streams/readable:1744:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  expose: true,
+  statusCode: 400,
+  status: 400,
+  body: '{"username":"Test User","email":"YOUR_REAL_SECOND_EMAIL@gmail.com","password":"12345678"}curl&{"username":"Test User","email":"crpturateam@gmail.com","password":"12345678"}',
+  type: 'entity.parse.failed'
+}
+❌ Server Error: SyntaxError: Unexpected non-whitespace character after JSON at position 89 (line 1 column 90)
+    at JSON.parse (<anonymous>)
+    at parse (/data/data/com.termux/files/home/X Plus/node_modules/body-parser/lib/types/json.js:91:21)
+    at /data/data/com.termux/files/home/X Plus/node_modules/body-parser/lib/read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:226:14)
+    at invokeCallback (/data/data/com.termux/files/home/X Plus/node_modules/raw-body/index.js:238:16)
+    at done (/data/data/com.termux/files/home/X Plus/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/data/data/com.termux/files/home/X Plus/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:509:20)
+    at endReadableNT (node:internal/streams/readable:1744:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  expose: true,
+  statusCode: 400,
+  status: 400,
+  body: '{"username":"Test User","email":"YOUR_REAL_SECOND_EMAIL@gmail.com","password":"12345678"}curl&{"username":"Test User","email":"crpturateam@gmail.com","password":"12345678"}',
+  type: 'entity.parse.failed'
+}
+📤 SMTP TRY: { from: 'crpturateam@gmail.com', to: 'gmail_real_new@gmail.com' }
+📧 SMTP SEND RESULT: {
+  accepted: [ 'gmail_real_new@gmail.com' ],
+  rejected: [],
+  response: '250 2.0.0 OK  1786203952 5b1f17b1804b1-4995e9e7164sm160264585e9.2 - gsmtp',
+  messageId: '<65a68ac9-9c14-b75b-d083-b8468bfb358b@gmail.com>'
+}
+📤 SMTP TRY: { from: 'crpturateam@gmail.com', to: 'ضع_هنا_إيميلك_الحقيقي' }
+REGISTER ERROR: Error: No recipients defined
+    at SMTPConnection._formatError (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:938:19)
+    at SMTPConnection._setEnvelope (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:1204:34)
+    at SMTPConnection.send (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:744:14)
+    at sendMessage (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-transport/index.js:233:28)
+    at /data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-transport/index.js:290:25
+    at SMTPConnection._actionAUTHComplete (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:1798:9)
+    at SMTPConnection.<anonymous> (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:669:26)
+    at SMTPConnection._processResponse (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:1150:20)
+    at SMTPConnection._onData (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:898:14)
+    at SMTPConnection._onSocketData (/data/data/com.termux/files/home/X Plus/node_modules/nodemailer/lib/smtp-connection/index.js:224:44) {
+  code: 'EENVELOPE',
+  command: 'API'
+}
+📤 SMTP TRY: { from: 'crpturateam@gmail.com', to: 'mytest@gmail.com' }
+📧 SMTP SEND RESULT: {
+  accepted: [ 'mytest@gmail.com' ],
+  rejected: [],
+  response: '250 2.0.0 OK  1786204200 ffacd0b85a97d-480021f90f8sm14444233f8f.26 - gsmtp',
+  messageId: '<da450ac9-fc9c-5e7a-79d5-7ea866d04ed0@gmail.com>'
+}
+📤 SMTP TRY: { from: 'crpturateam@gmail.com', to: 'xplus-test-2026@example.com' }
+📧 SMTP SEND RESULT: {
+  accepted: [ 'xplus-test-2026@example.com' ],
+  rejected: [],
+  response: '250 2.0.0 OK  1786300954 ffacd0b85a97d-48002150952sm23232459f8f.15 - gsmtp',
+  messageId: '<62d1c92d-71b9-6198-4477-c6d070696cbb@gmail.com>'
+}

@@ -144,6 +144,23 @@ exports.register = async (req, res) => {
 
 
     // -------------------------
+    // التأكد من عدم وجود المستخدم
+    // -------------------------
+
+    const existingUser = await User.findByEmail(cleanEmail);
+
+
+    if (existingUser) {
+
+      return res.status(400).json({
+        success: false,
+        message: "البريد الإلكتروني مستخدم مسبقاً"
+      });
+
+    }
+
+
+    // -------------------------
     // تشفير كلمة المرور
     // -------------------------
 
