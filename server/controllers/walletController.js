@@ -282,16 +282,21 @@ exports.disconnectWallet = async (req, res) => {
 // =====================================================
 
 exports.depositInfo = async (req, res) => {
-
   try {
-
     const userId = uid(req);
 
-    const network =
-      String(req.query.network || 'TRC20').toUpperCase();
+    if (!userId) {
+      return res.status(401).json({
+        ok: false,
+        error: 'هوية المستخدم غير موجودة'
+      });
+    }
+
+    const network = String(
+      req.query.network || 'TRC20'
+    ).toUpperCase();
 
     const config = NETWORKS[network];
-
 
     if (!config) {
       return res.status(400).json({
@@ -300,75 +305,230 @@ exports.depositInfo = async (req, res) => {
       });
     }
 
-
-    // عناوين الإيداع الموجودة عند المستخدم
-    const addressResult = await pool.query(
-      `
-      SELECT "عنوان"
-      FROM "عناوين الإيداع"
-      WHERE "معرف المستخدم" = $1
-        AND "شبكة" = $2
+    const addressResult = await pool.query(`
+      SELECT deposit_address
+      FROM platform_config
+      WHERE id = 1
       LIMIT 1
-      `,
-      [
-        userId,
-        network
-      ]
-    );
+    `);
 
-
-    // آخر إيداع معلق
-    const pendingResult = await pool.query(
-      `
+    const pendingResult = await pool.query(`
       SELECT
         amount,
         tx_hash,
         confirmations,
-        required_conf
-      FROM transactions
+        status,
+        network,
+        created_at
+      FROM wallet_transactions
       WHERE user_id = $1
         AND type = 'deposit'
         AND status = 'pending'
       ORDER BY id DESC
       LIMIT 1
-      `,
-      [userId]
-    );
-
+    `, [userId]);
 
     res.json({
-
       ok: true,
-
       network,
-
-      address:
-        addressResult.rows[0]?.['عنوان'] || null,
-
+      address: addressResult.rows[0]?.deposit_address || null,
       min: config.min,
-
-      confirmations_required:
-        config.confirmations,
-
+      confirmations_required: config.confirmations,
       time: config.time,
-
-      pending:
-        pendingResult.rows[0]
-          ? num(pendingResult.rows[0])
-          : null
-
+      pending: pendingResult.rows[0]
+        ? {
+            amount: Number(pendingResult.rows[0].amount || 0),
+            tx_hash: pendingResult.rows[0].tx_hash,
+            confirmations: Number(
+              pendingResult.rows[0].confirmations || 0
+            ),
+            status: pendingResult.rows[0].status,
+            network: pendingResult.rows[0].network,
+            created_at: pendingResult.rows[0].created_at
+          }
+        : null
     });
 
-
   } catch (error) {
-
     console.error('DEPOSIT INFO ERROR:', error);
 
     res.status(500).json({
       ok: false,
       error: 'خطأ في الخادم'
     });
+  }
+};
 
+
+// =====================================================
+// XP DEPOSIT
+// =====================================================
+
+exports.deposit = async (req, res) => {
+  const userId = uid(req);
+
+  if (!userId) {
+    return res.status(401).json({
+      ok: false,
+      error: 'هوية المستخدم غير موجودة'
+    });
+  }
+
+  const network = String(
+    req.body?.network || ''
+  ).toUpperCase();
+
+  const txHash = String(
+    req.body?.tx_hash || ''
+  ).trim();
+
+  const amount = Number(req.body?.amount);
+  const config = NETWORKS[network];
+
+  if (!config) {
+    return res.status(400).json({
+      ok: false,
+      error: 'اختر شبكة مدعومة'
+    });
+  }
+
+  if (!Number.isFinite(amount) || amount < config.min) {
+    return res.status(400).json({
+      ok: false,
+      error: `الحد الأدنى للإيداع على ${network} هو $${config.min}`
+    });
+  }
+
+  if (!txHash || txHash.length < 10) {
+    return res.status(400).json({
+      ok: false,
+      error: 'أدخل TX Hash صحيحاً'
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const wallet = await client.query(`
+      SELECT user_id
+      FROM xp_wallets
+      WHERE user_id = $1
+      FOR UPDATE
+    `, [userId]);
+
+    if (!wallet.rows[0]) {
+      await client.query('ROLLBACK');
+
+      return res.status(404).json({
+        ok: false,
+        error: 'محفظة XP غير موجودة'
+      });
+    }
+
+    const existing = await client.query(`
+      SELECT id, status
+      FROM wallet_transactions
+      WHERE tx_hash = $1
+      LIMIT 1
+      FOR UPDATE
+    `, [txHash]);
+
+    if (existing.rows[0]) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        error: 'هذه المعاملة مسجلة مسبقاً'
+      });
+    }
+
+    const pending = await client.query(`
+      SELECT id
+      FROM wallet_transactions
+      WHERE user_id = $1
+        AND type = 'deposit'
+        AND status = 'pending'
+      LIMIT 1
+    `, [userId]);
+
+    if (pending.rows[0]) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        error: 'لديك إيداع معلق بالفعل'
+      });
+    }
+
+    const reference =
+      'DP-' +
+      Math.random()
+        .toString(36)
+        .slice(2, 8)
+        .toUpperCase();
+
+    await client.query(`
+      INSERT INTO wallet_transactions (
+        user_id,
+        type,
+        title,
+        sub,
+        amount,
+        unit,
+        sign,
+        status,
+        network,
+        tx_hash,
+        reference,
+        note
+      )
+      VALUES (
+        $1,
+        'deposit',
+        'إيداع USDT',
+        $2,
+        $3,
+        '$',
+        1,
+        'pending',
+        $4,
+        $5,
+        $6,
+        'بانتظار تأكيد الشبكة'
+      )
+    `, [
+      userId,
+      `إيداع عبر ${network}`,
+      amount,
+      network,
+      txHash,
+      reference
+    ]);
+
+    await client.query('COMMIT');
+
+    res.json({
+      ok: true,
+      reference,
+      amount,
+      network,
+      status: 'pending'
+    });
+
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    console.error('XP DEPOSIT ERROR:', error);
+
+    res.status(500).json({
+      ok: false,
+      error: 'خطأ في الخادم'
+    });
+
+  } finally {
+    client.release();
   }
 };
 
@@ -1361,4 +1521,329 @@ exports.history = async (req, res) => {
 
   }
 
+};
+
+// =====================================================
+// XP WALLET STATE
+// =====================================================
+
+exports.state = async (req, res) => {
+  try {
+    const userId = uid(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        ok: false,
+        message: 'هوية المستخدم غير موجودة'
+      });
+    }
+
+    const wallet = await pool.query(`
+      SELECT
+        uid,
+        user_id,
+        name,
+        balance,
+        points,
+        rate,
+        daily_pts,
+        last_claim,
+        total_converted,
+        power,
+        mining_start_time
+      FROM xp_wallets
+      WHERE user_id = $1
+      LIMIT 1
+    `, [userId]);
+
+    if (!wallet.rows[0]) {
+      return res.status(404).json({
+        ok: false,
+        message: 'محفظة XP غير موجودة'
+      });
+    }
+
+    const history = await pool.query(`
+      SELECT
+        type,
+        title,
+        sub,
+        amount,
+        unit,
+        sign,
+        status,
+        network,
+        address,
+        tx_hash,
+        reference,
+        note,
+        created_at
+      FROM wallet_transactions
+      WHERE user_id = $1
+      ORDER BY id DESC
+      LIMIT 100
+    `, [userId]);
+
+    const w = wallet.rows[0];
+
+    const week = await pool.query(`
+      SELECT COALESCE(SUM(amount), 0) AS points
+      FROM wallet_transactions
+      WHERE user_id = $1
+        AND type = 'earn'
+        AND created_at >= NOW() - INTERVAL '7 days'
+    `, [userId]);
+
+    res.json({
+      ok: true,
+
+      wallet: {
+        uid: w.uid,
+        user_id: w.user_id,
+        name: w.name,
+        balance: Number(w.balance || 0),
+        points: Number(w.points || 0),
+        rate: Number(w.rate || 100),
+        dailyPts: Number(w.daily_pts || 320),
+        lastClaim: w.last_claim,
+        totalConverted: Number(w.total_converted || 0),
+        power: Number(w.power || 0),
+        miningStartTime: w.mining_start_time,
+        weekPoints: Number(week.rows[0]?.points || 0)
+      },
+
+      history: history.rows.map(h => ({
+        type: h.type,
+        title: h.title,
+        sub: h.sub,
+        amount: Number(h.amount || 0),
+        unit: h.unit || '$',
+        sign: Number(h.sign || 0),
+        status: h.status || 'completed',
+        network: h.network,
+        address: h.address,
+        tx_hash: h.tx_hash,
+        reference: h.reference,
+        note: h.note,
+        created_at: h.created_at
+      }))
+    });
+
+  } catch (error) {
+    console.error('XP WALLET STATE ERROR:', error);
+
+    res.status(500).json({
+      ok: false,
+      message: 'خطأ في الخادم'
+    });
+  }
+};
+
+
+// =====================================================
+// DAILY CLAIM
+// =====================================================
+
+exports.claim = async (req, res) => {
+  const userId = uid(req);
+
+  if (!userId) {
+    return res.status(401).json({
+      ok: false,
+      message: 'هوية المستخدم غير موجودة'
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const result = await client.query(`
+      SELECT points, daily_pts, last_claim
+      FROM xp_wallets
+      WHERE user_id = $1
+      FOR UPDATE
+    `, [userId]);
+
+    if (!result.rows[0]) {
+      await client.query('ROLLBACK');
+
+      return res.status(404).json({
+        ok: false,
+        message: 'محفظة XP غير موجودة'
+      });
+    }
+
+    const wallet = result.rows[0];
+
+    const todayUtc = new Date().toISOString().slice(0, 10);
+
+    if (
+      wallet.last_claim &&
+      String(wallet.last_claim).slice(0, 10) === todayUtc
+    ) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        message: 'استلمت نقاط اليوم'
+      });
+    }
+
+    const claimed = Number(wallet.daily_pts || 320);
+
+    await client.query(`
+      UPDATE xp_wallets
+      SET
+        points = points + $1,
+        last_claim = CURRENT_DATE
+      WHERE user_id = $2
+    `, [claimed, userId]);
+
+    await client.query(`
+      INSERT INTO wallet_transactions
+        (user_id, type, title, sub, amount, unit, sign, status, note)
+      VALUES
+        ($1, 'earn', 'مكافأة يومية', 'استلام نقاط اليوم', $2, 'points', 1, 'completed', 'Daily claim')
+    `, [userId, claimed]);
+
+    await client.query('COMMIT');
+
+    res.json({
+      ok: true,
+      claimed
+    });
+
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    console.error('XP CLAIM ERROR:', error);
+
+    res.status(500).json({
+      ok: false,
+      message: 'خطأ في الخادم'
+    });
+
+  } finally {
+    client.release();
+  }
+};
+
+
+// =====================================================
+// POINTS CONVERSION
+// =====================================================
+
+exports.convert = async (req, res) => {
+  const userId = uid(req);
+  const amount = Math.floor(Number(req.body?.amount));
+
+  if (!userId) {
+    return res.status(401).json({
+      ok: false,
+      message: 'هوية المستخدم غير موجودة'
+    });
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return res.status(400).json({
+      ok: false,
+      message: 'أدخل كمية نقاط صحيحة'
+    });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const result = await client.query(`
+      SELECT points, rate
+      FROM xp_wallets
+      WHERE user_id = $1
+      FOR UPDATE
+    `, [userId]);
+
+    if (!result.rows[0]) {
+      await client.query('ROLLBACK');
+
+      return res.status(404).json({
+        ok: false,
+        message: 'محفظة XP غير موجودة'
+      });
+    }
+
+    const wallet = result.rows[0];
+    const points = Number(wallet.points || 0);
+    const rate = Number(wallet.rate || 100);
+
+    if (amount < rate) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        message: `الحد الأدنى ${rate} نقطة`
+      });
+    }
+
+    if (amount > points) {
+      await client.query('ROLLBACK');
+
+      return res.status(400).json({
+        ok: false,
+        message: 'رصيد نقاطك غير كافٍ'
+      });
+    }
+
+    const got = amount / rate;
+
+    await client.query(`
+      UPDATE xp_wallets
+      SET
+        points = points - $1,
+        balance = balance + $2,
+        total_converted = total_converted + $1
+      WHERE user_id = $3
+    `, [amount, got, userId]);
+
+    await client.query(`
+      INSERT INTO wallet_transactions
+        (user_id, type, title, sub, amount, unit, sign, status, note)
+      VALUES
+        ($1, 'convert', 'تحويل نقاط', $2, $3, '$', 1, 'completed', 'Points conversion')
+    `, [
+      userId,
+      `${amount} نقطة → $${got.toFixed(2)}`,
+      got
+    ]);
+
+    await client.query(`
+      INSERT INTO wallet_transactions
+        (user_id, type, title, sub, amount, unit, sign, status, note)
+      VALUES
+        ($1, 'points', 'خصم نقاط', 'تم خصم النقاط للتحويل', $2, 'points', -1, 'completed', 'Points conversion')
+    `, [userId, amount]);
+
+    await client.query('COMMIT');
+
+    res.json({
+      ok: true,
+      converted: amount,
+      got
+    });
+
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    console.error('XP CONVERT ERROR:', error);
+
+    res.status(500).json({
+      ok: false,
+      message: 'خطأ في الخادم'
+    });
+
+  } finally {
+    client.release();
+  }
 };

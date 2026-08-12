@@ -591,12 +591,43 @@ async function doConvert() {
 }
 
 /* ═══════════ الإيداع ═══════════ */
+
+async function loadDepositInfo(network = selectedDepNet) {
+  const data = await (
+    await apiFetch(`${API_URL}/wallet/deposit?network=${encodeURIComponent(network)}`)
+  ).json();
+
+  if (data.address) {
+    $('depositAddr').childNodes[0].textContent = data.address;
+  }
+
+  const warns = document.querySelectorAll('#v-deposit .warn-box b');
+
+  if (data.min != null && warns[0]) {
+    warns[0].textContent = '$' + data.min;
+  }
+
+  if (data.confirmations_required != null && warns[1]) {
+    warns[1].textContent = data.confirmations_required + ' تأكيد';
+  }
+
+  if (data.time && warns[2]) {
+    warns[2].textContent = data.time;
+  }
+}
+
+
 document.addEventListener('click', e => {
   if (e.target.closest('#depNetworks .net-btn')) {
     document.querySelectorAll('#depNetworks .net-btn').forEach(b => b.classList.remove('active'));
     e.target.closest('.net-btn').classList.add('active');
     selectedDepNet = e.target.closest('.net-btn').dataset.net;
     $('depNetName').textContent = selectedDepNet;
+
+    loadDepositInfo(selectedDepNet).catch(err => {
+      $('depErr').textContent = '⚠️ ' + err.message;
+      $('depErr').style.display = 'block';
+    });
   }
   if (e.target.closest('#wdNetworks .net-btn')) {
     document.querySelectorAll('#wdNetworks .net-btn').forEach(b => b.classList.remove('active'));
@@ -623,7 +654,7 @@ async function submitDeposit() {
   try {
     const data = await (await apiFetch(`${API_URL}/wallet/deposit`, {
       method: 'POST',
-      body: JSON.stringify({ amount, network: selectedDepNet, txHash })
+      body: JSON.stringify({ amount, network: selectedDepNet, tx_hash: txHash })
     })).json();
     toast(data.message);
     $('depAmount').value = '';

@@ -39,6 +39,19 @@ async function sendOTPEmail(email, otp, username) {
     to: email,
     subject: "رمز التحقق X Plus",
 
+    text: `مرحباً ${username}
+
+رمز التحقق الخاص بك في X Plus: ${otp}
+
+صلاحية الرمز 10 دقائق.`,
+
+    replyTo: process.env.SMTP_USER,
+
+    headers: {
+      "X-Mailer": "X Plus",
+      "X-Priority": "1"
+    },
+
     html: `
       <div dir="rtl" style="font-family:Arial,sans-serif">
 
@@ -46,10 +59,7 @@ async function sendOTPEmail(email, otp, username) {
 
         <p>رمز التحقق الخاص بك في X Plus:</p>
 
-        <h1 style="
-          letter-spacing:8px;
-          color:#3b82f6;
-        ">
+        <h1 style="letter-spacing:8px;color:#3b82f6;">
           ${otp}
         </h1>
 
@@ -67,6 +77,13 @@ async function sendOTPEmail(email, otp, username) {
     envelope: info.envelope,
     subject: "رمز التحقق X Plus"
   });
+
+  return {
+    accepted: Array.isArray(info.accepted) && info.accepted.length > 0,
+    rejected: Array.isArray(info.rejected) && info.rejected.length > 0,
+    response: info.response,
+    messageId: info.messageId
+  };
 
 }
 
@@ -674,17 +691,18 @@ exports.sendOTP = async (req, res) => {
       new Date(Date.now() + 10 * 60 * 1000)
     );
 
-    await sendOTPEmail(
+    const mailResult = await sendOTPEmail(
       cleanEmail,
       otp,
       cleanUsername
     );
 
     return res.status(200).json({
-      success: true,
-      message: "تم إرسال رمز التحقق إلى البريد الإلكتروني",
-      email: cleanEmail
-    });
+  success: true,
+  message: "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+  email: cleanEmail,
+  mailResult
+});
 
   } catch (err) {
 
