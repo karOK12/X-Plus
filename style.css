@@ -1607,3 +1607,17 @@ textarea.form-control {
 .mobile-toggle {
   transform: translateY(-8px);
 }
+
+/* رفع زر الشريط إلى أعلى اليسار */
+.sidebar-toggle {
+  position: fixed !important;
+  left: 20px !important;
+  top: 20px !important;
+  transform: none !important;
+  z-index: 100000 !important;
+}
+
+.sidebar-toggle:hover {
+  transform: translateY(-1px) !important;
+}
+

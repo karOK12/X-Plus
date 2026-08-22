@@ -340,7 +340,7 @@
               <span>تقييم التطبيق</span>
             </a>
 
-            <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
+            <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button" onclick="logoutUser()">
               <span class="sidebar-icon">🚪</span>
               <span>تسجيل الخروج</span>
             </button>
@@ -740,8 +740,22 @@
 
     /* ================= END SIDEBAR CONTROL ================= */
 
-  </script>
+  
+function logoutUser() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("auth_token");
+  window.location.href = "login-user.html";
+}
+
+</script>
 
 
 </body>
 </html>
+<script>
+document.getElementById("sidebarLogout")?.addEventListener("click", function () {
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth_token");
+    window.location.href = "login-user.html";
+});
+</script>
