@@ -12,6 +12,7 @@ const otpRoutes = require("./server/routes/otp");
 const authRoutes = require("./server/routes/auth");
 const profileRoutes = require("./server/routes/profile");
 const walletRoutes = require("./server/routes/wallet");
+const ratingRoutes = require("./server/routes/rating");
 const uploadRoutes = require("./api/index");
 
 const app = express();
@@ -167,6 +168,88 @@ async function initDatabase() {
             );
         `);
 
+
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS rewards (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                title TEXT NOT NULL,
+                description TEXT,
+                amount REAL DEFAULT 0,
+                points INT DEFAULT 0,
+                status TEXT DEFAULT 'available',
+                claimed_at TIMESTAMPTZ,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            CREATE TABLE IF NOT EXISTS referrals (
+                id SERIAL PRIMARY KEY,
+                inviter_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                invited_user_id INT REFERENCES users(id) ON DELETE SET NULL,
+                referral_code TEXT NOT NULL,
+                status TEXT DEFAULT 'pending',
+                reward_amount REAL DEFAULT 0,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                completed_at TIMESTAMPTZ
+            );
+
+            CREATE TABLE IF NOT EXISTS activity_logs (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                action TEXT NOT NULL,
+                description TEXT,
+                metadata JSONB DEFAULT '{}'::jsonb,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            CREATE TABLE IF NOT EXISTS achievements (
+                id SERIAL PRIMARY KEY,
+                title TEXT NOT NULL,
+                description TEXT,
+                icon TEXT,
+                requirement_type TEXT,
+                requirement_value INT DEFAULT 0,
+                reward_points INT DEFAULT 0,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            CREATE TABLE IF NOT EXISTS user_achievements (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                achievement_id INT NOT NULL REFERENCES achievements(id) ON DELETE CASCADE,
+                progress INT DEFAULT 0,
+                completed BOOLEAN DEFAULT FALSE,
+                completed_at TIMESTAMPTZ,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                UNIQUE(user_id, achievement_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS notifications (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                title TEXT NOT NULL,
+                message TEXT,
+                type TEXT DEFAULT 'info',
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_rewards_user_id
+                ON rewards(user_id);
+
+            CREATE INDEX IF NOT EXISTS idx_referrals_inviter_id
+                ON referrals(inviter_id);
+
+            CREATE INDEX IF NOT EXISTS idx_activity_logs_user_id
+                ON activity_logs(user_id);
+
+            CREATE INDEX IF NOT EXISTS idx_user_achievements_user_id
+                ON user_achievements(user_id);
+
+            CREATE INDEX IF NOT EXISTS idx_notifications_user_id
+                ON notifications(user_id);
+        `);
 
         await pool.query(`
             ALTER TABLE users
@@ -565,77 +648,14 @@ app.use(
 
 
 // ══════════════════════════════════════════════════════
+// Rating Routes
+app.use(
+    "/api/rating",
+    ratingRoutes
+);
+
 // Temporary DB Diagnostic
 // ══════════════════════════════════════════════════════
-
-app.get(
-    "/api/debug-db-config",
-    (req, res) => {
-
-        try {
-
-            const raw =
-                process.env.DATABASE_URL;
-
-
-            if (!raw) {
-
-                return res.json({
-
-                    exists: false
-
-                });
-
-            }
-
-
-            const u =
-                new URL(raw);
-
-
-            res.json({
-
-                exists: true,
-
-                host:
-                    u.hostname,
-
-                user:
-                    u.username,
-
-                database:
-                    u.pathname.slice(1),
-
-                port:
-                    u.port || "5432",
-
-                sslmode:
-                    u.searchParams.get(
-                        "sslmode"
-                    ),
-
-                channel_binding:
-                    u.searchParams.get(
-                        "channel_binding"
-                    )
-
-            });
-
-        } catch (error) {
-
-            res.status(500).json({
-
-                exists: false,
-
-                error:
-                    error.message
-
-            });
-
-        }
-
-    }
-);
 
 
 // ══════════════════════════════════════════════════════

@@ -402,6 +402,22 @@ async function verifyOTP() {
       );
     }
 
+    // الحساب موجود مسبقاً: الانتقال إلى تسجيل الدخول
+    if (data.accountExists) {
+      sessionStorage.removeItem('pendingVerification');
+      sessionStorage.removeItem('verifyFormData');
+      sessionStorage.removeItem('otpVerified');
+
+      showAlert('✓ تم التحقق من البريد. يرجى تسجيل الدخول.', 'success');
+
+      setTimeout(() => {
+        window.location.href =
+          '/login-user.html';
+      }, 700);
+
+      return;
+    }
+
     // حفظ جلسة المستخدم بعد نجاح التحقق
     if (data.token) {
       localStorage.setItem('token', data.token);

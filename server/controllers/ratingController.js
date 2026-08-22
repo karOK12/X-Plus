@@ -58,7 +58,7 @@ exports.getRating = async (req, res) => {
       `
       SELECT
         COUNT(rating)::integer AS total_ratings,
-        COUNT(comment)::integer AS total_reviews,
+        COUNT(*) FILTER (WHERE comment IS NOT NULL AND LENGTH(TRIM(comment)) > 0)::integer AS total_reviews,
         COALESCE(ROUND(AVG(rating)::numeric, 2), 0) AS average_rating,
         COUNT(*) FILTER (WHERE rating = 5)::integer AS five_star,
         COUNT(*) FILTER (WHERE rating = 4)::integer AS four_star,
@@ -68,6 +68,38 @@ exports.getRating = async (req, res) => {
       FROM app_ratings
       `
     );
+
+    const ageStatsResult = await db.query(
+      `
+      SELECT
+        COUNT(*) FILTER (
+          WHERE birth_date IS NOT NULL
+            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 13 AND 17
+        )::integer AS age_13_17,
+        COUNT(*) FILTER (
+          WHERE birth_date IS NOT NULL
+            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 18 AND 24
+        )::integer AS age_18_24,
+        COUNT(*) FILTER (
+          WHERE birth_date IS NOT NULL
+            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 25 AND 34
+        )::integer AS age_25_34,
+        COUNT(*) FILTER (
+          WHERE birth_date IS NOT NULL
+            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 35 AND 44
+        )::integer AS age_35_44,
+        COUNT(*) FILTER (
+          WHERE birth_date IS NOT NULL
+            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) >= 45
+        )::integer AS age_45_plus,
+        COUNT(*) FILTER (
+          WHERE birth_date IS NULL
+        )::integer AS age_unknown
+      FROM users
+      `
+    );
+
+    const ageStats = ageStatsResult.rows[0];
 
     const reviewsResult = await db.query(
       `
@@ -116,6 +148,15 @@ exports.getRating = async (req, res) => {
 
       stats: {
         averageRating: Number(stats.average_rating || 0),
+
+        ageGroups: {
+          "13-17": Number(ageStats.age_13_17 || 0),
+          "18-24": Number(ageStats.age_18_24 || 0),
+          "25-34": Number(ageStats.age_25_34 || 0),
+          "35-44": Number(ageStats.age_35_44 || 0),
+          "45+": Number(ageStats.age_45_plus || 0),
+          unknown: Number(ageStats.age_unknown || 0)
+        },
         totalRatings: Number(stats.total_ratings || 0),
         totalReviews: Number(stats.total_reviews || 0),
 

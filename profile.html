@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الملف الشخصي</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0b1120;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  padding: 12px;
+}
+
+/* الغلاف */
+.cover {
+  width: 100%;
+  height: 240px;
+  position: relative;
+  overflow: hidden;
+  background: #1f2937;
+  border-radius: 12px;
+  touch-action: none;
+}
+
+.cover img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.cover-camera {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* الأزرار */
+button {
+  font-family: inherit;
+}
+
+.cover-actions {
+  margin-top: 8px;
+  position: relative;
+  display: inline-block;
+  z-index: 100;
+}
+
+.options-btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #1f2937;
+  color: white;
+  border: 1px solid #374151;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  display: flex;
+  gap: 6px;
+  background: #111827;
+  padding: 7px;
+  border-radius: 9px;
+  border: 1px solid #374151;
+  box-shadow: 0 4px 12px rgba(0,0,0,.35);
+}
+
+.menu button {
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.edit-btn {
+  background: #f59e0b;
+  color: #000;
+}
+
+.save-btn {
+  background: #22c55e;
+  color: white;
+}
+
+/* الملف الشخصي */
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -55px;
+  position: relative;
+  z-index: 10;
+}
+
+.profile-image-wrapper {
+  position: relative;
+}
+
+.profile-image {
+  width: 115px;
+  height: 115px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 5px solid #111827;
+  background: #374151;
+  box-shadow: 0 4px 15px rgba(0,0,0,.4);
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-upload {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #1877f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  border: 3px solid #111827;
+}
+
+.profile h2 {
+  margin-top: 10px;
+  font-size: 22px;
+}
+
+/* المعلومات */
+.info {
+  background: #111827;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.info h3 {
+  margin-top: 18px;
+}
+
+.field {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.field-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.label {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.value {
+  font-size: 14px;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.value.has-value {
+  color: white;
+}
+
+.arrow {
+  color: #9ca3af;
+  margin-right: 10px;
+}
+
+/* القوائم */
+.dropdown {
+  margin-top: 8px;
+  background: #111827;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown button {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: white;
+  cursor: pointer;
+  text-align: right;
+}
+
+.dropdown button.active {
+  background: #1877f2;
+}
+
+/* الهوايات */
+.hobbies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  background: #111827;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.hobby {
+  padding: 6px 10px;
+  border-radius: 16px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hobby.active {
+  background: #1877f2;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-box {
+  width: 90%;
+  max-width: 420px;
+  background: #111827;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+textarea {
+  height: 120px;
+  resize: none;
+}
+
+.modal-save {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* البحث */
+.search-results {
+  margin-top: 10px;
+  background: #1f2937;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.search-result {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #374151;
+}
+
+/* Progress */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,.12);
+  z-index: 999999;
+  display: none;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: #22c55e;
+  transition: width .2s linear;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- الغلاف -->
+  <div class="cover" id="cover">
+
+    <img id="coverImage">
+
+    <label class="cover-camera">
+      📷
+      <input
+        type="file"
+        id="coverUpload"
+        hidden
+        accept="image/*"
+      >
+    </label>
+
+  </div>
+
+  <!-- خيارات الغلاف -->
+  <div class="cover-actions">
+
+    <button
+      class="options-btn"
+      id="optionsButton"
+    >
+      ⚙️ عرض الخيارات ▼
+    </button>
+
+    <div
+      class="menu"
+      id="coverMenu"
+      style="display:none"
+    >
+
+      <button
+        class="edit-btn"
+        id="editCover"
+      >
+        ✏️ تعديل
+      </button>
+
+      <button
+        class="save-btn"
+        id="saveCover"
+      >
+        💾 حفظ
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- Progress -->
+  <div class="progress" id="progress">
+    <div
+      class="progress-bar"
+      id="progressBar"
+    ></div>
+  </div>
+
+  <!-- الصورة الشخصية -->
+  <div class="profile">
+
+    <div class="profile-image-wrapper">
+
+      <div class="profile-image">
+
+        <img
+          id="profileImage"
+          src="/assets/images/profile.jpg"
+        >
+
+      </div>
+
+      <label class="profile-upload">
+        +
+        <input
+          type="file"
+          hidden
+          accept="image/*"
+          id="profileUpload"
+        >
+      </label>
+
+    </div>
+
+    <h2>الملف الشخصي</h2>
+
+  </div>
+
+  <!-- المعلومات -->
+  <div class="info">
+
+    <h3>المعلومات الشخصية</h3>
+
+    <!-- الاسم -->
+    <h3>الاسم الكامل</h3>
+
+    <input
+      class="input"
+      id="fullNameInput"
+      placeholder="اكتب الاسم الكامل"
+      autocomplete="name"
+    >
+
+    <!-- اللقب -->
+    <h3>اللقب</h3>
+
+    <input
+      class="input"
+      id="nicknameInput"
+      placeholder="اكتب اللقب"
+    >
+
+    <!-- تاريخ الميلاد -->
+    <h3>تاريخ الميلاد</h3>
+
+    <div
+      class="field"
+      id="dobButton"
+    >
+      <div class="field-content">
+        <span class="label">تاريخ الميلاد</span>
+        <span
+          class="value"
+          id="dobValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="dropdown"
+      id="dobDropdown"
+      style="display:none"
+    >
+
+      <select id="day">
+        <option value="">اليوم</option>
+      </select>
+
+      <select id="month">
+        <option value="">الشهر</option>
+      </select>
+
+      <select id="year">
+        <option value="">السنة</option>
+      </select>
+
+      <button id="saveDob">
+        حفظ
+      </button>
+
+    </div>
+
+
+    <!-- الجنس -->
+    <h3>الجنس</h3>
+
+    <div
+      class="field"
+      id="genderButton"
+    >
+      <div class="field-content">
+        <span class="label">الجنس</span>
+        <span
+          class="value"
+          id="genderValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="dropdown"
+      id="genderDropdown"
+      style="display:none"
+    >
+
+      <button data-gender="ذكر">
+        ذكر
+      </button>
+
+      <button data-gender="أنثى">
+        أنثى
+      </button>
+
+    </div>
+
+
+    <!-- الهوايات -->
+    <h3>الهوايات</h3>
+
+    <div
+      class="field"
+      id="hobbiesButton"
+    >
+      <div class="field-content">
+        <span class="label">الهوايات</span>
+        <span
+          class="value"
+          id="hobbiesValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="hobbies"
+      id="hobbiesContainer"
+      style="display:none"
+    ></div>
+
+
+    <!-- التعليم -->
+    <h3>التعليم</h3>
+
+    <div
+      class="field"
+      id="educationButton"
+    >
+      <div class="field-content">
+        <span class="label">التعليم</span>
+        <span
+          class="value"
+          id="educationValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="dropdown"
+      id="educationDropdown"
+      style="display:none"
+    ></div>
+
+
+    <!-- المهنة -->
+    <h3>المهنة</h3>
+
+    <div
+      class="field"
+      id="jobButton"
+    >
+      <div class="field-content">
+        <span class="label">المهنة</span>
+        <span
+          class="value"
+          id="jobValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="dropdown"
+      id="jobDropdown"
+      style="display:none"
+    ></div>
+
+
+    <!-- التواصل -->
+    <h3>معلومات التواصل</h3>
+
+    <div
+      class="field"
+      data-contact="facebook"
+    >
+      <div class="field-content">
+        <span class="label">فيسبوك</span>
+        <span
+          class="value"
+          id="facebookValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="field"
+      data-contact="whatsapp"
+    >
+      <div class="field-content">
+        <span class="label">واتساب</span>
+        <span
+          class="value"
+          id="whatsappValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="field"
+      data-contact="instagram"
+    >
+      <div class="field-content">
+        <span class="label">انستكرام</span>
+        <span
+          class="value"
+          id="instagramValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="field"
+      data-contact="email"
+    >
+      <div class="field-content">
+        <span class="label">البريد الإلكتروني</span>
+        <span
+          class="value"
+          id="emailValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+
+    <!-- الموقع -->
+    <h3>الموقع</h3>
+
+    <div
+      class="field"
+      data-location="current"
+    >
+      <div class="field-content">
+        <span class="label">الموقع الحالي</span>
+        <span
+          class="value"
+          id="currentValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+    <div
+      class="field"
+      data-location="origin"
+    >
+      <div class="field-content">
+        <span class="label">مكان المنشأ</span>
+        <span
+          class="value"
+          id="originValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+      <span class="arrow">▼</span>
+    </div>
+
+
+    <!-- العائلة -->
+    <h3>عدد أفراد العائلة</h3>
+
+    <div
+      class="field"
+      data-modal="familyModal"
+    >
+      <div class="field-content">
+        <span class="label">
+          عدد أفراد العائلة
+        </span>
+
+        <span
+          class="value"
+          id="familyValue"
+        >
+          غير مضاف
+        </span>
+      </div>
+
+      <span class="arrow">▼</span>
+    </div>
+
+
+    <!-- السيرة الذاتية -->
+    <h3>السيرة الذاتية</h3>
+
+    <textarea
+      class="input"
+      id="bioInput"
+      placeholder="اكتب نبذة عن نفسك..."
+      style="min-height:120px; resize:vertical;"
+    ></textarea>
+
+  </div>
+</div>
+
+
+<!-- ================= MODALS ================= -->
+
+
+
+
+
+
+
+<!-- العائلة -->
+<div class="modal" id="familyModal">
+
+  <div class="modal-box">
+
+    <h3>عدد أفراد العائلة</h3>
+
+    <input
+      class="input"
+      type="number"
+      id="familyInput"
+      placeholder="مثال: 5"
+    >
+
+    <button
+      class="modal-save"
+      onclick="saveText('familyCount')"
+    >
+      حفظ
+    </button>
+
+  </div>
+
+</div>
+
+
+
+
+
+<!-- التواصل -->
+<div class="modal" id="contactModal">
+
+  <div class="modal-box">
+
+    <h3 id="contactTitle"></h3>
+
+    <input
+      class="input"
+      id="contactInput"
+    >
+
+    <button
+      class="modal-save"
+      id="contactSave"
+    >
+      حفظ
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- الموقع -->
+<div class="modal" id="locationModal">
+
+  <div class="modal-box">
+
+    <h3 id="locationTitle"></h3>
+
+    <input
+      class="input"
+      id="locationInput"
+      placeholder="ابحث عن مدينة أو منطقة..."
+    >
+
+    <div
+      class="search-results"
+      id="searchResults"
+    ></div>
+
+    <div
+      style="
+        margin-top:10px;
+        font-size:12px;
+        color:#9ca3af
+      "
+    >
+      مثال: بغداد، البصرة، الموصل
+    </div>
+
+    <button
+      class="modal-save"
+      id="locationSave"
+    >
+      حفظ
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const fullName = document.getElementById("fullNameInput");
+  const nickname = document.getElementById("nicknameInput");
+  const bio = document.getElementById("bioInput");
+
+  if (fullName) {
+    fullName.value = localStorage.getItem("fullName") || "";
+    fullName.addEventListener("input", function () {
+      localStorage.setItem("fullName", this.value);
+    });
+  }
+
+  if (nickname) {
+    nickname.value = localStorage.getItem("nickname") || "";
+    nickname.addEventListener("input", function () {
+      localStorage.setItem("nickname", this.value);
+    });
+  }
+
+  if (bio) {
+    bio.value = localStorage.getItem("bio") || "";
+    bio.addEventListener("input", function () {
+      localStorage.setItem("bio", this.value);
+    });
+  }
+
+});
+</script>
+
+<script>
+
+/* =========================
+   أدوات عامة
+========================= */
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function openModal(id) {
+  $(id).classList.add("show");
+}
+
+function closeModal(id) {
+  $(id).classList.remove("show");
+}
+
+document.querySelectorAll(".modal").forEach(modal => {
+
+  modal.addEventListener("click", e => {
+
+    if (e.target === modal) {
+      modal.classList.remove("show");
+    }
+
+  });
+
+});
+
+
+/* =========================
+   تحميل البيانات
+========================= */
+
+const keys = [
+  "fullName",
+  "nickname",
+  "familyCount",
+  "bio",
+  "facebook",
+  "whatsapp",
+  "instagram",
+  "email",
+  "currentLocation",
+  "originLocation",
+  "gender",
+  "education",
+  "job"
+];
+
+function loadData() {
+
+  keys.forEach(key => {
+
+    const value =
+      localStorage.getItem(key) || "";
+
+    updateValue(key, value);
+
+  });
+
+  const hobbies =
+    JSON.parse(
+      localStorage.getItem("hobbies") || "[]"
+    );
+
+  selectedHobbies = hobbies;
+
+  renderHobbies();
+
+  loadDob();
+
+  loadImages();
+
+}
+
+function updateValue(key, value) {
+
+  let element = null;
+
+  const map = {
+
+    fullName: "fullNameValue",
+    nickname: "nicknameValue",
+    familyCount: "familyValue",
+    bio: "bioValue",
+    facebook: "facebookValue",
+    whatsapp: "whatsappValue",
+    instagram: "instagramValue",
+    email: "emailValue",
+    currentLocation: "currentValue",
+    originLocation: "originValue",
+    gender: "genderValue",
+    education: "educationValue",
+    job: "jobValue"
+
+  };
+
+  element = $(map[key]);
+
+  if (!element) return;
+
+  if (key === "familyCount" && value) {
+
+    element.textContent =
+      value + " أفراد";
+
+  } else {
+
+    element.textContent =
+      value || "غير مضاف";
+
+  }
+
+  element.classList.toggle(
+    "has-value",
+    !!value
+  );
+
+}
+
+
+/* =========================
+   النصوص
+========================= */
+
+function saveText(key) {
+
+  let input;
+
+  if (key === "familyCount")
+    input = $("familyInput");
+
+  const value = input.value.trim();
+
+  localStorage.setItem(key, value);
+
+  updateValue(key, value);
+
+  if (key === "familyCount") {
+    closeModal("familyModal");
+  }
+
+}
+
+
+/* فتح النوافذ */
+
+document
+.querySelectorAll("[data-modal]")
+.forEach(element => {
+
+  element.addEventListener("click", () => {
+
+    const modal =
+      element.dataset.modal;
+
+    const keyMap = {
+
+      familyModal: "familyInput"
+
+    };
+
+    const input =
+      $(keyMap[modal]);
+
+    const key =
+      modal
+      .replace("Modal","");
+
+    input.value =
+      localStorage.getItem(key) || "";
+
+    openModal(modal);
+
+  });
+
+});
+
+
+/* =========================
+   تاريخ الميلاد
+========================= */
+
+for (let i = 1; i <= 31; i++) {
+
+  const option =
+    document.createElement("option");
+
+  option.value = i;
+  option.textContent = i;
+
+  $("day").appendChild(option);
+
+}
+
+for (let i = 1; i <= 12; i++) {
+
+  const option =
+    document.createElement("option");
+
+  option.value = i;
+  option.textContent = i;
+
+  $("month").appendChild(option);
+
+}
+
+for (let i = 2026; i >= 1946; i--) {
+
+  const option =
+    document.createElement("option");
+
+  option.value = i;
+  option.textContent = i;
+
+  $("year").appendChild(option);
+
+}
+
+function loadDob() {
+
+  const dob =
+    localStorage.getItem("dob");
+
+  if (!dob) return;
+
+  const parts =
+    dob.split("/");
+
+  if (parts.length !== 3)
+    return;
+
+  $("day").value = parts[0];
+  $("month").value = parts[1];
+  $("year").value = parts[2];
+
+  $("dobValue").textContent = dob;
+  $("dobValue").classList.add("has-value");
+
+}
+
+$("dobButton").onclick = () => {
+
+  const dropdown =
+    $("dobDropdown");
+
+  dropdown.style.display =
+    dropdown.style.display === "none"
+      ? "flex"
+      : "none";
+
+};
+
+$("saveDob").onclick = () => {
+
+  const day = $("day").value;
+  const month = $("month").value;
+  const year = $("year").value;
+
+  if (!day || !month || !year)
+    return;
+
+  const dob =
+    `${day}/${month}/${year}`;
+
+  localStorage.setItem(
+    "dob",
+    dob
+  );
+
+  $("dobValue").textContent = dob;
+  $("dobValue").classList.add("has-value");
+
+  $("dobDropdown").style.display =
+    "none";
+
+};
+
+
+/* =========================
+   الجنس
+========================= */
+
+$("genderButton").onclick = () => {
+
+  const dropdown =
+    $("genderDropdown");
+
+  dropdown.style.display =
+    dropdown.style.display === "none"
+      ? "flex"
+      : "none";
+
+};
+
+document
+.querySelectorAll("[data-gender]")
+.forEach(button => {
+
+  button.onclick = () => {
+
+    const value =
+      button.dataset.gender;
+
+    localStorage.setItem(
+      "gender",
+      value
+    );
+
+    updateValue(
+      "gender",
+      value
+    );
+
+    $("genderDropdown").style.display =
+      "none";
+
+  };
+
+});
+
+
+/* =========================
+   الهوايات
+========================= */
+
+const hobbyList = [
+
+  "كاتب",
+  "مصور فوتوغرافي",
+  "السفر",
+  "تصميم مونتاج",
+  "مخرج سينمائي",
+  "مؤلف",
+  "منتج",
+  "القراءة",
+  "مقدم",
+  "إعلامي"
+
+];
+
+let selectedHobbies = [];
+
+$("hobbiesButton").onclick = () => {
+
+  const container =
+    $("hobbiesContainer");
+
+  container.style.display =
+    container.style.display === "none"
+      ? "flex"
+      : "none";
+
+};
+
+function renderHobbies() {
+
+  const container =
+    $("hobbiesContainer");
+
+  container.innerHTML = "";
+
+  hobbyList.forEach(hobby => {
+
+    const button =
+      document.createElement("button");
+
+    button.className = "hobby";
+
+    button.textContent = hobby;
+
+    if (
+      selectedHobbies.includes(hobby)
+    ) {
+      button.classList.add("active");
+    }
+
+    button.onclick = () => {
+
+      if (
+        selectedHobbies.includes(hobby)
+      ) {
+
+        selectedHobbies =
+          selectedHobbies.filter(
+            x => x !== hobby
+          );
+
+      } else {
+
+        selectedHobbies.push(hobby);
+
+      }
+
+      localStorage.setItem(
+        "hobbies",
+        JSON.stringify(
+          selectedHobbies
+        )
+      );
+
+      renderHobbies();
+
+      updateHobbiesValue();
+
+    };
+
+    container.appendChild(button);
+
+  });
+
+  updateHobbiesValue();
+
+}
+
+function updateHobbiesValue() {
+
+  const element =
+    $("hobbiesValue");
+
+  if (!selectedHobbies.length) {
+
+    element.textContent =
+      "غير مضاف";
+
+    element.classList.remove(
+      "has-value"
+    );
+
+    return;
+
+  }
+
+  element.textContent =
+    selectedHobbies.join(" • ");
+
+  element.classList.add(
+    "has-value"
+  );
+
+}
+
+
+/* =========================
+   التعليم
+========================= */
+
+const educationList = [
+
+  "ابتدائي",
+  "متوسط",
+  "إعدادي",
+  "ثانوي",
+  "كلية",
+  "دراسات عليا"
+
+];
+
+createOptions(
+  "educationDropdown",
+  educationList,
+  "education"
+);
+
+
+/* =========================
+   المهنة
+========================= */
+
+const jobList = [
+
+  "طالب",
+  "مبرمج",
+  "مصمم",
+  "مصور",
+  "إعلامي",
+  "موظف",
+  "حر"
+
+];
+
+createOptions(
+  "jobDropdown",
+  jobList,
+  "job"
+);
+
+function createOptions(
+  containerId,
+  list,
+  key
+) {
+
+  const container =
+    $(containerId);
+
+  const buttonId =
+    key === "education"
+      ? "educationButton"
+      : "jobButton";
+
+  $(buttonId).onclick = () => {
+
+    container.style.display =
+      container.style.display === "none"
+        ? "flex"
+        : "none";
+
+  };
+
+  list.forEach(item => {
+
+    const button =
+      document.createElement("button");
+
+    button.textContent = item;
+
+    button.onclick = () => {
+
+      localStorage.setItem(
+        key,
+        item
+      );
+
+      updateValue(
+        key,
+        item
+      );
+
+      container.style.display =
+        "none";
+
+    };
+
+    container.appendChild(button);
+
+  });
+
+}
+
+
+/* =========================
+   معلومات التواصل
+========================= */
+
+const contactLabels = {
+
+  facebook: "فيسبوك",
+  whatsapp: "واتساب",
+  instagram: "انستكرام",
+  email: "البريد الإلكتروني"
+
+};
+
+let currentContact = "";
+
+document
+.querySelectorAll("[data-contact]")
+.forEach(element => {
+
+  element.onclick = () => {
+
+    currentContact =
+      element.dataset.contact;
+
+    $("contactTitle").textContent =
+      contactLabels[currentContact];
+
+    $("contactInput").value =
+      localStorage.getItem(
+        currentContact
+      ) || "";
+
+    openModal("contactModal");
+
+  };
+
+});
+
+$("contactSave").onclick = () => {
+
+  const value =
+    $("contactInput").value.trim();
+
+  localStorage.setItem(
+    currentContact,
+    value
+  );
+
+  updateValue(
+    currentContact,
+    value
+  );
+
+  closeModal("contactModal");
+
+};
+
+
+/* =========================
+   الموقع والبحث
+========================= */
+
+let currentLocationType = "";
+
+document
+.querySelectorAll("[data-location]")
+.forEach(element => {
+
+  element.onclick = () => {
+
+    currentLocationType =
+      element.dataset.location;
+
+    const key =
+      currentLocationType === "current"
+        ? "currentLocation"
+        : "originLocation";
+
+    $("locationTitle").textContent =
+      currentLocationType === "current"
+        ? "الموقع الحالي"
+        : "مكان المنشأ";
+
+    $("locationInput").value =
+      localStorage.getItem(key) || "";
+
+    $("searchResults").innerHTML = "";
+
+    openModal("locationModal");
+
+  };
+
+});
+
+let searchTimeout;
+
+$("locationInput").addEventListener(
+  "input",
+  function() {
+
+    clearTimeout(searchTimeout);
+
+    const value =
+      this.value.trim();
+
+    if (value.length < 2) {
+
+      $("searchResults").innerHTML =
+        "";
+
+      return;
+
+    }
+
+    searchTimeout =
+      setTimeout(
+        () => searchLocation(value),
+        400
+      );
+
+  }
+);
+
+async function searchLocation(value) {
+
+  try {
+
+    const response =
+      await fetch(
+        "https://nominatim.openstreetmap.org/search?" +
+        new URLSearchParams({
+          format: "json",
+          q: value,
+          "accept-language": "ar"
+        })
+      );
+
+    const data =
+      await response.json();
+
+    const results =
+      $("searchResults");
+
+    results.innerHTML = "";
+
+    data.slice(0, 8).forEach(place => {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "search-result";
+
+      div.textContent =
+        place.display_name;
+
+      div.onclick = () => {
+
+        $("locationInput").value =
+          place.display_name;
+
+        results.innerHTML = "";
+
+      };
+
+      results.appendChild(div);
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+$("locationSave").onclick = () => {
+
+  const value =
+    $("locationInput").value.trim();
+
+  const key =
+    currentLocationType === "current"
+      ? "currentLocation"
+      : "originLocation";
+
+  localStorage.setItem(
+    key,
+    value
+  );
+
+  updateValue(
+    key,
+    value
+  );
+
+  closeModal("locationModal");
+
+};
+
+
+/* =========================
+   الصورة الشخصية
+========================= */
+
+$("profileUpload").addEventListener(
+  "change",
+  function() {
+
+    const file =
+      this.files[0];
+
+    if (!file) return;
+
+    const reader =
+      new FileReader();
+
+    reader.onload = () => {
+
+      const image =
+        reader.result;
+
+      $("profileImage").src =
+        image;
+
+      localStorage.setItem(
+        "profileImage",
+        image
+      );
+
+    };
+
+    reader.readAsDataURL(file);
+
+  }
+);
+
+
+/* =========================
+   الغلاف
+========================= */
+
+let coverDragging = false;
+let startY = 0;
+let currentTop = 0;
+let locked = false;
+
+$("coverUpload").addEventListener(
+  "change",
+  function() {
+
+    const file =
+      this.files[0];
+
+    if (!file) return;
+
+    locked = false;
+
+    const reader =
+      new FileReader();
+
+    reader.onload = () => {
+
+      $("coverImage").src =
+        reader.result;
+
+      $("coverImage").style.display =
+        "block";
+
+      $("coverImage").style.top =
+        "0px";
+
+      currentTop = 0;
+
+      $("coverImage").onload =
+        () => {
+
+          const frame =
+            $("cover");
+
+          const img =
+            $("coverImage");
+
+          const ratio =
+            frame.offsetWidth /
+            img.naturalWidth;
+
+          img.style.width =
+            frame.offsetWidth + "px";
+
+          img.style.height =
+            img.naturalHeight *
+            ratio +
+            "px";
+
+        };
+
+    };
+
+    reader.readAsDataURL(file);
+
+  }
+);
+
+
+/* سحب الغلاف */
+
+function moveCover(y) {
+
+  if (locked) return;
+
+  const img =
+    $("coverImage");
+
+  const frame =
+    $("cover");
+
+  let top =
+    y - startY;
+
+  if (top > 0)
+    top = 0;
+
+  const min =
+    frame.offsetHeight -
+    img.offsetHeight;
+
+  if (top < min)
+    top = min;
+
+  img.style.top =
+    top + "px";
+
+  currentTop = top;
+
+}
+
+
+$("coverImage").addEventListener(
+  "mousedown",
+  e => {
+
+    if (locked) return;
+
+    coverDragging = true;
+
+    startY =
+      e.clientY -
+      currentTop;
+
+  }
+);
+
+document.addEventListener(
+  "mousemove",
+  e => {
+
+    if (!coverDragging) return;
+
+    moveCover(e.clientY);
+
+  }
+);
+
+document.addEventListener(
+  "mouseup",
+  () => {
+
+    coverDragging = false;
+
+  }
+);
+
+
+$("coverImage").addEventListener(
+  "touchstart",
+  e => {
+
+    if (locked) return;
+
+    coverDragging = true;
+
+    startY =
+      e.touches[0].clientY -
+      currentTop;
+
+  }
+);
+
+document.addEventListener(
+  "touchmove",
+  e => {
+
+    if (!coverDragging) return;
+
+    moveCover(
+      e.touches[0].clientY
+    );
+
+  }
+);
+
+document.addEventListener(
+  "touchend",
+  () => {
+
+    coverDragging = false;
+
+  }
+);
+
+
+/* =========================
+   قائمة الغلاف
+========================= */
+
+$("optionsButton").onclick = () => {
+
+  const menu =
+    $("coverMenu");
+
+  menu.style.display =
+    menu.style.display === "none"
+      ? "flex"
+      : "none";
+
+};
+
+$("editCover").onclick = () => {
+
+  locked = false;
+
+  $("coverImage").style.top =
+    "0px";
+
+  currentTop = 0;
+
+};
+
+$("saveCover").onclick = () => {
+
+  const image =
+    $("coverImage");
+
+  if (!image.src)
+    return;
+
+  localStorage.setItem(
+    "profileCover",
+    image.src
+  );
+
+  locked = true;
+
+  $("coverMenu").style.display =
+    "none";
+
+  alert("تم حفظ الغلاف ✔");
+
+};
+
+
+/* =========================
+   تحميل الصور
+========================= */
+
+function loadImages() {
+
+  const profile =
+    localStorage.getItem(
+      "profileImage"
+    );
+
+  if (profile) {
+
+    $("profileImage").src =
+      profile;
+
+  }
+
+  const cover =
+    localStorage.getItem(
+      "profileCover"
+    );
+
+  if (cover) {
+
+    $("coverImage").src =
+      cover;
+
+    $("coverImage").style.display =
+      "block";
+
+    $("coverImage").onload =
+      () => {
+
+        const frame =
+          $("cover");
+
+        const img =
+          $("coverImage");
+
+        const ratio =
+          frame.offsetWidth /
+          img.naturalWidth;
+
+        img.style.width =
+          frame.offsetWidth + "px";
+
+        img.style.height =
+          img.naturalHeight *
+          ratio +
+          "px";
+
+      };
+
+    locked = true;
+
+  }
+
+}
+
+
+/* =========================
+   تشغيل
+========================= */
+
+loadData();
+
+</script>
+
+</body>
+</html>

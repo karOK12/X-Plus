@@ -40,6 +40,15 @@
             border-radius: 50%;
             object-fit: cover;
         }
+
+        .welcome-text {
+            display: none;
+            margin-top: -5px;
+            margin-bottom: 15px;
+            color: #60a5fa;
+            font-size: 15px;
+            font-weight: bold;
+        }
         
         input {
             width: 100%;
@@ -85,6 +94,24 @@
             background: #1d4ed8;
         }
         
+        .social-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0 8px;
+            color: #9ca3af;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .social-divider::before,
+        .social-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #374151;
+        }
+
         .social {
             display: flex;
             justify-content: space-between;
@@ -119,6 +146,8 @@
     <img src="https://d.top4top.io/p_3867p7o0f1.png" alt="شعار X Plus">
 </div>
 
+<p class="welcome-text" style="display:none;">مرحباً بك في موقع X Plus</p>
+
         <!-- Inputs -->
         <input type="email" id="email" placeholder="البريد الإلكتروني">
         <input type="password" id="password" placeholder="كلمة المرور">
@@ -130,10 +159,13 @@
         <button class="main-btn" onclick="login()">تسجيل الدخول</button>
 
         <!-- Register -->
-        <p class="link" onclick="register()">إنشاء حساب جديد</p>
+        <p class="link" id="registerLink" onclick="register()">إنشاء حساب جديد</p>
 
         <!-- Social -->
-        <div class="social">
+        <div class="social-divider" id="socialDivider">
+    <span>متابعة</span>
+</div>
+        <div class="social" id="socialButtons">
             <button class="social-btn" style="background: #db4437;" onclick="socialLogin('google')">Google</button>
             <button class="social-btn" style="background: #1877f2;" onclick="socialLogin('facebook')">Facebook</button>
             <button class="social-btn" style="background: #22c55e;" onclick="phoneVerification()">Phone</button>
@@ -143,9 +175,86 @@
     </div>
 
   <script>
+const emailInput = document.getElementById("email");
+const loginEmail = new URLSearchParams(window.location.search).get("email");
+
+if (loginEmail) {
+    emailInput.value = loginEmail;
+}
+
+// ============================================
+// التحقق من اكتمال التسجيل الداخلي
+// ============================================
+function checkRegistrationStatus() {
+
+    const registrationCompleted =
+        localStorage.getItem("registrationCompleted") === "true";
+
+    if (!registrationCompleted) {
+        return;
+    }
+
+    console.log("🔒 POST-REGISTRATION MODE");
+
+    // العناصر التي يجب إخفاؤها نهائياً بعد اكتمال التسجيل
+    const elementsToHide = [
+        document.getElementById("registerLink"),
+        document.getElementById("socialDivider"),
+        document.getElementById("socialButtons")
+    ];
+
+    elementsToHide.forEach((el) => {
+        if (el) {
+            el.hidden = true;
+            el.style.setProperty("display", "none", "important");
+            el.style.setProperty("visibility", "hidden", "important");
+        }
+    });
+
+    // الشعار يبقى ظاهراً
+    const logo = document.querySelector(".logo-box");
+    if (logo) {
+        logo.hidden = false;
+        logo.style.setProperty("display", "block", "important");
+        logo.style.setProperty("visibility", "visible", "important");
+    }
+
+    // الترحيب يظهر تحت الشعار
+    const welcome = document.querySelector(".welcome-text");
+    if (welcome) {
+        welcome.textContent =
+            "تم إنشاء حسابك بنجاح، يرجى تسجيل الدخول";
+        welcome.hidden = false;
+        welcome.style.setProperty("display", "block", "important");
+        welcome.style.setProperty("visibility", "visible", "important");
+    }
+
+    // حقول الدخول تبقى ظاهرة وفارغة
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+
+    if (email) {
+        email.value = "";
+        email.style.setProperty("display", "block", "important");
+        email.style.setProperty("visibility", "visible", "important");
+    }
+
+    if (password) {
+        password.value = "";
+        password.style.setProperty("display", "block", "important");
+        password.style.setProperty("visibility", "visible", "important");
+    }
+
+    console.log("✅ واجهة ما بعد التسجيل مفعلة");
+    console.log("❌ إنشاء حساب / متابعة / Google / Facebook / Phone مخفية");
+}
+
+document.addEventListener("DOMContentLoaded", checkRegistrationStatus);
+window.addEventListener("load", checkRegistrationStatus);
+
 async function login() {
 
-    const email = document.getElementById("email").value.trim();
+    const email = emailInput.value.trim();
     const password = document.getElementById("password").value;
     const errorMsg = document.getElementById("errorMsg");
 
@@ -178,6 +287,8 @@ async function login() {
 
 localStorage.setItem("token", data.token);
 localStorage.removeItem("auth_token");
+
+console.log("LOGIN TOKEN SAVED:", !!localStorage.getItem("token"));
 
 window.location.href = "/";
 

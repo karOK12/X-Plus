@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المراجعات - X Plus</title>
+
+<style>
+body{
+margin:0;
+padding:20px;
+font-family:Cairo,Arial,sans-serif;
+background:#06101d;
+color:#fff;
+}
+
+.container{
+max-width:720px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+.review{
+padding:18px 0;
+border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.review-head{
+display:flex;
+justify-content:space-between;
+gap:10px;
+}
+
+.username{
+font-weight:800;
+}
+
+.date{
+color:#8193a8;
+font-size:12px;
+}
+
+.stars{
+color:#ffd43b;
+direction:ltr;
+margin-top:6px;
+letter-spacing:1px;
+}
+
+.comment{
+margin-top:9px;
+line-height:1.9;
+color:#d9e3ed;
+white-space:pre-wrap;
+}
+
+.empty{
+text-align:center;
+color:#8fa1b5;
+padding:30px;
+}
+
+.back{
+display:block;
+text-align:center;
+margin-top:25px;
+color:#91acd0;
+text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>مراجعات X Plus</h1>
+
+<div id="reviews">
+<div class="empty">جاري تحميل المراجعات...</div>
+</div>
+
+<a class="back" href="rating.html">← العودة إلى التقييم</a>
+
+</div>
+
+<script>
+
+const API_URL="/api";
+
+function getToken(){
+return localStorage.getItem("token") ||
+localStorage.getItem("auth_token");
+}
+
+function apiFetch(url,options={}){
+const token=getToken();
+
+return fetch(url,{
+...options,
+headers:{
+"Content-Type":"application/json",
+...(token?{Authorization:`Bearer ${token}`}:{ }),
+...(options.headers||{})
+}
+});
+}
+
+function escapeHtml(value){
+return String(value||"")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+}
+
+function formatDate(value){
+
+if(!value)return "";
+
+try{
+return new Date(value).toLocaleDateString(
+"ar-IQ",
+{
+year:"numeric",
+month:"long",
+day:"numeric"
+}
+);
+}catch{
+return "";
+}
+
+}
+
+function renderStars(rating){
+
+const value=Number(rating);
+
+if(!value)return "";
+
+return `
+<div class="stars">
+${"★".repeat(value)}${"☆".repeat(5-value)}
+</div>
+`;
+
+}
+
+async function loadReviews(){
+
+const container=document.getElementById("reviews");
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating`);
+const data=await res.json();
+
+if(!res.ok || !data.success){
+throw new Error(data.message||"تعذر تحميل المراجعات");
+}
+
+const items=data.reviews||[];
+
+if(!items.length){
+
+container.innerHTML=
+`<div class="empty">لا توجد مراجعات بعد.</div>`;
+
+return;
+
+}
+
+container.innerHTML=items.map(review=>`
+
+<article class="review">
+
+<div class="review-head">
+
+<div class="username">
+${escapeHtml(review.username||"مستخدم")}
+</div>
+
+<div class="date">
+${formatDate(review.createdAt)}
+</div>
+
+</div>
+
+${renderStars(review.rating)}
+
+<div class="comment">
+${escapeHtml(review.comment||"")}
+</div>
+
+</article>
+
+`).join("");
+
+}catch(error){
+
+console.error(error);
+
+container.innerHTML=
+`<div class="empty">تعذر تحميل المراجعات حاليًا.</div>`;
+
+}
+
+}
+
+loadReviews();
+
+</script>
+
+</body>
+</html>

@@ -105,6 +105,27 @@ const User = {
 
 
   // ===============================
+  // تحديث كلمة المرور بواسطة ID
+  // ===============================
+  async updatePasswordById(userId, password) {
+
+    const result = await db.query(
+      `
+      UPDATE users
+      SET password = $1
+      WHERE id = $2
+      RETURNING
+        id,
+        username,
+        email
+      `,
+      [password, userId]
+    );
+
+    return result.rows[0] || null;
+  },
+
+  // ===============================
   // تحديث وقت بدء التعدين
   // ===============================
   async startMining(userId) {

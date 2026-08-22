@@ -1448,24 +1448,6 @@ textarea.form-control {
   }
 }
 
-/* ---------- Scrollbar ---------- */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--gradient-primary);
-  border-radius: var(--radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-blue);
-}
-
 /* ---------- Selection ---------- */
 ::selection {
   background: var(--neon-blue);

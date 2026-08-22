@@ -222,7 +222,8 @@ router.get("/user/profile", auth, async (req, res) => {
         id_name,
         id_number,
         id_image,
-        profile_image
+        profile_image,
+        registration_completed
        FROM users
        WHERE id = $1`,
       [req.user.id]
@@ -287,7 +288,8 @@ router.put("/user/profile", auth, async (req, res) => {
         id_name = $9,
         id_number = $10,
         id_image = $11,
-        profile_image = $12
+        profile_image = $12,
+        registration_completed = TRUE
        WHERE id = $13`,
       [
         fullName || null,
