@@ -1604,3 +1604,6 @@ textarea.form-control {
   z-index: 2;
 }
 
+.mobile-toggle {
+  transform: translateY(-8px);
+}
