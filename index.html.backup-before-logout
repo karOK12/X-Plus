@@ -19,7 +19,7 @@
     .logo-icon-svg { 
       width: 28px; 
       height: 28px; 
-      color: #3b82f6; 
+      color: #2563eb; 
       transition: all 0.3s ease;
     }
     .logo:hover .logo-icon-svg {
@@ -246,10 +246,77 @@
     }
 
     .sidebar-icon {
-      width: 26px;
-      text-align: center;
-      font-size: 17px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+      color: currentColor;
+    }
+
+    .sidebar-icon svg {
+      width: 23px;
+      height: 23px;
+      display: block;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .sidebar-profile-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #eff6ff;
+    }
+
+    .sidebar-profile-icon img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    /* ألوان مكونات الشريط الجانبي */
+
+    .sidebar-items .sidebar-item:nth-child(1) {
+      color: #2563eb;
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(2) {
+      color: #7c3aed;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(3) {
+      color: #0891b2;
+      background: #ecfeff;
+      border-color: #a5f3fc;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(4) {
+      color: #d97706;
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(5) {
+      color: #ca8a04;
+      background: #fefce8;
+      border-color: #fef08a;
+    }
+
+    .sidebar-icon svg {
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .sidebar-item:hover .sidebar-icon svg {
+      transform: scale(1.12);
     }
 
     .sidebar-logout {
@@ -292,16 +359,76 @@
 
     /* ================= END LEFT SIDEBAR ================= */
 \n  </style>
+
+<style id="sidebar-icon-polish">
+.sidebar-items .sidebar-item .sidebar-icon {
+  width: 34px !important;
+  height: 34px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-items .sidebar-item .sidebar-icon svg {
+  width: 23px !important;
+  height: 23px !important;
+  display: block !important;
+  stroke-width: 2.2 !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  transition: transform .2s ease !important;
+}
+
+.sidebar-item:hover .sidebar-icon svg {
+  transform: scale(1.08);
+}
+
+.sidebar-items a[href="profile.html"] .sidebar-icon {
+  color: #2563eb !important;
+}
+
+.sidebar-items a[href="account-settings.html"] .sidebar-icon {
+  color: #808080 !important;
+}
+
+.sidebar-items a[href="wallet.html"] .sidebar-icon {
+  color: #16a34a !important;
+}
+
+.sidebar-items a[href="edit-profile.html"] .sidebar-icon {
+  color: #7c3aed !important;
+}
+
+.sidebar-items a[href="rating.html"] .sidebar-icon {
+  color: #d97706 !important;
+}
+
+.sidebar-items .sidebar-logout .sidebar-icon {
+  color: #dc2626 !important;
+}
+</style>
+
+
+<style id="sidebar-toggle-hide">
+.sidebar-toggle {
+  transition: opacity .25s ease, transform .25s ease, visibility .25s ease !important;
+}
+
+.sidebar-toggle.sidebar-toggle-hidden {
+  display: none !important;
+}
+</style>
+
 </head>
 <body>
 
   <nav class="navbar">
     <div class="container">
       <div class="nav-wrapper">
-        <a href="#" class="logo" onclick="openWallet(event)" title="💰 افتح المحفظة">
+        <a href="wallet.html" class="logo" title="المحفظة">
           <svg class="logo-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
           <span class="logo-text">X Plus</span>
-          <span class="logo-tooltip">💰 افتح المحفظة</span>
         </a>
         <ul class="nav-menu" id="navMenu">
           <li><a href="#hero" class="nav-link">الرئيسية</a></li>
@@ -320,30 +447,46 @@
           </div>
 
           <div class="sidebar-items">
+
             <a href="profile.html" class="sidebar-item">
-              <span class="sidebar-icon">👤</span>
+              <span class="sidebar-icon sidebar-profile-icon">
+                <img id="sidebarProfileImage" src="/assets/images/profile.jpg" alt="صورة الملف الشخصي">
+              </span>
               <span>الملف الشخصي</span>
             </a>
 
-            <a href="edit-profile.html" class="sidebar-item">
-              <span class="sidebar-icon">✏️</span>
-              <span>تعديل الملف الشخصي</span>
-            </a>
-
             <a href="account-settings.html" class="sidebar-item">
-              <span class="sidebar-icon">⚙️</span>
-              <span>إعدادات الحساب</span>
-            </a>
+  <span class="sidebar-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12.55 7.7a4.15 4.3 0 1 0 0 8.6 4.3 4.3 0 0 0 0-8.6Z"/>
+  <path d="M19.4 13.35a7.8 7.8 0 0 0 0-2.7l2-1.5-1.9-3.3-2.3.95a7.7 7.7 0 0 0-2.15-1.25L14.7 3h-3.4l-.35 2.55A7.7 7.7 0 0 0 8.8 6.8L6.5 5.85l-1.9 3.3 2 1.5a7.8 7.8 0 0 0 0 2.7l-2 1.5 1.9 3.3 2.3-.95a7.7 7.7 0 0 0 2.15 1.25L11.3 21h3.4l.35-2.55a7.7 7.7 0 0 0 2.15-1.25l2.3.95 1.9-3.3-2-1.5Z"/>
+</svg>
+  </span>
+  <span>إعدادات الحساب</span>
+</a>
+
+            
 
             <a href="rating.html" class="sidebar-item">
-              <span class="sidebar-icon">⭐</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m12 3 2.78 5.63 6.22.9-4.5 4.39 1.06 6.2L12 17.2l-5.56 2.92 1.06-6.2L3 9.53l6.22-.9Z"></path>
+                </svg>
+              </span>
               <span>تقييم التطبيق</span>
             </a>
 
             <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
-              <span class="sidebar-icon">🚪</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <path d="M16 17l5-5-5-5"></path>
+                  <path d="M21 12H9"></path>
+                </svg>
+              </span>
               <span>تسجيل الخروج</span>
             </button>
+
           </div>
         </aside>
 
@@ -714,11 +857,19 @@
     }
     /* ================= SIDEBAR CONTROL ================= */
 
+    const sidebarProfileImage = document.getElementById("sidebarProfileImage");
+
+    const savedProfileImage = localStorage.getItem("profileImage");
+    if (sidebarProfileImage && savedProfileImage) {
+      sidebarProfileImage.src = savedProfileImage;
+    }
+
     const sidebarToggle = document.getElementById("sidebarToggle");
     const leftSidebar = document.getElementById("leftSidebar");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
 
     function openSidebar() {
+      sidebarToggle.classList.add("sidebar-toggle-hidden");
       leftSidebar.classList.add("active");
       sidebarOverlay.classList.add("active");
       document.body.style.overflow = "hidden";
@@ -727,6 +878,7 @@
     function closeSidebar() {
       leftSidebar.classList.remove("active");
       sidebarOverlay.classList.remove("active");
+      sidebarToggle.classList.remove("sidebar-toggle-hidden");
       document.body.style.overflow = "";
     }
 
@@ -738,10 +890,59 @@
       sidebarOverlay.addEventListener("click", closeSidebar);
     }
 
+    /* إغلاق الشريط عند الضغط خارج القائمة */
+    document.addEventListener("click", (event) => {
+      if (!leftSidebar || !sidebarToggle) return;
+
+      const clickedInsideSidebar = leftSidebar.contains(event.target);
+      const clickedToggle = sidebarToggle.contains(event.target);
+
+      if (
+        leftSidebar.classList.contains("active") &&
+        !clickedInsideSidebar &&
+        !clickedToggle
+      ) {
+        closeSidebar();
+      }
+    });
+
+    /* إغلاق الشريط بزر Escape */
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && leftSidebar.classList.contains("active")) {
+        closeSidebar();
+      }
+    });
+
     /* ================= END SIDEBAR CONTROL ================= */
 
   </script>
 
 
 </body>
-</html>
+</html><style id="wallet-blue-fix">
+.logo {
+  color: #2563eb !important;
+}
+
+.logo:visited,
+.logo:hover,
+.logo:active,
+.logo:focus {
+  color: #2563eb !important;
+  outline: none !important;
+}
+
+.logo .logo-icon-svg {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+}
+
+.logo:hover .logo-icon-svg,
+.logo:active .logo-icon-svg,
+.logo:focus .logo-icon-svg {
+  color: #2563eb !important;
+  stroke: #2563eb !important;
+  filter: none !important;
+  transform: none !important;
+}
+</style>

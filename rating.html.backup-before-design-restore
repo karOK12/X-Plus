@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>تقييم X Plus</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+margin:0;
+padding:0;
+min-height:100%;
+scrollbar-width:none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar{
+display:none;
+}
+
+body{
+font-family:"Cairo",sans-serif;
+background:
+radial-gradient(circle at 50% -10%,rgba(37,99,235,.22),transparent 38%),
+linear-gradient(145deg,#050d18,#091a2d 55%,#0d2742);
+color:#fff;
+padding:18px 12px 35px;
+}
+
+.page{
+width:100%;
+max-width:680px;
+margin:auto;
+}
+
+/* HEADER */
+
+.header{
+text-align:center;
+padding:22px 12px 18px;
+}
+
+.logo{
+width:66px;
+height:66px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:20px;
+background:linear-gradient(145deg,#ffd43b,#ffb800);
+box-shadow:0 10px 35px rgba(255,212,59,.18);
+font-size:34px;
+}
+
+.header h1{
+font-size:27px;
+margin:13px 0 5px;
+font-weight:800;
+}
+
+.header p{
+margin:0;
+color:#9fb0c3;
+font-size:13px;
+line-height:1.8;
+}
+
+/* CARD */
+
+.card{
+background:rgba(10,25,42,.94);
+border:1px solid rgba(255,255,255,.08);
+border-radius:22px;
+padding:20px;
+margin-bottom:14px;
+box-shadow:0 15px 45px rgba(0,0,0,.22);
+}
+
+/* TOP STATS */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:9px;
+}
+
+.stat{
+text-align:center;
+padding:13px 5px;
+border-radius:15px;
+background:rgba(255,255,255,.045);
+border:1px solid rgba(255,255,255,.055);
+}
+
+.stat strong{
+display:block;
+font-size:20px;
+font-weight:800;
+}
+
+.stat span{
+display:block;
+margin-top:3px;
+font-size:10px;
+color:#91a3b7;
+}
+
+/* RATING SUMMARY */
+
+.rating-summary{
+text-align:center;
+padding:5px 0 20px;
+border-bottom:1px solid rgba(255,255,255,.07);
+margin-bottom:20px;
+}
+
+.rating-number{
+font-size:42px;
+font-weight:800;
+line-height:1;
+direction:ltr;
+}
+
+.rating-number .star{
+font-size:28px;
+color:#ffd43b;
+vertical-align:5px;
+margin-left:3px;
+}
+
+.rating-label{
+margin-top:9px;
+font-size:14px;
+color:#aebdce;
+}
+
+.reviews-title{
+font-size:20px;
+font-weight:800;
+margin-bottom:12px;
+}
+
+/* REVIEW */
+
+.review{
+padding:16px 0;
+border-top:1px solid rgba(255,255,255,.07);
+}
+
+.review:first-child{
+border-top:0;
+padding-top:4px;
+}
+
+.review-head{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+}
+
+.username{
+font-weight:800;
+font-size:14px;
+}
+
+.review-date{
+font-size:10px;
+color:#718399;
+}
+
+.review-stars{
+direction:ltr;
+color:#ffd43b;
+font-size:15px;
+letter-spacing:1px;
+margin-top:5px;
+}
+
+.review-comment{
+margin-top:8px;
+font-size:13px;
+color:#d8e2ec;
+line-height:1.9;
+white-space:pre-wrap;
+overflow-wrap:anywhere;
+}
+
+.developer-reply{
+margin-top:11px;
+padding:11px 13px;
+border-radius:12px;
+background:rgba(37,99,235,.08);
+border-right:3px solid #2563eb;
+font-size:12px;
+line-height:1.8;
+color:#d8e4f0;
+}
+
+.developer-reply strong{
+display:block;
+color:#fff;
+margin-bottom:3px;
+}
+
+/* USER COUNT */
+
+.user-count{
+text-align:center;
+padding:18px;
+margin-bottom:14px;
+border-radius:18px;
+background:rgba(255,255,255,.045);
+border:1px solid rgba(255,255,255,.07);
+}
+
+.user-count-icon{
+font-size:25px;
+}
+
+.user-count-number{
+font-size:32px;
+font-weight:800;
+color:#ffd43b;
+line-height:1.2;
+}
+
+.user-count-title{
+font-size:14px;
+font-weight:700;
+}
+
+.user-count-sub{
+font-size:10px;
+color:#7f91a6;
+margin-top:3px;
+}
+
+/* YOUR RATING */
+
+.card-title{
+font-size:20px;
+font-weight:800;
+margin:0 0 5px;
+}
+
+.card-subtitle{
+font-size:12px;
+color:#8496aa;
+margin-bottom:14px;
+}
+
+.stars{
+display:flex;
+justify-content:center;
+direction:ltr;
+gap:4px;
+margin:12px 0;
+}
+
+.star-button{
+border:0;
+background:transparent;
+color:#4e6074;
+font-size:46px;
+padding:3px;
+cursor:pointer;
+line-height:1;
+transition:.18s;
+}
+
+.star-button:hover,
+.star-button.active{
+color:#ffd43b;
+transform:scale(1.08);
+text-shadow:0 0 12px rgba(255,212,59,.3);
+}
+
+.rating-text{
+text-align:center;
+min-height:25px;
+font-size:13px;
+font-weight:700;
+color:#ffd43b;
+}
+
+/* FORM */
+
+.form-area{
+display:none;
+margin-top:14px;
+}
+
+label{
+display:block;
+font-size:13px;
+font-weight:700;
+margin-bottom:7px;
+}
+
+textarea{
+width:100%;
+height:125px;
+resize:none;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.09);
+background:rgba(255,255,255,.045);
+color:#fff;
+padding:12px;
+font-family:inherit;
+font-size:13px;
+line-height:1.8;
+outline:none;
+}
+
+textarea:focus{
+border-color:#2563eb;
+background:rgba(255,255,255,.06);
+}
+
+textarea::placeholder{
+color:#65788d;
+}
+
+.counter{
+font-size:10px;
+color:#718399;
+text-align:left;
+margin-top:4px;
+}
+
+.button{
+width:100%;
+border:0;
+border-radius:13px;
+padding:13px;
+margin-top:11px;
+font-family:inherit;
+font-size:14px;
+font-weight:800;
+cursor:pointer;
+}
+
+.primary{
+background:#2563eb;
+color:#fff;
+}
+
+.secondary{
+background:rgba(255,255,255,.055);
+color:#dbe5ef;
+border:1px solid rgba(255,255,255,.08);
+}
+
+.button:disabled{
+opacity:.5;
+cursor:not-allowed;
+}
+
+.message{
+min-height:22px;
+text-align:center;
+font-size:12px;
+font-weight:700;
+margin-top:10px;
+}
+
+/* EMPTY */
+
+.empty{
+text-align:center;
+padding:25px 5px;
+color:#7f91a6;
+font-size:12px;
+line-height:1.8;
+}
+
+/* BACK */
+
+.back{
+display:block;
+text-align:center;
+color:#8faed3;
+text-decoration:none;
+font-size:12px;
+margin-top:18px;
+}
+
+/* MOBILE */
+
+@media(max-width:500px){
+
+body{
+padding:10px 9px 25px;
+}
+
+.card{
+padding:17px;
+border-radius:19px;
+}
+
+.header h1{
+font-size:23px;
+}
+
+.logo{
+width:58px;
+height:58px;
+font-size:30px;
+}
+
+.stats{
+gap:6px;
+}
+
+.stat strong{
+font-size:18px;
+}
+
+.stat span{
+font-size:9px;
+}
+
+.star-button{
+font-size:40px;
+}
+
+.rating-number{
+font-size:38px;
+}
+
+}
+</style>
+
+<style>
+/* ================================
+   X PLUS — GOOGLE STYLE RATINGS
+   ================================ */
+
+.google-summary{
+  direction:ltr;
+  display:grid;
+  grid-template-columns:150px 1fr;
+  align-items:center;
+  gap:28px;
+  width:100%;
+  padding:6px 0 24px;
+}
+
+/* المتوسط */
+
+.google-score{
+  text-align:center;
+  direction:rtl;
+}
+
+.google-score-number{
+  font-size:48px;
+  line-height:1;
+  font-weight:800;
+  color:#ffffff;
+  letter-spacing:-1px;
+}
+
+.google-stars{
+  direction:ltr;
+  margin-top:9px;
+  color:#ffd43b;
+  font-size:22px;
+  line-height:1;
+  letter-spacing:2px;
+  white-space:nowrap;
+}
+
+.google-review-count{
+  margin-top:8px;
+  color:#9aabbd;
+  font-size:13px;
+}
+
+/* توزيع النجوم */
+
+.google-distribution{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  width:100%;
+}
+
+.google-row{
+  direction:ltr;
+  display:grid;
+  grid-template-columns:25px minmax(0,1fr) 28px;
+  align-items:center;
+  gap:9px;
+  height:19px;
+}
+
+.google-row > span{
+  color:#dce5ee;
+  font-size:12px;
+  font-weight:700;
+  text-align:center;
+}
+
+.google-row > span::after{
+  content:"★";
+  color:#ffd43b;
+  margin-left:2px;
+  font-size:10px;
+}
+
+.google-bar{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,.09);
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.google-bar-fill{
+  width:0%;
+  height:100%;
+  background:#ffd43b;
+  border-radius:99px;
+  transition:width .45s ease;
+}
+
+.google-row small{
+  color:#899bad;
+  font-size:11px;
+  text-align:left;
+  min-width:20px;
+}
+
+/* العنوان */
+
+.reviews-title{
+  direction:rtl;
+  text-align:right;
+  font-size:20px;
+  font-weight:800;
+  color:#ffffff;
+  margin:0 0 10px;
+}
+
+/* المراجعات */
+
+#reviews{
+  direction:rtl;
+  text-align:right;
+}
+
+.review{
+  direction:rtl;
+  text-align:right;
+  padding:17px 0;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+
+.review-head{
+  direction:rtl;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.username{
+  color:#ffffff;
+  font-size:15px;
+  font-weight:800;
+}
+
+.review-date{
+  color:#7f91a6;
+  font-size:11px;
+}
+
+.review-stars{
+  direction:ltr;
+  text-align:right;
+  color:#ffd43b;
+  font-size:17px;
+  letter-spacing:1px;
+  margin-top:5px;
+}
+
+.review-comment{
+  direction:rtl;
+  text-align:right;
+  color:#d9e3ed;
+  font-size:14px;
+  line-height:1.9;
+  margin-top:7px;
+}
+
+.developer-reply{
+  direction:rtl;
+  text-align:right;
+  margin-top:11px;
+  padding:11px 13px;
+  border-right:3px solid #2563eb;
+  border-radius:10px;
+  background:rgba(37,99,235,.08);
+}
+
+/* موبايل */
+
+@media(max-width:560px){
+
+  .google-summary{
+    grid-template-columns:105px minmax(0,1fr);
+    gap:15px;
+  }
+
+  .google-score-number{
+    font-size:40px;
+  }
+
+  .google-stars{
+    font-size:17px;
+    letter-spacing:1px;
+  }
+
+  .google-review-count{
+    font-size:11px;
+  }
+
+  .google-row{
+    grid-template-columns:24px minmax(0,1fr) 25px;
+    gap:6px;
+  }
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+<header class="header">
+
+<div class="logo">⭐</div>
+
+<h1>تقييم X Plus</h1>
+
+<p>
+شارك تجربتك وساعدنا على تطوير X Plus
+</p>
+
+</header>
+
+
+<!-- الإحصائيات -->
+
+<section class="card">
+
+<div class="stats">
+
+<div class="stat">
+<strong id="downloadCount">0</strong>
+<span>عمليات تنزيل</span>
+</div>
+
+<div class="stat">
+<strong>13+</strong>
+<span>الفئة العمرية</span>
+</div>
+
+<div class="stat">
+<strong id="storeRating">0</strong>
+<span>المراجعات</span>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ملخص التقييم -->
+
+<section class="card google-reviews-card">
+
+<div class="google-summary">
+
+  <div class="google-score">
+
+    <div id="averageRating" class="google-score-number">0.0</div>
+
+    <div id="averageStars" class="google-stars">
+      ☆☆☆☆☆
+    </div>
+
+    <div class="google-review-count">
+      <span id="googleTotalRatings">0</span> مراجعة
+    </div>
+
+  </div>
+
+  <div class="google-distribution">
+
+    <div class="google-row">
+      <span>5</span>
+      <div class="google-bar">
+        <div id="bar5" class="google-bar-fill"></div>
+      </div>
+      <small id="count5">0</small>
+    </div>
+
+    <div class="google-row">
+      <span>4</span>
+      <div class="google-bar">
+        <div id="bar4" class="google-bar-fill"></div>
+      </div>
+      <small id="count4">0</small>
+    </div>
+
+    <div class="google-row">
+      <span>3</span>
+      <div class="google-bar">
+        <div id="bar3" class="google-bar-fill"></div>
+      </div>
+      <small id="count3">0</small>
+    </div>
+
+    <div class="google-row">
+      <span>2</span>
+      <div class="google-bar">
+        <div id="bar2" class="google-bar-fill"></div>
+      </div>
+      <small id="count2">0</small>
+    </div>
+
+    <div class="google-row">
+      <span>1</span>
+      <div class="google-bar">
+        <div id="bar1" class="google-bar-fill"></div>
+      </div>
+      <small id="count1">0</small>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="reviews-title">
+آخر المراجعات
+</div>
+
+<div id="reviews">
+  <div class="empty">
+    جاري تحميل المراجعات...
+  </div>
+</div>
+
+</section>
+
+
+<!-- عدد المستخدمين -->
+
+<div class="user-count">
+
+<div class="user-count-icon">👥</div>
+
+<div class="user-count-number" id="userRatingCount">
+0
+</div>
+
+<div class="user-count-title">
+مستخدم قيّم X Plus
+</div>
+
+<div class="user-count-sub">
+عدد التقييمات الفعلية
+</div>
+
+</div>
+
+
+<!-- تقييم المستخدم -->
+
+<section class="card">
+
+<h2 class="card-title">
+تقييمك
+</h2>
+
+<div class="card-subtitle">
+اختر عدد النجوم ثم اكتب تجربتك إذا أردت
+</div>
+
+<div class="stars" id="stars">
+
+<button class="star-button" type="button" data-rating="1">★</button>
+<button class="star-button" type="button" data-rating="2">★</button>
+<button class="star-button" type="button" data-rating="3">★</button>
+<button class="star-button" type="button" data-rating="4">★</button>
+<button class="star-button" type="button" data-rating="5">★</button>
+
+</div>
+
+<div id="ratingText" class="rating-text">
+اختر تقييمك
+</div>
+
+
+<div id="formArea" class="form-area">
+
+<label for="comment">
+اكتب تعليقك
+</label>
+
+<textarea
+id="comment"
+maxlength="500"
+placeholder="شاركنا تجربتك مع X Plus..."
+></textarea>
+
+<div class="counter">
+<span id="charCount">0</span> / 500
+</div>
+
+<button
+id="sendBtn"
+class="button primary"
+type="button"
+>
+نشر المراجعة
+</button>
+
+</div>
+
+
+<button
+id="commentOnlyBtn"
+class="button secondary"
+type="button"
+>
+كتابة تعليق بدون تقييم
+</button>
+
+<div id="commentOnlyArea" class="form-area">
+
+<label for="commentOnly">
+تعليقك
+</label>
+
+<textarea
+id="commentOnly"
+maxlength="500"
+placeholder="اكتب رأيك..."
+></textarea>
+
+<div class="counter">
+<span id="commentOnlyCount">0</span> / 500
+</div>
+
+<button
+id="submitCommentOnly"
+class="button primary"
+type="button"
+>
+نشر التعليق
+</button>
+
+</div>
+
+<div id="message" class="message"></div>
+
+</section>
+
+
+<a href="index.html" class="back">
+← العودة للرئيسية
+</a>
+
+</div>
+
+
+<script>
+
+const API_URL="/api";
+
+let selectedRating=null;
+
+const stars=document.querySelectorAll(".star-button");
+const ratingText=document.getElementById("ratingText");
+const formArea=document.getElementById("formArea");
+const comment=document.getElementById("comment");
+const charCount=document.getElementById("charCount");
+const sendBtn=document.getElementById("sendBtn");
+
+const commentOnlyBtn=
+document.getElementById("commentOnlyBtn");
+
+const commentOnlyArea=
+document.getElementById("commentOnlyArea");
+
+const commentOnly=
+document.getElementById("commentOnly");
+
+const commentOnlyCount=
+document.getElementById("commentOnlyCount");
+
+const submitCommentOnly=
+document.getElementById("submitCommentOnly");
+
+const message=document.getElementById("message");
+
+const reviews=document.getElementById("reviews");
+
+
+function getToken(){
+
+return localStorage.getItem("token") ||
+localStorage.getItem("auth_token");
+
+}
+
+
+function apiFetch(url,options={}){
+
+const token=getToken();
+
+return fetch(url,{
+
+...options,
+
+headers:{
+"Content-Type":"application/json",
+
+...(token
+?{Authorization:`Bearer ${token}`}
+:{ }),
+
+...(options.headers||{})
+}
+
+});
+
+}
+
+
+function showStars(value){
+
+stars.forEach(star=>{
+
+const rating=Number(star.dataset.rating);
+
+star.classList.toggle(
+"active",
+value &&
+rating<=Number(value)
+);
+
+});
+
+}
+
+
+stars.forEach(star=>{
+
+star.addEventListener("click",()=>{
+
+selectedRating=
+Number(star.dataset.rating);
+
+showStars(selectedRating);
+
+ratingText.textContent=
+`${selectedRating} من 5 ⭐`;
+
+formArea.style.display="block";
+
+commentOnlyArea.style.display="none";
+
+message.textContent="";
+
+});
+
+});
+
+
+comment.addEventListener("input",()=>{
+
+charCount.textContent=
+comment.value.length;
+
+});
+
+
+commentOnly.addEventListener("input",()=>{
+
+commentOnlyCount.textContent=
+commentOnly.value.length;
+
+});
+
+
+function escapeHtml(value){
+
+return String(value||"")
+
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+function formatDate(value){
+
+if(!value)return "";
+
+try{
+
+return new Date(value).toLocaleDateString(
+"ar-IQ",
+{
+year:"numeric",
+month:"long",
+day:"numeric"
+}
+);
+
+}catch{
+
+return "";
+
+}
+
+}
+
+
+function renderStars(rating){
+
+const n=Number(rating)||0;
+
+return "★".repeat(n)+
+"☆".repeat(5-n);
+
+}
+
+
+function updateStats(stats){
+
+if(!stats)return;
+
+const average =
+Number(stats.averageRating || 0);
+
+const total =
+Number(stats.totalRatings || 0);
+
+const averageElement =
+document.getElementById("averageRating");
+
+if(averageElement){
+  averageElement.textContent =
+    average.toFixed(1);
+}
+
+const totalElement =
+document.getElementById("googleTotalRatings");
+
+if(totalElement){
+  totalElement.textContent = total;
+}
+
+const storeRating =
+document.getElementById("storeRating");
+
+if(storeRating){
+  storeRating.textContent = total;
+}
+
+const userRatingCount =
+document.getElementById("userRatingCount");
+
+if(userRatingCount){
+  userRatingCount.textContent = total;
+}
+
+const rounded =
+Math.max(0,Math.min(5,Math.round(average)));
+
+const averageStars =
+document.getElementById("averageStars");
+
+if(averageStars){
+
+  averageStars.textContent =
+    "★".repeat(rounded) +
+    "☆".repeat(5-rounded);
+}
+
+const distribution =
+stats.distribution || {};
+
+for(let i=1;i<=5;i++){
+
+  const count =
+    Number(distribution[i] || 0);
+
+  const countElement =
+    document.getElementById(`count${i}`);
+
+  const barElement =
+    document.getElementById(`bar${i}`);
+
+  if(countElement){
+    countElement.textContent = count;
+  }
+
+  if(barElement){
+
+    const percentage =
+      total > 0
+      ? (count / total) * 100
+      : 0;
+
+    barElement.style.width =
+      `${percentage}%`;
+  }
+}
+
+}
+
+
+function renderReviews(items){
+
+if(!Array.isArray(items)||!items.length){
+
+reviews.innerHTML=`
+<div class="empty">
+لا توجد مراجعات بعد.<br>
+كن أول من يشارك تجربته.
+</div>`;
+
+return;
+
+}
+
+
+reviews.innerHTML=items.map(review=>{
+
+const starsHtml=
+review.rating
+?`
+<div class="review-stars">
+${renderStars(review.rating)}
+</div>
+`
+:"";
+
+
+const reply=
+review.developerReply
+?`
+<div class="developer-reply">
+<strong>رد فريق X Plus</strong>
+${escapeHtml(review.developerReply)}
+</div>
+`
+:"";
+
+
+return`
+
+<article class="review">
+
+<div class="review-head">
+
+<div class="username">
+${escapeHtml(review.username||"مستخدم")}
+</div>
+
+<div class="review-date">
+${formatDate(review.createdAt)}
+</div>
+
+</div>
+
+${starsHtml}
+
+<div class="review-comment">
+${escapeHtml(review.comment||"")}
+</div>
+
+${reply}
+
+</article>
+
+`;
+
+}).join("");
+
+}
+
+
+async function loadRating(){
+
+if(!getToken()){
+
+window.location.href="login.html";
+
+return;
+
+}
+
+
+try{
+
+const res=
+await apiFetch(`${API_URL}/rating`);
+
+const data=
+await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||
+"تعذر تحميل المراجعات"
+);
+
+}
+
+updateStats(data.stats);
+
+renderReviews(data.reviews);
+
+
+if(
+data.rating!==null &&
+data.rating!==undefined &&
+Number(data.rating)>=1
+){
+
+selectedRating=
+Number(data.rating);
+
+showStars(selectedRating);
+
+ratingText.textContent=
+"تم تسجيل تقييمك";
+
+}
+
+if(data.comment){
+
+comment.value=data.comment;
+
+charCount.textContent=
+data.comment.length;
+
+}
+
+}catch(error){
+
+console.error(error);
+
+reviews.innerHTML=`
+<div class="empty">
+تعذر تحميل المراجعات حاليًا.
+</div>`;
+
+}
+
+}
+
+
+async function submitRating(){
+
+const text=
+comment.value.trim();
+
+if(!selectedRating&&!text){
+
+message.textContent=
+"⚠️ اختر تقييمًا أو اكتب تعليقًا.";
+
+return;
+
+}
+
+sendBtn.disabled=true;
+
+message.textContent=
+"⏳ جاري نشر المراجعة...";
+
+
+try{
+
+const res=
+await apiFetch(`${API_URL}/rating`,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+rating:selectedRating,
+comment:text||null
+
+})
+
+});
+
+
+const data=
+await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||
+"فشل نشر المراجعة"
+);
+
+}
+
+message.textContent=
+"✅ تم حفظ مراجعتك بنجاح.";
+
+await loadRating();
+
+}catch(error){
+
+message.textContent=
+`❌ ${error.message}`;
+
+}finally{
+
+sendBtn.disabled=false;
+
+}
+
+}
+
+
+sendBtn.addEventListener(
+"click",
+submitRating
+);
+
+
+commentOnlyBtn.addEventListener("click",()=>{
+
+formArea.style.display="none";
+
+commentOnlyArea.style.display="block";
+
+commentOnly.focus();
+
+message.textContent="";
+
+});
+
+
+submitCommentOnly.addEventListener(
+"click",
+async()=>{
+
+const text=
+commentOnly.value.trim();
+
+if(!text){
+
+message.textContent=
+"⚠️ اكتب تعليقك أولًا.";
+
+return;
+
+}
+
+submitCommentOnly.disabled=true;
+
+message.textContent=
+"⏳ جاري نشر التعليق...";
+
+
+try{
+
+const res=
+await apiFetch(`${API_URL}/rating`,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+rating:null,
+comment:text
+
+})
+
+});
+
+
+const data=
+await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||
+"فشل نشر التعليق"
+);
+
+}
+
+message.textContent=
+"✅ تم نشر تعليقك بنجاح.";
+
+commentOnly.value="";
+
+commentOnlyCount.textContent="0";
+
+commentOnlyArea.style.display="none";
+
+await loadRating();
+
+}catch(error){
+
+message.textContent=
+`❌ ${error.message}`;
+
+}finally{
+
+submitCommentOnly.disabled=false;
+
+}
+
+});
+
+
+loadRating();
+
+</script>
+
+</body>
+</html>
+
+<style>
+/* إصلاح اتجاه قسم المراجعات */
+.reviews-card{
+  direction:rtl !important;
+  text-align:right !important;
+}
+
+.reviews-card .rating-summary{
+  direction:rtl !important;
+  text-align:center !important;
+}
+
+.reviews-card .reviews-title{
+  direction:rtl !important;
+  text-align:right !important;
+}
+
+.reviews-card #reviews{
+  direction:rtl !important;
+  text-align:right !important;
+}
+
+.reviews-card .review{
+  direction:rtl !important;
+  text-align:right !important;
+}
+
+.reviews-card .review-head{
+  direction:rtl !important;
+  flex-direction:row !important;
+  text-align:right !important;
+}
+
+.reviews-card .username{
+  text-align:right !important;
+}
+
+.reviews-card .review-date{
+  text-align:left !important;
+}
+
+.reviews-card .review-stars{
+  direction:ltr !important;
+  text-align:right !important;
+}
+
+.reviews-card .review-comment{
+  direction:rtl !important;
+  text-align:right !important;
+}
+
+.reviews-card .developer-reply{
+  direction:rtl !important;
+  text-align:right !important;
+}
+
+.reviews-card .empty{
+  direction:rtl !important;
+  text-align:center !important;
+}
+</style>
+
+
+<style>
+.google-reviews-card{
+  direction:rtl!important;
+  text-align:right!important;
+}
+

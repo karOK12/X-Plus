@@ -736,7 +736,23 @@
 
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener("click", closeSidebar);
+      sidebarOverlay.addEventListener("touchstart", closeSidebar, { passive: true });
     }
+
+    /* ================= UNIVERSAL SIDEBAR CLOSE ================= */
+
+    document.addEventListener("pointerdown", function(e) {
+      if (!leftSidebar || !leftSidebar.classList.contains("active")) return;
+
+      const clickedInsideSidebar = leftSidebar.contains(e.target);
+      const clickedToggle = sidebarToggle && sidebarToggle.contains(e.target);
+
+      if (!clickedInsideSidebar && !clickedToggle) {
+        closeSidebar();
+      }
+    });
+
+    /* ================= END UNIVERSAL SIDEBAR CLOSE ================= */
 
     /* ================= END SIDEBAR CONTROL ================= */
 

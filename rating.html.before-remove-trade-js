@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+    }
+
+    thumb.style.display = "block";
+
+    const maxMove =
+      trackHeight - thumbHeight;
+
+    const move =
+      (scrollTop / maxScroll) * maxMove;
+
+    thumb.style.transform =
+      `translateY(${move}px)`;
+  }
+
+  window.addEventListener(
+    "scroll",
+    updateTradeScroll,
+    {passive:true}
+  );
+
+  window.addEventListener(
+    "resize",
+    updateTradeScroll
+  );
+
+  updateTradeScroll();
+
+})();
+</script>
+
+</body>
+</html>

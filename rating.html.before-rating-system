@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تقييم التطبيق - X Plus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Cairo", sans-serif;
+      background: linear-gradient(135deg, #07111f, #0b1d33);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(15, 30, 50, 0.95);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      padding: 35px 25px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+
+    .icon {
+      font-size: 55px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #aebdce;
+      margin-bottom: 28px;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      direction: ltr;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .star {
+      border: 0;
+      background: transparent;
+      color: #526174;
+      font-size: 48px;
+      cursor: pointer;
+      transition: .2s;
+      padding: 2px;
+    }
+
+    .star:hover,
+    .star.active {
+      color: #ffd43b;
+      transform: scale(1.08);
+    }
+
+    .rating-text {
+      min-height: 30px;
+      color: #ffd43b;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .save-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    .save-btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .message {
+      min-height: 28px;
+      margin-top: 18px;
+      font-weight: 600;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 20px;
+      color: #9db8d8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <div class="icon">⭐</div>
+
+    <h1>قيّم تطبيق X Plus</h1>
+
+    <div class="subtitle">
+      رأيك يساعدنا على تطوير المنصة وتحسين تجربتك.
+    </div>
+
+    <div class="stars" id="stars">
+      <button class="star" data-rating="1">★</button>
+      <button class="star" data-rating="2">★</button>
+      <button class="star" data-rating="3">★</button>
+      <button class="star" data-rating="4">★</button>
+      <button class="star" data-rating="5">★</button>
+    </div>
+
+    <div class="rating-text" id="ratingText">
+      اختر تقييمك
+    </div>
+
+    <button class="save-btn" id="saveBtn" disabled>
+      حفظ التقييم
+    </button>
+
+    <div class="message" id="message"></div>
+
+    <a class="back" href="index.html">← العودة للرئيسية</a>
+  </div>
+
+<script>
+const API_URL = "/api";
+
+let selectedRating = 0;
+
+const stars = document.querySelectorAll(".star");
+const ratingText = document.getElementById("ratingText");
+const saveBtn = document.getElementById("saveBtn");
+const message = document.getElementById("message");
+
+function getToken() {
+  return localStorage.getItem("token") ||
+         localStorage.getItem("auth_token");
+}
+
+function apiFetch(url, options = {}) {
+  const token = getToken();
+
+  return fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {})
+    }
+  });
+}
+
+function showStars(value) {
+  stars.forEach(star => {
+    const rating = Number(star.dataset.rating);
+    star.classList.toggle("active", rating <= value);
+  });
+}
+
+stars.forEach(star => {
+  star.addEventListener("click", () => {
+    selectedRating = Number(star.dataset.rating);
+    showStars(selectedRating);
+
+    ratingText.textContent =
+      `${selectedRating} من 5 ⭐`;
+
+    saveBtn.disabled = false;
+    message.textContent = "";
+  });
+});
+
+async function loadRating() {
+  if (!getToken()) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const res = await apiFetch(`${API_URL}/rating`);
+    const data = await res.json();
+
+    if (data.success && data.rating) {
+      selectedRating = Number(data.rating);
+      showStars(selectedRating);
+      ratingText.textContent = `${selectedRating} من 5 ⭐`;
+      saveBtn.disabled = false;
+    }
+  } catch (err) {
+    console.error("فشل جلب التقييم:", err);
+  }
+}
+
+saveBtn.addEventListener("click", async () => {
+  if (!selectedRating) return;
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "⏳ جاري الحفظ...";
+  message.textContent = "";
+
+  try {
+    const res = await apiFetch(`${API_URL}/rating`, {
+      method: "POST",
+      body: JSON.stringify({
+        rating: selectedRating
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      message.textContent = "✅ تم حفظ تقييمك بنجاح";
+      saveBtn.textContent = "✅ تم الحفظ";
+    } else {
+      throw new Error(data.message || "فشل حفظ التقييم");
+    }
+
+  } catch (err) {
+    console.error(err);
+    message.textContent = "❌ حدث خطأ أثناء حفظ التقييم";
+    saveBtn.disabled = false;
+    saveBtn.textContent = "حفظ التقييم";
+  }
+});
+
+loadRating();
+</script>
+
+</body>
+</html>

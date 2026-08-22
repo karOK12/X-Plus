@@ -155,11 +155,6 @@
     /* ================= LEFT SIDEBAR ================= */
 
     .sidebar-toggle {
-      position: absolute;
-      left: 0;
-      top: 25%;
-      transform: translateY(-50%);
-      margin: 0;
       width: 38px;
       height: 38px;
       border: 1px solid #e2e8f0;
@@ -172,6 +167,7 @@
       align-items: center;
       justify-content: center;
       transition: .25s ease;
+      margin-right: 8px;
     }
 
     .sidebar-toggle:hover {
@@ -210,6 +206,17 @@
       color: #1e293b;
       font-weight: 800;
       font-size: 16px;
+    }
+
+    .sidebar-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #475569;
+      cursor: pointer;
+      font-size: 20px;
     }
 
     .sidebar-items {
@@ -317,6 +324,7 @@
         <aside class="left-sidebar" id="leftSidebar">
           <div class="sidebar-header">
             <span>القائمة</span>
+            <button class="sidebar-close" id="sidebarClose" type="button">×</button>
           </div>
 
           <div class="sidebar-items">
@@ -716,6 +724,7 @@
 
     const sidebarToggle = document.getElementById("sidebarToggle");
     const leftSidebar = document.getElementById("leftSidebar");
+    const sidebarClose = document.getElementById("sidebarClose");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
 
     function openSidebar() {
@@ -732,6 +741,10 @@
 
     if (sidebarToggle) {
       sidebarToggle.addEventListener("click", openSidebar);
+    }
+
+    if (sidebarClose) {
+      sidebarClose.addEventListener("click", closeSidebar);
     }
 
     if (sidebarOverlay) {

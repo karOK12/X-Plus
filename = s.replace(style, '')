@@ -1,0 +1,44 @@
+[1mdiff --git a/login.html b/login.html[m
+[1mindex 75b4347..902bd56 100644[m
+[1m--- a/login.html[m
+[1m+++ b/login.html[m
+[36m@@ -166,9 +166,15 @@[m
+     <span>متابعة</span>[m
+ </div>[m
+         <div class="social" id="socialButtons">[m
+[31m-            <button class="social-btn" style="background: #db4437;" onclick="socialLogin('google')">Google</button>[m
+[31m-            <button class="social-btn" style="background: #1877f2;" onclick="socialLogin('facebook')">Facebook</button>[m
+[31m-            <button class="social-btn" style="background: #22c55e;" onclick="phoneVerification()">Phone</button>[m
+[32m+[m[32m            <button class="social-btn" style="background: #db4437;" onclick="socialLogin('google')">[m
+[32m+[m[32m                <span class="social-icon">G</span> Google[m
+[32m+[m[32m            </button>[m
+[32m+[m[32m            <button class="social-btn" style="background: #1877f2;" onclick="socialLogin('facebook')">[m
+[32m+[m[32m                <span class="social-icon">f</span> Facebook[m
+[32m+[m[32m            </button>[m
+[32m+[m[32m            <button class="social-btn" style="background: #22c55e;" onclick="phoneVerification()">[m
+[32m+[m[32m                <span class="social-icon">☎</span> Phone[m
+[32m+[m[32m            </button>[m
+         </div>[m
+ [m
+         <p class="error-msg" id="errorMsg"></p>[m
+[36m@@ -318,4 +324,18 @@[m [mfunction phoneVerification() {[m
+ }[m
+ </script>[m
+ </body>[m
+[31m-</html>[m
+\ No newline at end of file[m
+[32m+[m[32m</html>[m
+[32m+[m[32m<style>[m
+[32m+[m[32m.social-btn {[m
+[32m+[m[32m    display: flex;[m
+[32m+[m[32m    align-items: center;[m
+[32m+[m[32m    justify-content: center;[m
+[32m+[m[32m    gap: 7px;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m.social-icon {[m
+[32m+[m[32m    font-weight: 800;[m
+[32m+[m[32m    font-size: 17px;[m
+[32m+[m[32m    line-height: 1;[m
+[32m+[m[32m}[m
+[32m+[m[32m</style>[m

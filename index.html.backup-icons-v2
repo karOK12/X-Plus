@@ -212,6 +212,44 @@
       font-size: 16px;
     }
 
+    .sidebar-profile {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 0 14px;
+      text-decoration: none;
+    }
+
+    .sidebar-profile-image {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #e2e8f0;
+      background: #f1f5f9;
+      box-shadow: 0 5px 18px rgba(15, 23, 42, .14);
+      transition: all .25s ease;
+    }
+
+    .sidebar-profile-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .sidebar-profile:hover .sidebar-profile-image {
+      border-color: #93c5fd;
+      transform: scale(1.04);
+    }
+
+    .sidebar-icon {
+      width: 21px;
+      height: 21px;
+      flex: 0 0 21px;
+      display: block;
+    }
+
     .sidebar-items {
       display: flex;
       flex-direction: column;
@@ -320,30 +358,86 @@
           </div>
 
           <div class="sidebar-items">
-            <a href="profile.html" class="sidebar-item">
-              <span class="sidebar-icon">👤</span>
-              <span>الملف الشخصي</span>
+
+            <a href="profile.html" class="sidebar-profile">
+              <span class="sidebar-profile-image">
+                <img id="sidebarProfileImage" src="/assets/images/profile.jpg" alt="صورة البروفايل">
+              </span>
             </a>
 
-            <a href="edit-profile.html" class="sidebar-item">
-              <span class="sidebar-icon">✏️</span>
-              <span>تعديل الملف الشخصي</span>
+            <a href="rewards.html" class="sidebar-item">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/>
+                <path d="M2 7h20v5H2z"/>
+                <path d="M12 22V7"/>
+                <path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7Z"/>
+                <path d="M12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7Z"/>
+              </svg>
+              <span>المكافآت</span>
+            </a>
+
+            <a href="referrals.html" class="sidebar-item">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M19 8v6"/>
+                <path d="M22 11h-6"/>
+              </svg>
+              <span>دعوة صديق</span>
+            </a>
+
+            <a href="activity.html" class="sidebar-item">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/>
+                <path d="m7 16 4-5 3 3 5-7"/>
+              </svg>
+              <span>سجل النشاط</span>
+            </a>
+
+            <a href="achievements.html" class="sidebar-item">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 21h8"/>
+                <path d="M12 17v4"/>
+                <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
+                <path d="M7 6H4v2a4 4 0 0 0 4 4"/>
+                <path d="M17 6h3v2a4 4 0 0 1-4 4"/>
+                <path d="M9 2h6"/>
+              </svg>
+              <span>الإنجازات</span>
+            </a>
+
+            <a href="notifications.html" class="sidebar-item">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                <path d="M10 21h4"/>
+              </svg>
+              <span>الإشعارات</span>
             </a>
 
             <a href="account-settings.html" class="sidebar-item">
-              <span class="sidebar-icon">⚙️</span>
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2.6V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8 15a1.7 1.7 0 0 0-1.6-1H6v-2.6h.4A1.7 1.7 0 0 0 8 10a1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5h2.6v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2V14h-.2a1.7 1.7 0 0 0-1.6 1Z"/>
+              </svg>
               <span>إعدادات الحساب</span>
             </a>
 
             <a href="rating.html" class="sidebar-item">
-              <span class="sidebar-icon">⭐</span>
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>
+              </svg>
               <span>تقييم التطبيق</span>
             </a>
 
             <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
-              <span class="sidebar-icon">🚪</span>
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <path d="m16 17 5-5-5-5"/>
+                <path d="M21 12H9"/>
+              </svg>
               <span>تسجيل الخروج</span>
             </button>
+
           </div>
         </aside>
 
@@ -712,6 +806,13 @@
       if (event) event.preventDefault();
       window.open('wallet.html', '_blank');
     }
+    const sidebarProfileImage = document.getElementById("sidebarProfileImage");
+    const savedSidebarProfileImage = localStorage.getItem("profileImage");
+
+    if (sidebarProfileImage && savedSidebarProfileImage) {
+      sidebarProfileImage.src = savedSidebarProfileImage;
+    }
+
     /* ================= SIDEBAR CONTROL ================= */
 
     const sidebarToggle = document.getElementById("sidebarToggle");
@@ -736,7 +837,23 @@
 
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener("click", closeSidebar);
+      sidebarOverlay.addEventListener("touchstart", closeSidebar, { passive: true });
     }
+
+    /* ================= UNIVERSAL SIDEBAR CLOSE ================= */
+
+    document.addEventListener("pointerdown", function(e) {
+      if (!leftSidebar || !leftSidebar.classList.contains("active")) return;
+
+      const clickedInsideSidebar = leftSidebar.contains(e.target);
+      const clickedToggle = sidebarToggle && sidebarToggle.contains(e.target);
+
+      if (!clickedInsideSidebar && !clickedToggle) {
+        closeSidebar();
+      }
+    });
+
+    /* ================= END UNIVERSAL SIDEBAR CLOSE ================= */
 
     /* ================= END SIDEBAR CONTROL ================= */
 

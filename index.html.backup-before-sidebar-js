@@ -155,11 +155,6 @@
     /* ================= LEFT SIDEBAR ================= */
 
     .sidebar-toggle {
-      position: absolute;
-      left: 0;
-      top: 25%;
-      transform: translateY(-50%);
-      margin: 0;
       width: 38px;
       height: 38px;
       border: 1px solid #e2e8f0;
@@ -172,6 +167,7 @@
       align-items: center;
       justify-content: center;
       transition: .25s ease;
+      margin-right: 8px;
     }
 
     .sidebar-toggle:hover {
@@ -210,6 +206,17 @@
       color: #1e293b;
       font-weight: 800;
       font-size: 16px;
+    }
+
+    .sidebar-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #475569;
+      cursor: pointer;
+      font-size: 20px;
     }
 
     .sidebar-items {
@@ -312,11 +319,13 @@
         <div class="nav-actions" id="navActions">
 
 </div>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="فتح القائمة"><span></span><span></span><span></span></button>
         <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="فتح الشريط الجانبي">☰</button>
 
         <aside class="left-sidebar" id="leftSidebar">
           <div class="sidebar-header">
             <span>القائمة</span>
+            <button class="sidebar-close" id="sidebarClose" type="button">×</button>
           </div>
 
           <div class="sidebar-items">
@@ -712,34 +721,6 @@
       if (event) event.preventDefault();
       window.open('wallet.html', '_blank');
     }
-    /* ================= SIDEBAR CONTROL ================= */
-
-    const sidebarToggle = document.getElementById("sidebarToggle");
-    const leftSidebar = document.getElementById("leftSidebar");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-    function openSidebar() {
-      leftSidebar.classList.add("active");
-      sidebarOverlay.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeSidebar() {
-      leftSidebar.classList.remove("active");
-      sidebarOverlay.classList.remove("active");
-      document.body.style.overflow = "";
-    }
-
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener("click", openSidebar);
-    }
-
-    if (sidebarOverlay) {
-      sidebarOverlay.addEventListener("click", closeSidebar);
-    }
-
-    /* ================= END SIDEBAR CONTROL ================= */
-
   </script>
 
 

@@ -246,10 +246,60 @@
     }
 
     .sidebar-icon {
-      width: 26px;
-      text-align: center;
-      font-size: 17px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+      color: currentColor;
+    }
+
+    .sidebar-icon svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+      stroke: currentColor;
+    }
+
+    /* ألوان مكونات الشريط الجانبي */
+
+    .sidebar-items .sidebar-item:nth-child(1) {
+      color: #2563eb;
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(2) {
+      color: #7c3aed;
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(3) {
+      color: #0891b2;
+      background: #ecfeff;
+      border-color: #a5f3fc;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(4) {
+      color: #d97706;
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .sidebar-items .sidebar-item:nth-child(5) {
+      color: #ca8a04;
+      background: #fefce8;
+      border-color: #fef08a;
+    }
+
+    .sidebar-icon svg {
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .sidebar-item:hover .sidebar-icon svg {
+      transform: scale(1.12);
     }
 
     .sidebar-logout {
@@ -320,30 +370,67 @@
           </div>
 
           <div class="sidebar-items">
+
             <a href="profile.html" class="sidebar-item">
-              <span class="sidebar-icon">👤</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"></path>
+                </svg>
+              </span>
               <span>الملف الشخصي</span>
             </a>
 
+            <a href="wallet.html" class="sidebar-item">
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h15v12H5a3 3 0 0 1-3-3V6"></path>
+                  <path d="M16 13h.01"></path>
+                </svg>
+              </span>
+              <span>المحفظة</span>
+            </a>
+
             <a href="edit-profile.html" class="sidebar-item">
-              <span class="sidebar-icon">✏️</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                </svg>
+              </span>
               <span>تعديل الملف الشخصي</span>
             </a>
 
             <a href="account-settings.html" class="sidebar-item">
-              <span class="sidebar-icon">⚙️</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.8 1.8-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.04 1.56V22h-2.55v-.1a1.7 1.7 0 0 0-1.04-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.8-1.8.06-.06A1.7 1.7 0 0 0 8.1 17a1.7 1.7 0 0 0-1.56-1.04H6.4v-2.55h.1A1.7 1.7 0 0 0 8.06 12a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.8-1.8.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.04-1.56V5h2.55v.1a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.8 1.8-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.56 1.04h.1v2.55h-.1A1.7 1.7 0 0 0 19.4 15z"></path>
+                </svg>
+              </span>
               <span>إعدادات الحساب</span>
             </a>
 
             <a href="rating.html" class="sidebar-item">
-              <span class="sidebar-icon">⭐</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m12 3 2.78 5.63 6.22.9-4.5 4.39 1.06 6.2L12 17.2l-5.56 2.92 1.06-6.2L3 9.53l6.22-.9Z"></path>
+                </svg>
+              </span>
               <span>تقييم التطبيق</span>
             </a>
 
             <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
-              <span class="sidebar-icon">🚪</span>
+              <span class="sidebar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <path d="M16 17l5-5-5-5"></path>
+                  <path d="M21 12H9"></path>
+                </svg>
+              </span>
               <span>تسجيل الخروج</span>
             </button>
+
           </div>
         </aside>
 
@@ -737,6 +824,29 @@
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener("click", closeSidebar);
     }
+
+    /* إغلاق الشريط عند الضغط خارج القائمة */
+    document.addEventListener("click", (event) => {
+      if (!leftSidebar || !sidebarToggle) return;
+
+      const clickedInsideSidebar = leftSidebar.contains(event.target);
+      const clickedToggle = sidebarToggle.contains(event.target);
+
+      if (
+        leftSidebar.classList.contains("active") &&
+        !clickedInsideSidebar &&
+        !clickedToggle
+      ) {
+        closeSidebar();
+      }
+    });
+
+    /* إغلاق الشريط بزر Escape */
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && leftSidebar.classList.contains("active")) {
+        closeSidebar();
+      }
+    });
 
     /* ================= END SIDEBAR CONTROL ================= */
 

@@ -736,6 +736,7 @@
 
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener("click", closeSidebar);
+      sidebarOverlay.addEventListener("touchstart", closeSidebar, { passive: true });
     }
 
     /* ================= END SIDEBAR CONTROL ================= */

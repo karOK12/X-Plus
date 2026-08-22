@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقييم التطبيق - X Plus</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+min-height:100vh;
+font-family:"Cairo",sans-serif;
+background:linear-gradient(145deg,#06101d 0%,#0b1d32 55%,#102844 100%);
+color:#fff;
+padding:24px 14px;
+}
+
+.page{
+width:100%;
+max-width:720px;
+margin:auto;
+}
+
+.card{
+background:rgba(13,28,47,.92);
+border:1px solid rgba(255,255,255,.09);
+border-radius:22px;
+padding:25px 22px;
+margin-bottom:16px;
+box-shadow:0 14px 45px rgba(0,0,0,.22);
+backdrop-filter:blur(10px);
+}
+
+.hero{
+text-align:center;
+padding:28px 22px 24px;
+}
+
+.icon{
+width:64px;
+height:64px;
+margin:0 auto 12px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:18px;
+background:rgba(255,212,59,.10);
+font-size:34px;
+}
+
+h1{
+margin:0 0 8px;
+font-size:27px;
+font-weight:800;
+}
+
+h2{
+margin:0 0 5px;
+font-size:21px;
+font-weight:800;
+}
+
+.subtitle{
+color:#aebdce;
+line-height:1.8;
+font-size:14px;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:9px;
+margin-top:22px;
+}
+
+.stat{
+background:rgba(255,255,255,.045);
+border:1px solid rgba(255,255,255,.055);
+border-radius:14px;
+padding:12px 7px;
+}
+
+.stat strong{
+display:block;
+font-size:20px;
+font-weight:800;
+}
+
+.stat span{
+color:#91a3b7;
+font-size:11px;
+}
+
+.distribution{
+margin-top:21px;
+text-align:right;
+}
+
+.distribution-row{
+display:flex;
+align-items:center;
+gap:8px;
+margin:7px 0;
+color:#b7c4d2;
+font-size:12px;
+}
+
+.bar{
+flex:1;
+height:6px;
+background:rgba(255,255,255,.08);
+border-radius:20px;
+overflow:hidden;
+}
+
+.bar-fill{
+height:100%;
+width:0;
+background:#ffd43b;
+border-radius:20px;
+transition:width .3s;
+}
+
+.stars{
+display:flex;
+justify-content:center;
+direction:ltr;
+gap:6px;
+margin:17px 0 8px;
+}
+
+.star{
+border:0;
+background:transparent;
+color:#566578;
+font-size:48px;
+line-height:1;
+cursor:pointer;
+padding:2px;
+appearance:none;
+-webkit-appearance:none;
+transition:transform .18s ease,color .18s ease;
+}
+
+.star:hover,
+.star:focus{
+transform:scale(1.12);
+color:#ffd43b;
+outline:none;
+}
+
+.star.active{
+color:#ffd43b !important;
+text-shadow:0 0 10px rgba(255,212,59,.35);
+}
+
+.star.active:hover{
+color:#ffe06a !important;
+}
+
+.rating-text{
+text-align:center;
+min-height:27px;
+color:#ffd43b;
+font-size:14px;
+font-weight:700;
+}
+
+.label{
+display:block;
+margin:20px 0 8px;
+font-size:15px;
+font-weight:700;
+}
+
+textarea{
+width:100%;
+min-height:125px;
+resize:vertical;
+border:1px solid rgba(255,255,255,.10);
+border-radius:15px;
+background:rgba(255,255,255,.045);
+color:#fff;
+padding:14px;
+font-family:inherit;
+font-size:15px;
+line-height:1.8;
+outline:none;
+}
+
+textarea::placeholder{
+color:#718399;
+}
+
+textarea:focus{
+border-color:rgba(37,99,235,.75);
+background:rgba(255,255,255,.06);
+}
+
+.counter{
+text-align:left;
+color:#8193a8;
+font-size:11px;
+margin-top:5px;
+}
+
+button.action{
+width:100%;
+border:0;
+border-radius:13px;
+padding:13px;
+font-family:inherit;
+font-size:15px;
+font-weight:800;
+cursor:pointer;
+transition:.18s;
+}
+
+.send{
+background:#2563eb;
+color:#fff;
+}
+
+.send:hover{
+background:#3472ed;
+}
+
+.comment-only{
+background:rgba(255,255,255,.055);
+border:1px solid rgba(255,255,255,.08)!important;
+color:#dbe5ef;
+}
+
+.comment-only:hover{
+background:rgba(255,255,255,.09);
+}
+
+button:disabled{
+opacity:.5;
+cursor:not-allowed;
+}
+
+.message{
+min-height:26px;
+text-align:center;
+margin-top:13px;
+font-size:14px;
+font-weight:700;
+}
+
+.review{
+border-top:1px solid rgba(255,255,255,.075);
+padding:18px 0;
+}
+
+.review:first-child{
+border-top:0;
+padding-top:5px;
+}
+
+.review-head{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+}
+
+.username{
+font-weight:800;
+}
+
+.review-date{
+color:#7f91a6;
+font-size:11px;
+}
+
+.review-stars{
+color:#ffd43b;
+direction:ltr;
+display:inline-block;
+margin-top:5px;
+letter-spacing:1px;
+}
+
+.review-comment{
+color:#d9e3ed;
+line-height:1.9;
+margin-top:8px;
+white-space:pre-wrap;
+overflow-wrap:anywhere;
+}
+
+.developer-reply{
+margin-top:12px;
+padding:12px 13px;
+border-radius:12px;
+background:rgba(37,99,235,.09);
+border-right:3px solid #2563eb;
+color:#d9e5f2;
+line-height:1.8;
+font-size:13px;
+}
+
+.developer-reply strong{
+display:block;
+margin-bottom:4px;
+color:#fff;
+}
+
+.back{
+display:block;
+text-align:center;
+color:#91acd0;
+text-decoration:none;
+margin:20px 0 8px;
+font-size:13px;
+}
+
+.empty{
+text-align:center;
+color:#8fa1b5;
+padding:24px 0;
+line-height:1.8;
+}
+
+@media(max-width:560px){
+body{padding:14px 10px}
+.card{padding:21px 16px;border-radius:19px}
+.hero{padding:24px 16px 21px}
+h1{font-size:24px}
+.stats{grid-template-columns:repeat(3,1fr)}
+.stat strong{font-size:18px}
+.stat span{font-size:10px}
+.star{font-size:40px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<section class="card hero">
+<div class="icon">⭐</div>
+
+<h1>شارك تجربتك مع X Plus</h1>
+
+<div class="subtitle">
+تقييمك وتعليقك يساعدان المستخدمين الآخرين على معرفة تجارب المجتمع، ويساعداننا على تطوير المنصة.
+</div>
+
+<div class="stats">
+<div class="stat">
+<strong id="ageRating">12+</strong>
+<span>مناسب لأعمار 12 عاما وما فوق</span>
+</div>
+
+<div class="stat">
+<strong id="downloadCount">10 مليار</strong>
+<span>عمليات تنزيل</span>
+</div>
+
+<div class="stat">
+<strong id="storeRating">4.4</strong>
+<span>★ 178 مليون مراجعة</span>
+</div>
+</div>
+
+<div class="stats" style="margin-top:10px;">
+<div class="stat">
+<strong id="averageRating">0.0</strong>
+<span>متوسط تقييم X Plus</span>
+</div>
+
+<div class="stat">
+<strong id="totalRatings">0</strong>
+<span>التقييمات الفعلية</span>
+</div>
+
+<div class="stat">
+<strong id="totalReviews">0</strong>
+<span>المراجعات الفعلية</span>
+</div>
+</div>
+
+<div class="distribution">
+
+<div class="distribution-row">
+<span>5 ★</span>
+<div class="bar"><div class="bar-fill" id="bar5"></div></div>
+<span id="count5">0</span>
+</div>
+
+<div class="distribution-row">
+<span>4 ★</span>
+<div class="bar"><div class="bar-fill" id="bar4"></div></div>
+<span id="count4">0</span>
+</div>
+
+<div class="distribution-row">
+<span>3 ★</span>
+<div class="bar"><div class="bar-fill" id="bar3"></div></div>
+<span id="count3">0</span>
+</div>
+
+<div class="distribution-row">
+<span>2 ★</span>
+<div class="bar"><div class="bar-fill" id="bar2"></div></div>
+<span id="count2">0</span>
+</div>
+
+<div class="distribution-row">
+<span>1 ★</span>
+<div class="bar"><div class="bar-fill" id="bar1"></div></div>
+<span id="count1">0</span>
+</div>
+
+</div>
+</section>
+
+<section class="card">
+
+<h2>تقييمك</h2>
+
+<div class="stars" id="stars">
+<button type="button" class="star" data-rating="1">★</button>
+<button type="button" class="star" data-rating="2">★</button>
+<button type="button" class="star" data-rating="3">★</button>
+<button type="button" class="star" data-rating="4">★</button>
+<button type="button" class="star" data-rating="5">★</button>
+</div>
+
+<div class="rating-text" id="ratingText">
+اختر عدد النجوم لتقييم X Plus
+</div>
+
+<div id="commentArea" style="display:none;">
+
+<label class="label" for="comment">صف تجربتك</label>
+
+<textarea
+id="comment"
+maxlength="500"
+placeholder="اكتب تجربتك أو رأيك في X Plus..."
+></textarea>
+
+<div class="counter">
+<span id="charCount">0</span> / 500
+</div>
+
+<button
+type="button"
+class="action send"
+id="sendBtn"
+style="margin-top:12px;"
+>
+مشاركة
+</button>
+
+</div>
+
+<div id="commentOnlyArea" style="display:none;">
+
+<label class="label" for="commentOnly">
+اكتب تعليقك
+</label>
+
+<textarea
+id="commentOnly"
+maxlength="500"
+placeholder="اكتب رأيك أو تجربتك في X Plus..."
+></textarea>
+
+<div class="counter">
+<span id="commentOnlyCount">0</span> / 500
+</div>
+
+<button
+type="button"
+class="action send"
+id="submitCommentOnly"
+style="margin-top:12px;"
+>
+مشاركة
+</button>
+
+</div>
+
+<button
+type="button"
+class="action comment-only"
+id="commentOnlyBtn"
+style="margin-top:14px;"
+>
+اكتب تعليقًا
+</button>
+
+<div class="message" id="message"></div>
+
+</section>
+
+<section class="card">
+
+<h2>آخر المراجعات</h2>
+
+<div id="reviews">
+<div class="empty">جاري تحميل المراجعات...</div>
+</div>
+
+</section>
+
+<a class="back" href="index.html">← العودة للرئيسية</a>
+
+</div>
+
+<script>
+
+const API_URL="/api";
+
+let selectedRating=null;
+
+const stars=document.querySelectorAll(".star");
+const ratingText=document.getElementById("ratingText");
+const comment=document.getElementById("comment");
+const charCount=document.getElementById("charCount");
+const sendBtn=document.getElementById("sendBtn");
+const commentOnlyBtn=document.getElementById("commentOnlyBtn");
+
+const commentOnlyArea=document.getElementById("commentOnlyArea");
+const commentOnly=document.getElementById("commentOnly");
+const commentOnlyCount=document.getElementById("commentOnlyCount");
+const submitCommentOnly=document.getElementById("submitCommentOnly");
+const message=document.getElementById("message");
+const reviews=document.getElementById("reviews");
+const commentArea=document.getElementById("commentArea");
+
+function getToken(){
+return localStorage.getItem("token") ||
+localStorage.getItem("auth_token");
+}
+
+function apiFetch(url,options={}){
+const token=getToken();
+
+return fetch(url,{
+...options,
+headers:{
+"Content-Type":"application/json",
+...(token?{Authorization:`Bearer ${token}`}:{ }),
+...(options.headers||{})
+}
+});
+}
+
+function showStars(value){
+
+stars.forEach(star=>{
+const rating=Number(star.dataset.rating);
+
+star.classList.toggle(
+"active",
+value!==null && rating<=value
+);
+});
+}
+
+stars.forEach(star=>{
+
+star.addEventListener("click",()=>{
+
+selectedRating=Number(star.dataset.rating);
+
+showStars(selectedRating);
+
+ratingText.textContent=`${selectedRating} من 5 ⭐`;
+
+commentOnlyArea.style.display="none";
+commentOnly.value="";
+commentOnlyCount.textContent="0";
+
+commentArea.style.display="block";
+
+message.textContent="";
+
+});
+
+});
+
+comment.addEventListener("input",()=>{
+charCount.textContent=comment.value.length;
+});
+
+function formatDate(value){
+
+if(!value)return "";
+
+try{
+
+return new Date(value).toLocaleDateString(
+"ar-IQ",
+{
+year:"numeric",
+month:"long",
+day:"numeric"
+}
+);
+
+}catch{
+return "";
+}
+
+}
+
+function renderStars(rating){
+
+if(!rating)return "";
+
+return "★".repeat(Number(rating))+
+"☆".repeat(5-Number(rating));
+}
+
+function updateStats(stats){
+
+if(!stats)return;
+
+document.getElementById("averageRating").textContent=
+Number(stats.averageRating||0).toFixed(1);
+
+document.getElementById("totalRatings").textContent=
+Number(stats.totalRatings||0);
+
+document.getElementById("totalReviews").textContent=
+Number(stats.totalReviews||0);
+
+const total=Number(stats.totalRatings||0);
+
+for(let i=1;i<=5;i++){
+
+const count=Number(stats.distribution?.[i]||0);
+
+document.getElementById(`count${i}`).textContent=count;
+
+const percentage=total>0?(count/total)*100:0;
+
+document.getElementById(`bar${i}`).style.width=
+`${percentage}%`;
+}
+}
+
+function renderReviews(items){
+
+if(!items||!items.length){
+
+reviews.innerHTML=
+`<div class="empty">لا توجد مراجعات بعد. كن أول من يشارك تجربته.</div>`;
+
+return;
+}
+
+reviews.innerHTML=items.map(review=>{
+
+const reply=review.developerReply
+?`
+<div class="developer-reply">
+<strong>رد فريق X Plus</strong>
+<div>${escapeHtml(review.developerReply)}</div>
+</div>
+`
+:"";
+
+const rating=review.rating
+?`<div class="review-stars">${renderStars(review.rating)}</div>`
+:`<div class="review-date">تعليق بدون تقييم نجوم</div>`;
+
+return `
+<article class="review">
+
+<div class="review-head">
+
+<div class="username">
+${escapeHtml(review.username||"مستخدم")}
+</div>
+
+<div class="review-date">
+${formatDate(review.createdAt)}
+</div>
+
+</div>
+
+${rating}
+
+<div class="review-comment">
+${escapeHtml(review.comment||"")}
+</div>
+
+${reply}
+
+</article>
+`;
+
+}).join("");
+
+}
+
+function escapeHtml(value){
+
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+}
+
+async function loadRating(){
+
+if(!getToken()){
+
+window.location.href="login.html";
+return;
+
+}
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating`);
+const data=await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||"تعذر تحميل التقييمات"
+);
+}
+
+if(data.rating){
+
+selectedRating=Number(data.rating);
+
+showStars(selectedRating);
+
+ratingText.textContent=
+`${selectedRating} من 5 ⭐`;
+
+}
+
+if(data.comment){
+
+comment.value=data.comment;
+
+charCount.textContent=
+data.comment.length;
+
+}
+
+updateStats(data.stats);
+renderReviews(data.reviews);
+
+}catch(err){
+
+console.error(err);
+
+reviews.innerHTML=
+`<div class="empty">تعذر تحميل المراجعات حاليًا.</div>`;
+
+}
+
+}
+
+async function submitParticipation(ratingValue){
+
+const text=comment.value.trim();
+
+if(!ratingValue&&!text){
+
+message.textContent=
+"⚠️ اختر تقييمًا أو اكتب تعليقًا أولًا.";
+
+return;
+
+}
+
+if(text.length>500){
+
+message.textContent=
+"⚠️ التعليق يجب ألا يتجاوز 500 حرف.";
+
+return;
+
+}
+
+sendBtn.disabled=true;
+commentOnlyBtn.disabled=true;
+
+message.textContent=
+"⏳ جاري إرسال مشاركتك...";
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating`,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+rating:ratingValue,
+comment:text||null
+
+})
+
+});
+
+const data=await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||"فشل نشر المراجعة"
+);
+
+}
+
+message.textContent=
+"✅ تم حفظ مشاركتك بنجاح.";
+
+await loadRating();
+
+}catch(err){
+
+console.error(err);
+
+message.textContent=
+`❌ ${err.message||"حدث خطأ أثناء الحفظ"}`;
+
+}finally{
+
+sendBtn.disabled=false;
+commentOnlyBtn.disabled=false;
+
+}
+
+}
+
+sendBtn.addEventListener("click",()=>{
+submitParticipation(selectedRating);
+});
+
+commentOnlyBtn.addEventListener("click",()=>{
+
+commentArea.style.display="none";
+
+comment.value="";
+charCount.textContent="0";
+
+showStars(null);
+
+selectedRating=null;
+
+ratingText.textContent="تعليق بدون تقييم";
+
+commentOnlyArea.style.display="block";
+
+commentOnly.focus();
+
+message.textContent="";
+
+});
+
+commentOnly.addEventListener("input",()=>{
+commentOnlyCount.textContent=
+commentOnly.value.length;
+});
+
+submitCommentOnly.addEventListener("click",async()=>{
+
+const text=commentOnly.value.trim();
+
+if(!text){
+
+message.textContent=
+"⚠️ اكتب تعليقك أولًا.";
+
+commentOnly.focus();
+
+return;
+
+}
+
+submitCommentOnly.disabled=true;
+
+message.textContent=
+"⏳ جاري نشر التعليق...";
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating`,{
+
+method:"POST",
+
+body:JSON.stringify({
+rating:null,
+comment:text
+})
+
+});
+
+const data=await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||"فشل نشر التعليق"
+);
+
+}
+
+message.textContent=
+"✅ تم نشر تعليقك بنجاح.";
+
+commentOnly.value="";
+commentOnlyCount.textContent="0";
+
+commentOnlyArea.style.display="none";
+
+await loadRating();
+
+}catch(err){
+
+console.error(err);
+
+message.textContent=
+`❌ ${err.message||"حدث خطأ أثناء النشر"}`;
+
+}finally{
+
+submitCommentOnly.disabled=false;
+
+}
+
+});
+
+loadRating();
+
+</script>
+
+</body>
+</html>

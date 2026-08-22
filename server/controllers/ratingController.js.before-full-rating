@@ -1,0 +1,77 @@
+const db = require("../config/database");
+
+exports.getRating = async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
+
+    const result = await db.query(
+      `SELECT rating, created_at, updated_at
+       FROM app_ratings
+       WHERE user_id = $1
+       LIMIT 1`,
+      [req.user.id]
+    );
+
+    return res.json({
+      success: true,
+      rating: result.rows[0]?.rating || 0,
+      rated: result.rows.length > 0
+    });
+
+  } catch (err) {
+    console.error("❌ GET RATING ERROR:", err);
+    return res.status(500).json({
+      success: false,
+      message: "فشل جلب التقييم"
+    });
+  }
+};
+
+exports.saveRating = async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
+
+    const rating = Number(req.body.rating);
+
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "التقييم يجب أن يكون بين 1 و5"
+      });
+    }
+
+    const result = await db.query(
+      `INSERT INTO app_ratings (user_id, rating)
+       VALUES ($1, $2)
+       ON CONFLICT (user_id)
+       DO UPDATE SET
+         rating = EXCLUDED.rating,
+         updated_at = NOW()
+       RETURNING rating, updated_at`,
+      [req.user.id, rating]
+    );
+
+    return res.json({
+      success: true,
+      message: "تم حفظ تقييمك بنجاح ⭐",
+      rating: result.rows[0].rating
+    });
+
+  } catch (err) {
+    console.error("❌ SAVE RATING ERROR:", err);
+    return res.status(500).json({
+      success: false,
+      message: "فشل حفظ التقييم"
+    });
+  }
+};

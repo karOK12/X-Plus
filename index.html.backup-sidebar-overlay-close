@@ -212,6 +212,28 @@
       font-size: 16px;
     }
 
+    .sidebar-close {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      background: #f8fafc;
+      color: #475569;
+      cursor: pointer;
+      font-size: 19px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .25s ease;
+    }
+
+    .sidebar-close:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #2563eb;
+      transform: translateX(-2px);
+    }
+
     .sidebar-items {
       display: flex;
       flex-direction: column;
@@ -317,6 +339,7 @@
         <aside class="left-sidebar" id="leftSidebar">
           <div class="sidebar-header">
             <span>القائمة</span>
+            <button class="sidebar-close" id="sidebarClose" type="button" aria-label="إغلاق الشريط الجانبي">←</button>
           </div>
 
           <div class="sidebar-items">
@@ -716,6 +739,7 @@
 
     const sidebarToggle = document.getElementById("sidebarToggle");
     const leftSidebar = document.getElementById("leftSidebar");
+    const sidebarClose = document.getElementById("sidebarClose");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
 
     function openSidebar() {
@@ -732,6 +756,10 @@
 
     if (sidebarToggle) {
       sidebarToggle.addEventListener("click", openSidebar);
+    }
+
+    if (sidebarClose) {
+      sidebarClose.addEventListener("click", closeSidebar);
     }
 
     if (sidebarOverlay) {

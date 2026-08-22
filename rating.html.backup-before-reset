@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#06101d">
+
+<title>تقييم التطبيق - X Plus</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+}
+
+html{
+scrollbar-width:none;
+}
+
+html::-webkit-scrollbar{
+display:none;
+}
+
+body{
+margin:0;
+min-height:100vh;
+padding:18px 12px 30px;
+font-family:"Cairo",sans-serif;
+color:#fff;
+
+background:
+radial-gradient(
+circle at 50% -10%,
+rgba(37,99,235,.18),
+transparent 38%
+),
+linear-gradient(
+145deg,
+#06101d 0%,
+#0b1d32 55%,
+#102844 100%
+);
+}
+
+button,
+textarea{
+font:inherit;
+}
+
+.page{
+width:100%;
+max-width:720px;
+margin:auto;
+}
+
+/* =========================
+   البطاقات
+========================= */
+
+.card{
+background:rgba(13,28,47,.94);
+border:1px solid rgba(255,255,255,.08);
+border-radius:22px;
+box-shadow:0 16px 45px rgba(0,0,0,.22);
+margin-bottom:14px;
+}
+
+/* =========================
+   الهيدر
+========================= */
+
+.hero{
+text-align:center;
+padding:27px 20px 23px;
+}
+
+.hero-icon{
+width:62px;
+height:62px;
+margin:0 auto 12px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:18px;
+
+background:rgba(255,212,59,.10);
+
+font-size:32px;
+}
+
+h1{
+margin:0 0 7px;
+font-size:25px;
+font-weight:800;
+}
+
+.subtitle{
+color:#aebdce;
+font-size:13px;
+line-height:1.9;
+}
+
+/* =========================
+   الإحصائيات
+========================= */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:9px;
+margin-top:20px;
+direction:ltr;
+}
+
+.stat{
+min-width:0;
+padding:12px 6px;
+
+border:1px solid rgba(255,255,255,.06);
+border-radius:14px;
+
+background:rgba(255,255,255,.045);
+
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:20px;
+font-weight:800;
+line-height:1.3;
+}
+
+.stat span{
+display:block;
+margin-top:3px;
+color:#91a3b7;
+font-size:10px;
+line-height:1.5;
+}
+
+.stat .age{
+font-size:19px;
+}
+
+/* =========================
+   قسم التقييم
+========================= */
+
+.rate-card{
+padding:22px 18px;
+}
+
+.section-title{
+margin:0 0 4px;
+font-size:20px;
+font-weight:800;
+}
+
+.section-subtitle{
+color:#8193a8;
+font-size:12px;
+}
+
+/* النجوم التي يضغط عليها المستخدم */
+
+.stars-input{
+display:flex;
+justify-content:center;
+direction:ltr;
+gap:5px;
+margin:15px 0 7px;
+}
+
+.star-button{
+width:48px;
+height:48px;
+
+padding:0;
+border:0;
+
+background:transparent;
+
+color:#536477;
+
+font-size:40px;
+line-height:1;
+
+cursor:pointer;
+
+transition:
+transform .15s ease,
+color .15s ease;
+}
+
+.star-button:hover{
+transform:scale(1.08);
+color:#ffd43b;
+}
+
+.star-button.active{
+color:#ffd43b;
+
+text-shadow:
+0 0 12px rgba(255,212,59,.28);
+}
+
+.rating-hint{
+min-height:25px;
+
+text-align:center;
+
+color:#ffd43b;
+
+font-size:13px;
+font-weight:700;
+}
+
+/* =========================
+   التعليق
+========================= */
+
+.label{
+display:block;
+margin:17px 0 7px;
+
+font-size:14px;
+font-weight:700;
+}
+
+textarea{
+display:block;
+
+width:100%;
+min-height:120px;
+
+resize:none;
+
+padding:13px;
+
+border:1px solid rgba(255,255,255,.09);
+border-radius:14px;
+
+outline:none;
+
+color:#fff;
+
+background:rgba(255,255,255,.045);
+
+line-height:1.8;
+font-size:14px;
+}
+
+textarea::placeholder{
+color:#718399;
+}
+
+textarea:focus{
+border-color:rgba(37,99,235,.75);
+background:rgba(255,255,255,.06);
+}
+
+.counter{
+margin-top:5px;
+
+text-align:left;
+
+color:#718399;
+
+font-size:10px;
+}
+
+/* =========================
+   الأزرار
+========================= */
+
+.action{
+width:100%;
+min-height:46px;
+
+margin-top:12px;
+
+border:0;
+border-radius:13px;
+
+cursor:pointer;
+
+font-size:14px;
+font-weight:800;
+
+transition:.15s;
+}
+
+.send{
+color:#fff;
+background:#2563eb;
+}
+
+.send:hover{
+background:#3472ed;
+}
+
+.comment-button{
+color:#dbe5ef;
+
+background:
+rgba(255,255,255,.055);
+
+border:1px solid rgba(255,255,255,.08);
+}
+
+.comment-button:hover{
+background:rgba(255,255,255,.09);
+}
+
+button:disabled{
+opacity:.55;
+cursor:not-allowed;
+}
+
+.hidden{
+display:none!important;
+}
+
+.message{
+min-height:24px;
+
+margin-top:10px;
+
+text-align:center;
+
+font-size:13px;
+font-weight:700;
+}
+
+/* =====================================================
+   GOOGLE STYLE — ملخص التقييم
+===================================================== */
+
+.reviews-card{
+padding:22px 18px;
+}
+
+.google-summary{
+
+display:grid;
+
+grid-template-columns:
+145px
+minmax(0,1fr);
+
+align-items:center;
+
+gap:22px;
+
+padding-bottom:22px;
+
+border-bottom:
+1px solid rgba(255,255,255,.07);
+}
+
+/* الرقم */
+
+.google-score{
+text-align:center;
+}
+
+.google-score-number{
+
+font-size:48px;
+
+line-height:1;
+
+font-weight:800;
+
+color:#fff;
+}
+
+/* النجوم الصفراء */
+
+.google-stars{
+
+direction:ltr;
+
+margin-top:8px;
+
+color:#ffd43b;
+
+font-size:20px;
+
+line-height:1;
+
+letter-spacing:1px;
+
+white-space:nowrap;
+}
+
+/* عدد المراجعات */
+
+.google-review-count{
+
+margin-top:7px;
+
+color:#aebdce;
+
+font-size:12px;
+}
+
+/* =========================
+   أشرطة Google
+========================= */
+
+.google-distribution{
+
+display:flex;
+
+flex-direction:column;
+
+gap:7px;
+}
+
+.google-row{
+
+display:grid;
+
+grid-template-columns:
+34px
+minmax(0,1fr)
+32px;
+
+align-items:center;
+
+gap:8px;
+
+min-height:20px;
+}
+
+.google-row-label{
+
+direction:ltr;
+
+color:#d9e3ed;
+
+font-size:12px;
+
+font-weight:700;
+
+text-align:left;
+
+white-space:nowrap;
+}
+
+.google-bar{
+
+width:100%;
+
+height:8px;
+
+overflow:hidden;
+
+border-radius:99px;
+
+background:
+rgba(255,255,255,.10);
+}
+
+.google-bar-fill{
+
+width:0;
+
+height:100%;
+
+border-radius:99px;
+
+background:#ffd43b;
+
+transition:
+width .45s ease;
+}
+
+.google-row-count{
+
+color:#8fa1b5;
+
+font-size:10px;
+
+text-align:left;
+}
+
+/* =========================
+   المراجعات
+========================= */
+
+.reviews-heading{
+
+margin:20px 0 5px;
+
+font-size:20px;
+
+font-weight:800;
+}
+
+.review{
+
+padding:17px 0;
+
+border-bottom:
+1px solid rgba(255,255,255,.07);
+}
+
+.review:last-child{
+border-bottom:0;
+}
+
+.review-head{
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+gap:10px;
+}
+
+.review-user{
+
+min-width:0;
+
+font-size:14px;
+
+font-weight:800;
+}
+
+.review-date{
+
+flex-shrink:0;
+
+color:#7f91a6;
+
+font-size:10px;
+}
+
+.review-stars{
+
+direction:ltr;
+
+margin-top:5px;
+
+color:#ffd43b;
+
+font-size:16px;
+
+letter-spacing:1px;
+}
+
+.review-comment{
+
+margin-top:7px;
+
+color:#d9e3ed;
+
+font-size:13px;
+
+line-height:1.9;
+
+white-space:pre-wrap;
+
+overflow-wrap:anywhere;
+}
+
+.developer-reply{
+
+margin-top:11px;
+
+padding:10px 12px;
+
+border-right:
+3px solid #2563eb;
+
+border-radius:10px;
+
+background:
+rgba(37,99,235,.08);
+
+color:#d9e5f2;
+
+font-size:12px;
+
+line-height:1.8;
+}
+
+.developer-reply strong{
+
+display:block;
+
+margin-bottom:2px;
+
+color:#fff;
+}
+
+.empty{
+
+padding:25px 5px;
+
+text-align:center;
+
+color:#8fa1b5;
+
+font-size:13px;
+
+line-height:1.9;
+}
+
+.back{
+
+display:block;
+
+margin:18px 0 5px;
+
+color:#91acd0;
+
+text-align:center;
+
+text-decoration:none;
+
+font-size:12px;
+}
+
+/* =========================
+   موبايل
+========================= */
+
+@media(max-width:560px){
+
+body{
+padding:12px 9px 25px;
+}
+
+.hero{
+padding:23px 15px 20px;
+}
+
+h1{
+font-size:23px;
+}
+
+.stats{
+gap:7px;
+}
+
+.stat strong{
+font-size:18px;
+}
+
+.stat span{
+font-size:9px;
+}
+
+.rate-card,
+.reviews-card{
+padding:20px 15px;
+}
+
+.star-button{
+
+width:43px;
+height:43px;
+
+font-size:36px;
+}
+
+.google-summary{
+
+grid-template-columns:
+105px
+minmax(0,1fr);
+
+gap:13px;
+}
+
+.google-score-number{
+font-size:40px;
+}
+
+.google-stars{
+font-size:17px;
+}
+
+.google-row{
+
+grid-template-columns:
+30px
+minmax(0,1fr)
+27px;
+
+gap:6px;
+}
+
+}
+
+</style>
+
+
+
+<style id="final-google-rating">
+/* إخفاء صف 1★ من الواجهة فقط */
+.google-row:has(#bar1){
+    display:none !important;
+}
+</style>
+
+
+
+
+<style id="rating-direction-only">
+#storeRating{
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  white-space:nowrap !important;
+  display:block !important;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+<!-- =====================================================
+     مقدمة
+===================================================== -->
+
+<section class="card hero">
+
+<div class="hero-icon">
+⭐
+</div>
+
+<h1>
+شارك تجربتك مع X Plus
+</h1>
+
+<div class="subtitle">
+تقييمك وتعليقك يساعدان المستخدمين الآخرين على معرفة تجارب المجتمع،
+ويساعداننا على تطوير المنصة.
+</div>
+
+<div class="stats">
+
+<div class="stat">
+
+<strong id="downloadCount">
+0
+</strong>
+
+<span>
+عمليات تنزيل
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong class="age">
+13+
+</strong>
+
+<span>
+مناسب لأعمار 13 عامًا وما فوق
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="storeRating">★ 0.0</strong>
+
+<span>
+مراجعة
+</span>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     تقييم المستخدم
+===================================================== -->
+
+<section class="card rate-card">
+
+<h2 class="section-title">
+تقييمك
+</h2>
+
+<div class="section-subtitle">
+اختر عدد النجوم التي تعبّر عن تجربتك
+</div>
+
+
+<div class="stars-input" id="stars">
+
+<button
+type="button"
+class="star-button"
+data-rating="1"
+aria-label="نجمة واحدة"
+>
+★
+</button>
+
+<button
+type="button"
+class="star-button"
+data-rating="2"
+aria-label="نجمتان"
+>
+★
+</button>
+
+<button
+type="button"
+class="star-button"
+data-rating="3"
+aria-label="ثلاث نجوم"
+>
+★
+</button>
+
+<button
+type="button"
+class="star-button"
+data-rating="4"
+aria-label="أربع نجوم"
+>
+★
+</button>
+
+<button
+type="button"
+class="star-button"
+data-rating="5"
+aria-label="خمس نجوم"
+>
+★
+</button>
+
+</div>
+
+
+<div
+class="rating-hint"
+id="ratingText"
+>
+اختر عدد النجوم لتقييم X Plus
+</div>
+
+
+<div id="ratingCommentArea">
+
+<label
+class="label"
+for="comment"
+>
+صف تجربتك
+</label>
+
+<textarea
+id="comment"
+maxlength="500"
+placeholder="اكتب تجربتك أو رأيك في X Plus..."
+></textarea>
+
+<div class="counter">
+<span id="charCount">0</span> / 500
+</div>
+
+<button
+type="button"
+class="action send"
+id="sendBtn"
+>
+مشاركة التقييم
+</button>
+
+</div>
+
+
+<div
+id="commentOnlyArea"
+class="hidden"
+>
+
+<label
+class="label"
+for="commentOnly"
+>
+اكتب تعليقك
+</label>
+
+<textarea
+id="commentOnly"
+maxlength="500"
+placeholder="اكتب رأيك أو تجربتك في X Plus..."
+></textarea>
+
+<div class="counter">
+<span id="commentOnlyCount">0</span> / 500
+</div>
+
+<button
+type="button"
+class="action send"
+id="submitCommentOnly"
+>
+مشاركة التعليق
+</button>
+
+</div>
+
+
+<button
+type="button"
+class="action comment-button"
+id="commentOnlyBtn"
+>
+اكتب تعليقًا بدون تقييم
+</button>
+
+
+<div
+class="message"
+id="message"
+></div>
+
+</section>
+
+
+<!-- =====================================================
+     ملخص Google + المراجعات
+===================================================== -->
+
+<section class="card reviews-card">
+
+<div class="google-summary">
+
+
+<!-- النتيجة -->
+
+<div class="google-score">
+
+<div
+id="averageRating"
+class="google-score-number"
+>
+0.0
+</div>
+
+
+<div
+id="averageStars"
+class="google-stars"
+>
+☆☆☆☆☆
+</div>
+
+
+<div class="google-review-count">
+
+<span id="googleTotalRatings">
+0
+</span>
+
+مراجعة
+
+</div>
+
+</div>
+
+
+<!-- التوزيع -->
+
+<div class="google-distribution">
+
+
+<div class="google-row">
+
+<span class="google-row-label">
+5★
+</span>
+
+<div class="google-bar">
+
+<div
+id="bar5"
+class="google-bar-fill"
+></div>
+
+</div>
+
+<small
+id="count5"
+class="google-row-count"
+>
+0
+</small>
+
+</div>
+
+
+<div class="google-row">
+
+<span class="google-row-label">
+4★
+</span>
+
+<div class="google-bar">
+
+<div
+id="bar4"
+class="google-bar-fill"
+></div>
+
+</div>
+
+<small
+id="count4"
+class="google-row-count"
+>
+0
+</small>
+
+</div>
+
+
+<div class="google-row">
+
+<span class="google-row-label">
+3★
+</span>
+
+<div class="google-bar">
+
+<div
+id="bar3"
+class="google-bar-fill"
+></div>
+
+</div>
+
+<small
+id="count3"
+class="google-row-count"
+>
+0
+</small>
+
+</div>
+
+
+<div class="google-row">
+
+<span class="google-row-label">
+2★
+</span>
+
+<div class="google-bar">
+
+<div
+id="bar2"
+class="google-bar-fill"
+></div>
+
+</div>
+
+<small
+id="count2"
+class="google-row-count"
+>
+0
+</small>
+
+</div>
+
+
+<div class="google-row">
+
+<span class="google-row-label">
+1★
+</span>
+
+<div class="google-bar">
+
+<div
+id="bar1"
+class="google-bar-fill"
+></div>
+
+</div>
+
+<small
+id="count1"
+class="google-row-count"
+>
+0
+</small>
+
+</div>
+
+</div>
+
+</div>
+
+
+<h2 class="reviews-heading">
+آخر المراجعات
+</h2>
+
+
+<div id="reviews">
+
+<div class="empty">
+جاري تحميل المراجعات...
+</div>
+
+</div>
+
+</section>
+
+
+<a
+class="back"
+href="index.html"
+>
+← العودة للرئيسية
+</a>
+
+</div>
+
+
+<script>
+
+const API_URL = "/api";
+
+let selectedRating = null;
+
+
+/* العناصر */
+
+const stars =
+document.querySelectorAll(".star-button");
+
+const ratingText =
+document.getElementById("ratingText");
+
+const comment =
+document.getElementById("comment");
+
+const charCount =
+document.getElementById("charCount");
+
+const sendBtn =
+document.getElementById("sendBtn");
+
+const commentOnlyBtn =
+document.getElementById("commentOnlyBtn");
+
+const commentOnlyArea =
+document.getElementById("commentOnlyArea");
+
+const commentOnly =
+document.getElementById("commentOnly");
+
+const commentOnlyCount =
+document.getElementById("commentOnlyCount");
+
+const submitCommentOnly =
+document.getElementById("submitCommentOnly");
+
+const message =
+document.getElementById("message");
+
+const reviews =
+document.getElementById("reviews");
+
+
+/* =====================================================
+   التوكن
+===================================================== */
+
+function getToken(){
+
+return (
+localStorage.getItem("token") ||
+localStorage.getItem("auth_token")
+);
+
+}
+
+
+/* =====================================================
+   API
+===================================================== */
+
+function apiFetch(url, options = {}){
+
+const token =
+getToken();
+
+return fetch(
+url,
+{
+...options,
+
+headers:{
+"Content-Type":
+"application/json",
+
+...(token
+? {
+Authorization:
+`Bearer ${token}`
+}
+: {}),
+
+...(options.headers || {})
+}
+
+}
+);
+
+}
+
+
+/* =====================================================
+   نجوم الإدخال
+===================================================== */
+
+function showStars(value){
+
+const selected = Number(value);
+
+stars.forEach(star => {
+
+const rating = Number(star.dataset.rating);
+const active =
+Number.isInteger(selected) &&
+selected >= 1 &&
+selected <= 5 &&
+rating <= selected;
+
+star.classList.toggle("active", active);
+
+star.style.setProperty(
+"color",
+active ? "#ffd43b" : "#536477",
+"important"
+);
+
+star.style.setProperty(
+"text-shadow",
+active
+? "0 0 12px rgba(255,212,59,.28)"
+: "none",
+"important"
+);
+
+});
+
+}
+
+
+stars.forEach(
+star => {
+
+star.addEventListener(
+"click",
+() => {
+
+selectedRating =
+Number(star.dataset.rating);
+
+showStars(
+selectedRating
+);
+
+console.log("⭐ STAR CLICK:", selectedRating);
+
+ratingText.textContent =
+`${selectedRating} من 5 ⭐`;
+
+commentOnlyArea
+.classList
+.add("hidden");
+
+message.textContent =
+"";
+
+}
+);
+
+}
+);
+
+
+/* =====================================================
+   عداد التعليق
+===================================================== */
+
+comment.addEventListener(
+"input",
+() => {
+
+charCount.textContent =
+comment.value.length;
+
+}
+);
+
+
+commentOnly.addEventListener(
+"input",
+() => {
+
+commentOnlyCount.textContent =
+commentOnly.value.length;
+
+}
+);
+
+
+/* =====================================================
+   التاريخ
+===================================================== */
+
+function formatDate(value){
+
+if(!value){
+return "";
+}
+
+try{
+
+return new Date(value)
+.toLocaleDateString(
+"ar-IQ",
+{
+year:"numeric",
+month:"long",
+day:"numeric"
+}
+);
+
+}
+catch{
+
+return "";
+
+}
+
+}
+
+
+/* =====================================================
+   نجوم المراجعات
+===================================================== */
+
+function renderStars(rating){
+
+const n =
+Math.max(
+0,
+Math.min(
+5,
+Number(rating) || 0
+)
+);
+
+return (
+"★".repeat(n) +
+"☆".repeat(5 - n)
+);
+
+}
+
+
+/* =====================================================
+   تحديث ملخص Google
+===================================================== */
+
+function updateStats(stats){
+
+if(!stats){
+return;
+}
+
+
+const average =
+Number(
+stats.averageRating || 0
+);
+
+
+const total =
+Number(
+stats.totalRatings || 0
+);
+
+
+const distribution =
+stats.distribution || {};
+
+
+/* المتوسط */
+
+const averageElement =
+document.getElementById(
+"averageRating"
+);
+
+if(averageElement){
+
+averageElement.textContent =
+"0.0";
+
+}
+
+
+/* النجوم */
+
+const averageStars =
+document.getElementById(
+"averageStars"
+);
+
+if(averageStars){
+
+const rounded =
+Math.max(
+0,
+Math.min(
+5,
+Math.round(average)
+)
+);
+
+averageStars.textContent =
+"★★★★★";
+
+}
+
+
+/* العدد */
+
+const totalElement =
+document.getElementById(
+"googleTotalRatings"
+);
+
+if(totalElement){
+
+totalElement.textContent =
+total;
+
+}
+
+
+/* العدد الموجود في الأعلى */
+
+const storeRating =
+document.getElementById(
+"storeRating"
+);
+
+if(storeRating){
+
+storeRating.textContent = "★ 0.0";
+
+}
+
+
+/* الأشرطة */
+
+for(
+let i = 1;
+i <= 5;
+i++
+){
+
+const count =
+Number(
+distribution[i] || 0
+);
+
+
+const countElement =
+document.getElementById(
+`count${i}`
+);
+
+
+const barElement =
+document.getElementById(
+`bar${i}`
+);
+
+
+if(countElement){
+
+countElement.textContent =
+count;
+
+}
+
+
+if(barElement){
+
+const percentage =
+total > 0
+? (count / total) * 100
+: 0;
+
+barElement.style.width =
+`${percentage}%`;
+
+}
+
+}
+
+}
+
+
+/* =====================================================
+   عرض المراجعات
+===================================================== */
+
+function renderReviews(items){
+
+if(
+!Array.isArray(items) ||
+!items.length
+){
+
+reviews.innerHTML = `
+
+<div class="empty">
+
+لا توجد مراجعات بعد.<br>
+
+كن أول من يشارك تجربته.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+reviews.innerHTML =
+items.map(
+review => {
+
+
+const rating =
+review.rating !== null &&
+review.rating !== undefined
+
+? `
+
+<div class="review-stars">
+
+${renderStars(
+review.rating
+)}
+
+</div>
+
+`
+
+: "";
+
+
+const reply =
+review.developerReply
+
+? `
+
+<div class="developer-reply">
+
+<strong>
+رد فريق X Plus
+</strong>
+
+<div>
+${escapeHtml(
+review.developerReply
+)}
+</div>
+
+</div>
+
+`
+
+: "";
+
+
+return `
+
+<article class="review">
+
+
+<div class="review-head">
+
+<div class="review-user">
+
+${escapeHtml(
+review.username ||
+"مستخدم"
+)}
+
+</div>
+
+
+<div class="review-date">
+
+${formatDate(
+review.createdAt
+)}
+
+</div>
+
+</div>
+
+
+${rating}
+
+
+<div class="review-comment">
+
+${escapeHtml(
+review.comment || ""
+)}
+
+</div>
+
+
+${reply}
+
+
+</article>
+
+`;
+
+}
+).join("");
+
+}
+
+
+/* =====================================================
+   حماية HTML
+===================================================== */
+
+function escapeHtml(value){
+
+return String(value)
+
+.replaceAll(
+"&",
+"&amp;"
+)
+
+.replaceAll(
+"<",
+"&lt;"
+)
+
+.replaceAll(
+">",
+"&gt;"
+)
+
+.replaceAll(
+'"',
+"&quot;"
+)
+
+.replaceAll(
+"'",
+"&#039;"
+);
+
+}
+
+
+/* =====================================================
+   تحميل التقييم
+===================================================== */
+
+async function loadRating(){
+
+if(!getToken()){
+
+window.location.href =
+"login.html";
+
+return;
+
+}
+
+
+try{
+
+const res =
+await apiFetch(
+`${API_URL}/rating`
+);
+
+
+const data =
+await res.json();
+
+
+if(
+!res.ok ||
+!data.success
+){
+
+throw new Error(
+data.message ||
+"تعذر تحميل التقييمات"
+);
+
+}
+
+
+/* إذا المستخدم قيّم سابقاً */
+
+if(
+data.rating !== null &&
+data.rating !== undefined &&
+Number(data.rating) >= 1
+){
+
+ratingText.textContent =
+"تم تسجيل تقييمك";
+
+}
+
+
+/* تعليق المستخدم */
+
+if(data.comment){
+
+comment.value =
+data.comment;
+
+charCount.textContent =
+data.comment.length;
+
+}
+
+
+/* تحديث البيانات */
+
+updateStats(
+data.stats
+);
+
+
+/* عرض المراجعات */
+
+renderReviews(
+data.reviews
+);
+
+}
+
+catch(err){
+
+console.error(err);
+
+reviews.innerHTML = `
+
+<div class="empty">
+
+تعذر تحميل المراجعات حاليًا.
+
+</div>
+
+`;
+
+}
+
+}
+
+
+/* =====================================================
+   إرسال التقييم
+===================================================== */
+
+async function submitParticipation(
+ratingValue
+){
+
+const text =
+comment.value.trim();
+
+
+if(
+!ratingValue &&
+!text
+){
+
+message.textContent =
+"⚠️ اختر تقييمًا أو اكتب تعليقًا أولًا.";
+
+return;
+
+}
+
+
+if(
+text.length > 500
+){
+
+message.textContent =
+"⚠️ التعليق يجب ألا يتجاوز 500 حرف.";
+
+return;
+
+}
+
+
+sendBtn.disabled =
+true;
+
+commentOnlyBtn.disabled =
+true;
+
+
+message.textContent =
+"⏳ جاري إرسال مشاركتك...";
+
+
+try{
+
+const res =
+await apiFetch(
+`${API_URL}/rating`,
+{
+method:"POST",
+
+body:
+JSON.stringify(
+{
+rating:
+ratingValue || null,
+
+comment:
+text || null
+}
+)
+}
+);
+
+
+const data =
+await res.json();
+
+
+if(
+!res.ok ||
+!data.success
+){
+
+throw new Error(
+data.message ||
+"فشل نشر المراجعة"
+);
+
+}
+
+
+message.textContent =
+"✅ تم حفظ مشاركتك بنجاح.";
+
+
+await loadRating();
+
+}
+
+catch(err){
+
+console.error(err);
+
+message.textContent =
+`❌ ${
+err.message ||
+"حدث خطأ أثناء الحفظ"
+}`;
+
+}
+
+finally{
+
+sendBtn.disabled =
+false;
+
+commentOnlyBtn.disabled =
+false;
+
+}
+
+}
+
+
+/* زر التقييم */
+
+sendBtn.addEventListener(
+"click",
+() => {
+
+submitParticipation(
+selectedRating
+);
+
+}
+);
+
+
+/* =====================================================
+   تعليق بدون تقييم
+===================================================== */
+
+commentOnlyBtn.addEventListener(
+"click",
+() => {
+
+document
+.getElementById(
+"ratingCommentArea"
+)
+.classList
+.add("hidden");
+
+
+showStars(null);
+
+selectedRating =
+null;
+
+
+ratingText.textContent =
+"تعليق بدون تقييم";
+
+
+commentOnlyArea
+.classList
+.remove("hidden");
+
+
+message.textContent =
+"";
+
+
+commentOnly.focus();
+
+}
+);
+
+
+/* =====================================================
+   إرسال التعليق فقط
+===================================================== */
+
+submitCommentOnly.addEventListener(
+"click",
+async () => {
+
+const text =
+commentOnly.value.trim();
+
+
+if(!text){
+
+message.textContent =
+"⚠️ اكتب تعليقك أولًا.";
+
+commentOnly.focus();
+
+return;
+
+}
+
+
+if(
+text.length > 500
+){
+
+message.textContent =
+"⚠️ التعليق يجب ألا يتجاوز 500 حرف.";
+
+return;
+
+}
+
+
+submitCommentOnly.disabled =
+true;
+
+
+message.textContent =
+"⏳ جاري نشر التعليق...";
+
+
+try{
+
+const res =
+await apiFetch(
+`${API_URL}/rating`,
+{
+method:"POST",
+
+body:
+JSON.stringify(
+{
+rating:null,
+comment:text
+}
+)
+}
+);
+
+
+const data =
+await res.json();
+
+
+if(
+!res.ok ||
+!data.success
+){
+
+throw new Error(
+data.message ||
+"فشل نشر التعليق"
+);
+
+}
+
+
+message.textContent =
+"✅ تم نشر تعليقك بنجاح.";
+
+
+commentOnly.value =
+"";
+
+commentOnlyCount.textContent =
+"0";
+
+
+commentOnlyArea
+.classList
+.add("hidden");
+
+
+document
+.getElementById(
+"ratingCommentArea"
+)
+.classList
+.remove("hidden");
+
+
+await loadRating();
+
+}
+
+catch(err){
+
+console.error(err);
+
+message.textContent =
+`❌ ${
+err.message ||
+"حدث خطأ أثناء النشر"
+}`;
+
+}
+
+finally{
+
+submitCommentOnly.disabled =
+false;
+
+}
+
+}
+);
+
+
+/* =====================================================
+   تشغيل الصفحة
+===================================================== */
+
+loadRating();
+
+
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+

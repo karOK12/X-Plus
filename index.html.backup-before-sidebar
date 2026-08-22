@@ -152,146 +152,7 @@
       .mining-right { align-items: center; text-align: center; }
       .balance-container, .power-container, .rate-container, .points-container { align-items: center; }
     }
-    /* ================= LEFT SIDEBAR ================= */
-
-    .sidebar-toggle {
-      position: absolute;
-      left: 0;
-      top: 25%;
-      transform: translateY(-50%);
-      margin: 0;
-      width: 38px;
-      height: 38px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
-      color: #334155;
-      cursor: pointer;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: .25s ease;
-    }
-
-    .sidebar-toggle:hover {
-      background: #e2e8f0;
-      transform: translateY(-1px);
-    }
-
-    .left-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 285px;
-      max-width: 82vw;
-      height: 100vh;
-      background: #ffffff;
-      box-shadow: 8px 0 30px rgba(15, 23, 42, .18);
-      z-index: 99999;
-      transform: translateX(-105%);
-      transition: transform .3s ease;
-      direction: rtl;
-      padding: 18px 14px;
-      overflow-y: auto;
-    }
-
-    .left-sidebar.active {
-      transform: translateX(0);
-    }
-
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 4px 14px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #e2e8f0;
-      color: #1e293b;
-      font-weight: 800;
-      font-size: 16px;
-    }
-
-    .sidebar-items {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .sidebar-item {
-      width: 100%;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
-      color: #334155;
-      text-decoration: none;
-      font-family: "Cairo", sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: right;
-      transition: .2s ease;
-    }
-
-    .sidebar-item:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #2563eb;
-      transform: translateX(2px);
-    }
-
-    .sidebar-icon {
-      width: 26px;
-      text-align: center;
-      font-size: 17px;
-      flex-shrink: 0;
-    }
-
-    .sidebar-logout {
-      color: #dc2626;
-      background: #fff7f7;
-    }
-
-    .sidebar-logout:hover {
-      background: #fef2f2;
-      border-color: #fca5a5;
-      color: #b91c1c;
-    }
-
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .45);
-      z-index: 99998;
-      opacity: 0;
-      visibility: hidden;
-      transition: .3s ease;
-    }
-
-    .sidebar-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar-toggle {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-      }
-
-      .left-sidebar {
-        width: 270px;
-      }
-    }
-
-    /* ================= END LEFT SIDEBAR ================= */
-\n  </style>
+  </style>
 </head>
 <body>
 
@@ -312,42 +173,7 @@
         <div class="nav-actions" id="navActions">
 
 </div>
-        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="فتح الشريط الجانبي">☰</button>
-
-        <aside class="left-sidebar" id="leftSidebar">
-          <div class="sidebar-header">
-            <span>القائمة</span>
-          </div>
-
-          <div class="sidebar-items">
-            <a href="profile.html" class="sidebar-item">
-              <span class="sidebar-icon">👤</span>
-              <span>الملف الشخصي</span>
-            </a>
-
-            <a href="edit-profile.html" class="sidebar-item">
-              <span class="sidebar-icon">✏️</span>
-              <span>تعديل الملف الشخصي</span>
-            </a>
-
-            <a href="account-settings.html" class="sidebar-item">
-              <span class="sidebar-icon">⚙️</span>
-              <span>إعدادات الحساب</span>
-            </a>
-
-            <a href="rating.html" class="sidebar-item">
-              <span class="sidebar-icon">⭐</span>
-              <span>تقييم التطبيق</span>
-            </a>
-
-            <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
-              <span class="sidebar-icon">🚪</span>
-              <span>تسجيل الخروج</span>
-            </button>
-          </div>
-        </aside>
-
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="فتح القائمة"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
@@ -712,36 +538,6 @@
       if (event) event.preventDefault();
       window.open('wallet.html', '_blank');
     }
-    /* ================= SIDEBAR CONTROL ================= */
-
-    const sidebarToggle = document.getElementById("sidebarToggle");
-    const leftSidebar = document.getElementById("leftSidebar");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-    function openSidebar() {
-      leftSidebar.classList.add("active");
-      sidebarOverlay.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeSidebar() {
-      leftSidebar.classList.remove("active");
-      sidebarOverlay.classList.remove("active");
-      document.body.style.overflow = "";
-    }
-
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener("click", openSidebar);
-    }
-
-    if (sidebarOverlay) {
-      sidebarOverlay.addEventListener("click", closeSidebar);
-    }
-
-    /* ================= END SIDEBAR CONTROL ================= */
-
   </script>
-
-
 </body>
 </html>

@@ -132,33 +132,6 @@
         .social-btn:hover {
             opacity: 0.9;
         }
-
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-        }
-
-        .social-icon {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-        }
-
-        .google-btn {
-            background: #ffffff !important;
-            color: #202124 !important;
-            border: 1px solid #dadce0 !important;
-        }
-
-        .facebook-btn {
-            background: #1877f2 !important;
-        }
-
-        .phone-btn {
-            background: #22c55e !important;
-        }
         
         .error-msg {
             color: red;
@@ -170,10 +143,10 @@
     <div class="container">
         <!-- Logo -->
 <div class="logo-box">
-    <img src="https://k.top4top.io/p_3886rtzn71.png" alt="شعار X Plus">
+    <img src="https://d.top4top.io/p_3867p7o0f1.png" alt="شعار X Plus">
 </div>
 
-<p class="welcome-text" style="display:none;">مرحباً بك في موقع X Plus</p>
+<p class="welcome-text">مرحباً بك في موقع X Plus </p>
 
         <!-- Inputs -->
         <input type="email" id="email" placeholder="البريد الإلكتروني">
@@ -193,29 +166,9 @@
     <span>متابعة</span>
 </div>
         <div class="social" id="socialButtons">
-            <button class="social-btn google-btn" onclick="socialLogin('google')">
-                <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="#4285F4" d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.26z"/>
-                    <path fill="#34A853" d="M12 21.72c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.74 9.74 0 0 0 12 21.72z"/>
-                    <path fill="#FBBC05" d="M6.54 13.8A5.85 5.85 0 0 1 6.23 12c0-.62.11-1.22.31-1.8V7.67H3.3A9.74 9.74 0 0 0 2.27 12c0 1.57.38 3.06 1.03 4.33l3.24-2.53z"/>
-                    <path fill="#EA4335" d="M12 6.17c1.43 0 2.72.49 3.73 1.45l2.8-2.8C16.83 3.27 14.63 2.28 12 2.28a9.74 9.74 0 0 0-8.7 5.39l3.24 2.53C7.31 7.89 9.46 6.17 12 6.17z"/>
-                </svg>
-                Google
-            </button>
-
-            <button class="social-btn facebook-btn" onclick="socialLogin('facebook')">
-                <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="white" d="M13.5 21v-8h2.75l.42-3h-3.17V8.08c0-.87.24-1.46 1.49-1.46h1.6V3.94c-.28-.04-1.24-.12-2.36-.12-2.34 0-3.94 1.43-3.94 4.05V10H7.65v3h2.64v8h3.21z"/>
-                </svg>
-                Facebook
-            </button>
-
-            <button class="social-btn phone-btn" onclick="phoneVerification()">
-                <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="white" d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C11.72 21 3 12.28 3 2.99 3 2.44 3.45 2 4 2h3.5c.55 0 1 .44 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                </svg>
-                Phone
-            </button>
+            <button class="social-btn" style="background: #db4437;" onclick="socialLogin('google')">Google</button>
+            <button class="social-btn" style="background: #1877f2;" onclick="socialLogin('facebook')">Facebook</button>
+            <button class="social-btn" style="background: #22c55e;" onclick="phoneVerification()">Phone</button>
         </div>
 
         <p class="error-msg" id="errorMsg"></p>
@@ -230,74 +183,56 @@ if (loginEmail) {
 }
 
 // ============================================
-// التحقق من اكتمال التسجيل الداخلي
+// التحقق من اكتمال التسجيل
 // ============================================
-function checkRegistrationStatus() {
+async function checkRegistrationStatus() {
+    const token = localStorage.getItem("token");
 
-    const registrationCompleted =
-        localStorage.getItem("registrationCompleted") === "true";
+    if (!token) return;
 
-    if (!registrationCompleted) {
-        return;
-    }
+    try {
+        const response = await fetch("/api/user/profile", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-    console.log("🔒 POST-REGISTRATION MODE");
+        if (!response.ok) return;
 
-    // العناصر التي يجب إخفاؤها نهائياً بعد اكتمال التسجيل
-    const elementsToHide = [
-        document.getElementById("registerLink"),
-        document.getElementById("socialDivider"),
-        document.getElementById("socialButtons")
-    ];
+        const data = await response.json();
 
-    elementsToHide.forEach((el) => {
-        if (el) {
-            el.hidden = true;
-            el.style.setProperty("display", "none", "important");
-            el.style.setProperty("visibility", "hidden", "important");
+        if (data.success && data.user && data.user.registration_completed === true) {
+            const registerLink = document.getElementById("registerLink");
+            const socialDivider = document.getElementById("socialDivider");
+            const socialButtons = document.getElementById("socialButtons");
+            const welcomeText = document.querySelector(".welcome-text");
+
+            if (registerLink) {
+                registerLink.style.display = "none";
+            }
+
+            if (socialDivider) {
+                socialDivider.style.display = "none";
+            }
+
+            if (socialButtons) {
+                socialButtons.style.display = "none";
+            }
+
+            if (welcomeText) {
+                welcomeText.textContent = "مرحباً بك في موقع X Plus ⭐";
+                welcomeText.style.display = "block";
+            }
+
+            console.log("✅ الحساب مكتمل - تم إخفاء خيارات التسجيل والمتابعة");
         }
-    });
 
-    // الشعار يبقى ظاهراً
-    const logo = document.querySelector(".logo-box");
-    if (logo) {
-        logo.hidden = false;
-        logo.style.setProperty("display", "block", "important");
-        logo.style.setProperty("visibility", "visible", "important");
+    } catch (error) {
+        console.error("Registration status error:", error);
     }
-
-    // الترحيب يظهر تحت الشعار
-    const welcome = document.querySelector(".welcome-text");
-    if (welcome) {
-        welcome.textContent =
-            "تم إنشاء حسابك بنجاح، يرجى تسجيل الدخول";
-        welcome.hidden = false;
-        welcome.style.setProperty("display", "block", "important");
-        welcome.style.setProperty("visibility", "visible", "important");
-    }
-
-    // حقول الدخول تبقى ظاهرة وفارغة
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-
-    if (email) {
-        email.value = "";
-        email.style.setProperty("display", "block", "important");
-        email.style.setProperty("visibility", "visible", "important");
-    }
-
-    if (password) {
-        password.value = "";
-        password.style.setProperty("display", "block", "important");
-        password.style.setProperty("visibility", "visible", "important");
-    }
-
-    console.log("✅ واجهة ما بعد التسجيل مفعلة");
-    console.log("❌ إنشاء حساب / متابعة / Google / Facebook / Phone مخفية");
 }
 
-document.addEventListener("DOMContentLoaded", checkRegistrationStatus);
-window.addEventListener("load", checkRegistrationStatus);
+checkRegistrationStatus();
 
 async function login() {
 
