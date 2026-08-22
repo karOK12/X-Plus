@@ -4,22 +4,13 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Otp = require("../models/Otp");
 
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 // =====================================================
 // SMTP
 // =====================================================
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
 
 
 // =====================================================
@@ -33,10 +24,11 @@ function generateOTP() {
 
 async function sendOTPEmail(email, otp, username) {
 
-  console.log("📤 SMTP TRY:", { from: process.env.SMTP_USER, to: email });
-  const info = await transporter.sendMail({
-    from: `"X Plus" <${process.env.SMTP_USER}>`,
-    to: email,
+  console.log("📤 RESEND TRY:", { to: email });
+
+  const { data, error } = await resend.emails.send({
+    from: "X Plus <no-reply@xplus.fun>",
+    to: [email],
     subject: "رمز التحقق X Plus",
 
     text: `مرحباً ${username}
@@ -44,13 +36,6 @@ async function sendOTPEmail(email, otp, username) {
 رمز التحقق الخاص بك في X Plus: ${otp}
 
 صلاحية الرمز 10 دقائق.`,
-
-    replyTo: process.env.SMTP_USER,
-
-    headers: {
-      "X-Mailer": "X Plus",
-      "X-Priority": "1"
-    },
 
     html: `
       <div dir="rtl" style="font-family:Arial,sans-serif">
@@ -69,24 +54,22 @@ async function sendOTPEmail(email, otp, username) {
     `
   });
 
-  console.log("📧 SMTP SEND RESULT:", {
-    accepted: info.accepted,
-    rejected: info.rejected,
-    response: info.response,
-    messageId: info.messageId,
-    envelope: info.envelope,
-    subject: "رمز التحقق X Plus"
+  if (error) {
+    console.error("❌ RESEND ERROR:", error);
+    throw new Error(error.message || "Resend email failed");
+  }
+
+  console.log("📧 RESEND SEND RESULT:", {
+    id: data?.id,
+    to: email
   });
 
   return {
-    accepted: Array.isArray(info.accepted) && info.accepted.length > 0,
-    rejected: Array.isArray(info.rejected) && info.rejected.length > 0,
-    response: info.response,
-    messageId: info.messageId
+    accepted: true,
+    rejected: false,
+    messageId: data?.id
   };
-
 }
-
 
 // =====================================================
 // JWT
@@ -353,7 +336,8 @@ exports.login = async (req, res) => {
 
         username: user.username,
 
-        email: user.email
+        email: user.email,
+        registration_completed: user.registration_completed === true
 
       }
 
@@ -533,7 +517,48 @@ exports.verifyOTP = async (req, res) => {
 
 
     // -------------------------
-    // إنشاء المستخدم
+    // التحقق من وجود الحساب مسبقاً
+    // -------------------------
+
+    const existingUser =
+      await User.findByEmail(cleanEmail);
+
+    if (existingUser) {
+
+      console.log("ℹ️ ACCOUNT ALREADY EXISTS:", {
+        id: existingUser.id,
+        email: existingUser.email
+      });
+
+      // تحديث كلمة المرور التي أدخلها المستخدم أثناء التسجيل
+      const updatedUser = await User.updatePassword(
+        cleanEmail,
+        data.password
+      );
+
+      if (!updatedUser) {
+        throw new Error("فشل تحديث كلمة مرور الحساب");
+      }
+
+      console.log("✅ PASSWORD UPDATED:", {
+        id: updatedUser.id,
+        email: updatedUser.email
+      });
+
+      await Otp.delete(cleanEmail);
+
+      return res.status(200).json({
+        success: true,
+        accountExists: true,
+        passwordUpdated: true,
+        message: "تم التحقق وتحديث كلمة المرور، يرجى تسجيل الدخول",
+        email: cleanEmail
+      });
+    }
+
+
+    // -------------------------
+    // إنشاء المستخدم الجديد
     // -------------------------
 
     console.log("🔎 BEFORE USER CREATE:", {
@@ -676,9 +701,13 @@ exports.sendOTP = async (req, res) => {
     // لا نفحص users هنا.
     // إرسال OTP لا يعني إنشاء حساب.
 
+    console.log("🟡 OTP STEP 1: generating OTP");
+
     const otp = generateOTP();
 
     const otpHash = await bcrypt.hash(otp, 10);
+
+    console.log("🟡 OTP STEP 2: saving OTP to database");
 
     await Otp.save(
       cleanEmail,
@@ -691,11 +720,17 @@ exports.sendOTP = async (req, res) => {
       new Date(Date.now() + 10 * 60 * 1000)
     );
 
+    console.log("🟡 OTP STEP 3: sending email via Resend");
+
     const mailResult = await sendOTPEmail(
       cleanEmail,
       otp,
       cleanUsername
     );
+
+    console.log("🟢 OTP STEP 4: Resend completed", {
+      messageId: mailResult?.messageId
+    });
 
     return res.status(200).json({
   success: true,
@@ -875,4 +910,74 @@ exports.resendOTP = async (req, res) => {
 
   }
 
+};
+// =====================================================
+// CHANGE PASSWORD
+// =====================================================
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "كلمة المرور الحالية والجديدة مطلوبة"
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل"
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "المستخدم غير موجود"
+      });
+    }
+
+    const currentMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!currentMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "كلمة المرور الحالية غير صحيحة"
+      });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 12);
+
+    const updatedUser = await User.updatePasswordById(
+      req.user.id,
+      newHash
+    );
+
+    if (!updatedUser) {
+      return res.status(500).json({
+        success: false,
+        message: "تعذر تحديث كلمة المرور"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "تم تغيير كلمة المرور بنجاح"
+    });
+
+  } catch (err) {
+    console.error("CHANGE PASSWORD ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "حدث خطأ في الخادم"
+    });
+  }
 };
