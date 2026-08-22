@@ -1581,3 +1581,26 @@ textarea.form-control {
   border-radius: 24px;
   padding: 0;
 }
+
+.mining-card-wrapper {
+  position: relative;
+  border-radius: 28px;
+  padding: 3px;
+  background: linear-gradient(135deg, #00d4ff, #8b5cf6, #00ff9d);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.25),
+    0 0 45px rgba(139, 92, 246, 0.15);
+  overflow: hidden;
+}
+
+.mining-card {
+  position: relative;
+  z-index: 1;
+  border-radius: 24px;
+}
+
+.mining-circle {
+  position: relative;
+  z-index: 2;
+}
+
