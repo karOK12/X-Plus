@@ -385,7 +385,7 @@ async function apiFetch(url, options = {}) {
 function restoreVerifyFormData() {
   const saved = sessionStorage.getItem('verifyFormData');
 
-  if (!saved) return;
+  if (!saved) return false;
 
   try {
     const formData = JSON.parse(saved);
@@ -396,9 +396,34 @@ function restoreVerifyFormData() {
       }
     });
 
+    // إعادة تعبئة عناصر النموذج من state.form
+    Object.keys(formData).forEach(key => {
+      const el = document.getElementById(key);
+
+      if (el && formData[key] !== undefined && formData[key] !== null) {
+        el.value = formData[key];
+      }
+    });
+
+    if (state.form.idType) {
+      const idFields = document.getElementById('idFields');
+      if (idFields) {
+        idFields.classList.add('show');
+      }
+    }
+
+    // استعادة حالة OTP
+    state.otpVerified =
+      sessionStorage.getItem('otpVerified') === 'true';
+
     console.log('OK: تم استعادة بيانات النموذج بعد التحقق');
+    console.log('OTP verified:', state.otpVerified);
+
+    return true;
+
   } catch (err) {
     console.error('Restore verify data error:', err);
+    return false;
   }
 }
 
@@ -742,7 +767,20 @@ async function sendOTP() {
     /*
      * حفظ بيانات التحقق مؤقتاً حتى ترجع من verify.html
      */
-    sessionStorage.setItem('verifyFormData', JSON.stringify(state.form));
+    const verifyFormData = {
+  fullName: state.form.fullName,
+  username: state.form.username,
+  email: state.form.email,
+  password: state.form.password,
+  phone: state.form.phone,
+  country: state.form.country,
+  twoFA: state.form.twoFA
+};
+
+sessionStorage.setItem(
+  'verifyFormData',
+  JSON.stringify(verifyFormData)
+);
 
     sessionStorage.setItem('pendingVerification', JSON.stringify({
       email: contact,
@@ -809,9 +847,17 @@ async function uploadImage(base64Data) {
 // ══════════════════════════════════════════════════════════
 // 💾 حفظ البيانات
 // ══════════════════════════════════════════════════════════
-async function saveData() {
+async function saveData(autoAfterVerify = false) {
+  console.log(
+    autoAfterVerify
+      ? '🟢 AUTO SAVE AFTER OTP'
+      : '🔵 SAVE BUTTON CLICKED'
+  );
+
   state.otpVerified =
     sessionStorage.getItem('otpVerified') === 'true';
+
+  console.log('🔐 OTP VERIFIED:', state.otpVerified);
 
   if (!state.otpVerified) {
     showAlert('⚠️ يجب إكمال التحقق أولاً', 'error');
@@ -874,13 +920,15 @@ async function saveData() {
     });
     
     showAlert('✓ تم حفظ البيانات بنجاح!', 'success');
+
+    // التسجيل اكتمل فعليًا بعد التحقق وحفظ البيانات
+    localStorage.setItem('registrationCompleted', 'true');
+
     
     setTimeout(() => {
-      if (window.opener) {
-        window.close();
-      } else {
-        window.location.href = '/index.html';
-      }
+      // بعد اكتمال التسجيل والـ OTP والبيانات
+      // العودة دائماً إلى واجهة تسجيل الدخول
+      window.location.href = '/login-user.html';
     }, 1500);
     
   } catch (err) {
@@ -894,8 +942,19 @@ async function saveData() {
 // ══════════════════════════════════════════════════════════
 // 🚀 بدء التشغيل
 // ══════════════════════════════════════════════════════════
-restoreVerifyFormData();
-loadUserData();
+const restoredAfterVerify = restoreVerifyFormData();
+
+if (restoredAfterVerify) {
+  console.log('🟢 تم استعادة بيانات التسجيل بعد OTP');
+
+  setTimeout(() => {
+    console.log('🚀 STARTING AUTO SAVE NOW');
+    saveData(true);
+  }, 300);
+
+} else {
+  loadUserData();
+}
 
 console.log('✅ صفحة بيانات المستخدم جاهزة');
 console.log('🔧 API URL:', API_URL);
