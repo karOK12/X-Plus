@@ -767,21 +767,6 @@ async function sendOTP() {
     /*
      * حفظ بيانات التحقق مؤقتاً حتى ترجع من verify.html
      */
-    const verifyFormData = {
-  fullName: state.form.fullName,
-  username: state.form.username,
-  email: state.form.email,
-  password: state.form.password,
-  phone: state.form.phone,
-  country: state.form.country,
-  twoFA: state.form.twoFA
-};
-
-sessionStorage.setItem(
-  'verifyFormData',
-  JSON.stringify(verifyFormData)
-);
-
     sessionStorage.setItem('pendingVerification', JSON.stringify({
       email: contact,
       twoFA: state.form.twoFA,
