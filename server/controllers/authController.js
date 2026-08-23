@@ -24,11 +24,27 @@ function generateOTP() {
 
 async function sendOTPEmail(email, otp, username) {
 
-  console.log("📤 RESEND TRY:", { to: email });
+  const cleanEmail = String(email || "")
+    .trim()
+    .toLowerCase();
+
+  console.log("📤 RESEND TRY:", {
+    originalEmail: email,
+    cleanEmail
+  });
+
+  // منع إرسال عناوين تحتوي أحرفاً غير صالحة
+  if (!cleanEmail || !/^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$/.test(cleanEmail)) {
+    throw new Error("عنوان البريد الإلكتروني غير صالح");
+  }
+
+  if (!/^[[:ascii:]]+$/.test(cleanEmail)) {
+    throw new Error("عنوان البريد الإلكتروني يجب أن يحتوي على أحرف إنجليزية فقط");
+  }
 
   const { data, error } = await resend.emails.send({
     from: "X Plus <no-reply@xplus.fun>",
-    to: [email],
+    to: [cleanEmail],
     subject: "رمز التحقق X Plus",
 
     text: `مرحباً ${username}
@@ -61,7 +77,7 @@ async function sendOTPEmail(email, otp, username) {
 
   console.log("📧 RESEND SEND RESULT:", {
     id: data?.id,
-    to: email
+    to: cleanEmail
   });
 
   return {
@@ -602,25 +618,20 @@ exports.verifyOTP = async (req, res) => {
 
 
     // -------------------------
-    // إنشاء JWT مباشرة
-    // -------------------------
-
-    const token =
-      createToken(user);
-
-
-    // -------------------------
-    // الرد
+    // الرد بعد إنشاء الحساب
+    // لا يتم تسجيل الدخول تلقائياً
     // -------------------------
 
     return res.json({
 
       success: true,
 
-      message:
-        "تم تفعيل الحساب وتسجيل الدخول بنجاح",
+      accountCreated: true,
 
-      token,
+      message:
+        "تم إنشاء الحساب بنجاح، يرجى تسجيل الدخول",
+
+      email: cleanEmail,
 
       user: {
 
@@ -681,7 +692,24 @@ exports.sendOTP = async (req, res) => {
     }
 
     const cleanUsername = username.trim();
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail = String(email).trim().toLowerCase();
+
+    // التحقق من البريد قبل إنشاء OTP أو إرساله
+    if (
+      !/^[^[:space:]@]+@[^[:space:]@]+\\.[^[:space:]@]+$/.test(cleanEmail)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "عنوان البريد الإلكتروني غير صالح"
+      });
+    }
+
+    if (!/^[[:ascii:]]+$/.test(cleanEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: "عنوان البريد الإلكتروني يجب أن يحتوي على أحرف إنجليزية فقط"
+      });
+    }
 
     if (cleanUsername.length < 3) {
       return res.status(400).json({

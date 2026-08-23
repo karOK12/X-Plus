@@ -1,761 +1,654 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="X Plus - منصة التعدين السحابي الاحترافية">
-  <title>X Plus - منصة التعدين السحابي</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    html { scroll-behavior: smooth; overflow-x: hidden; }
-    body { overflow-x: hidden; overflow-y: auto; min-height: 100vh; }
-    .logo-icon-svg { 
-      width: 28px; 
-      height: 28px; 
-      color: #3b82f6; 
-      transition: all 0.3s ease;
-    }
-    .logo:hover .logo-icon-svg {
-      color: #fbbf24;
-      transform: scale(1.1) rotate(-5deg);
-      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
-    }
-    .logo {
-      position: relative;
-      cursor: pointer;
-    }
-    .logo-tooltip {
-      position: absolute;
-      bottom: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1e293b;
-      color: #fbbf24;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-      border: 1px solid rgba(251, 191, 36, 0.3);
-    }
-    .logo:hover .logo-tooltip {
-      opacity: 1;
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    <link rel="stylesheet" href="style.css">
 
-    .nav-auth-btn {
-      text-decoration: none;
-      padding: 9px 16px;
-      border-radius: 10px;
-      font-family: 'Cairo', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      transition: all 0.25s ease;
-      white-space: nowrap;
-    }
+    <title>X Plus</title>
 
-    .login-btn {
-      color: #334155;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    .login-btn:hover {
-      background: #e2e8f0;
-      transform: translateY(-1px);
-    }
+        html {
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
 
-    .register-btn {
-      color: white;
-      background: linear-gradient(90deg, #3b82f6, #06b6d4);
-      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
-    }
+        body {
+            margin: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #0b0f1a;
+            color: white;
+            overflow-x: hidden;
+        }
 
-    .register-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 9px 20px rgba(59, 130, 246, 0.35);
-    }
+        /* =========================
+           HEADER
+        ========================= */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            padding: 15px 25px;
+            background: #111827;
+            direction: ltr;
+        }
 
-    .mining-card-wrapper { width: 100%; max-width: 520px; margin: 0 auto; }
-    .mining-card { padding: 24px; border-radius: 22px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%); box-shadow: 0 20px 50px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1); backdrop-filter: blur(10px); position: relative; color: white; }
-    .mining-card::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: linear-gradient(135deg, #3b82f6, #06b6d4, #3b82f6); border-radius: 24px; z-index: -1; opacity: 0.3; }
-    .mining-row { display: flex; justify-content: flex-start; align-items: center; gap: 20px; flex-wrap: wrap; }
-    .mining-circle { width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, #1e293b, #0f172a); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); position: relative; flex-shrink: 0; }
-    .mining-right { flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; min-width: 200px; }
-    .progress-ring { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
-    .progress-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 6; }
-    .progress-bar { fill: none; stroke: #3b82f6; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.2s linear; }
-    .progress-dot {
-      fill: #3b82f6;
-      filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.9));
-      animation: dotGlow 2s ease-in-out infinite;
-    }
-    @keyframes dotGlow {
-      0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8)); }
-      50%      { filter: drop-shadow(0 0 11px rgba(59, 130, 246, 1)); }
-    }
-    .timer { font-size: 20px; font-weight: bold; color: #3b82f6; font-variant-numeric: tabular-nums; direction: ltr; }
-    .sub { font-size: 10px; opacity: 0.6; letter-spacing: 1px; }
-    .balance-container, .power-container, .rate-container, .points-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-    .balance-label, .power-label, .rate-label, .points-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
-    .balance { font-size: 22px; font-weight: bold; color: #a78bfa; font-variant-numeric: tabular-nums; direction: ltr; }
-    .points { font-size: 18px; font-weight: bold; color: #fbbf24; font-variant-numeric: tabular-nums; direction: ltr; }
-    .power { font-size: 14px; color: #4ade80; font-variant-numeric: tabular-nums; direction: ltr; }
-    .rate { font-size: 13px; color: #fbbf24; font-weight: bold; font-variant-numeric: tabular-nums; direction: ltr; }
-    .profit-info { font-size: 10px; color: #94a3b8; text-align: right; opacity: 0.7; direction: ltr; }
-    .adBtn { width: 100%; padding: 8px; border-radius: 10px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; margin-top: 4px; font-family: 'Cairo', sans-serif; font-size: 13px; transition: all 0.3s; }
-    .adBtn:hover { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
-    .mineBtn { width: 100%; margin-top: 16px; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(90deg, #3b82f6, #06b6d4); color: white; font-weight: bold; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 15px; transition: all 0.3s; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
-    .mineBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(59, 130, 246, 0.5); }
-    .mineBtn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-    
-    .deposit-section { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px dashed rgba(59, 130, 246, 0.3); text-align: center; }
-    .deposit-title { font-size: 14px; color: #94a3b8; margin-bottom: 10px; }
-    .deposit-address { background: #0f172a; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 13px; color: #3b82f6; word-break: break-all; margin-bottom: 10px; direction: ltr; }
-    .copy-btn { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-size: 12px; transition: 0.3s; }
-    .copy-btn:hover { background: #3b82f6; color: white; }
-    .deposit-status { font-size: 11px; color: #4ade80; margin-top: 8px; }
+        /* =========================
+           LOGO
+        ========================= */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            min-width: 150px;
+        }
 
-    .terms-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-    .terms-modal.active { display: flex; }
-    .terms-content { background: white; border-radius: 16px; max-width: 400px; width: 90%; max-height: 70vh; overflow-y: auto; padding: 15px; position: relative; }
-    .terms-close { position: absolute; top: 10px; left: 10px; background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; color: #64748b; transition: all 0.3s; }
-    .terms-close:hover { background: #ef4444; color: white; }
-    .terms-content h2 { color: #1e293b; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #3b82f6; font-size: 16px; }
-    .terms-content h3 { color: #334155; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
-    .terms-content p { color: #64748b; line-height: 1.5; margin-bottom: 8px; font-size: 12px; }
-    .terms-content ul { padding-right: 15px; color: #64748b; font-size: 12px; }
-    .terms-content li { margin-bottom: 4px; }
-    .faq-answer { display: none; padding-top: 10px; color: #64748b; font-size: 14px; line-height: 1.6; }
-    .faq-item.active .faq-answer { display: block; }
-    .faq-item.active .faq-toggle { transform: rotate(45deg); color: #3b82f6; }
-    .faq-toggle { cursor: pointer; transition: transform 0.3s; font-size: 18px; font-weight: bold; }
-    @media (max-width: 768px) {
-      .nav-menu { position: absolute; top: 100%; right: 0; left: 0; background: white; flex-direction: column; padding: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); display: none; z-index: 100; }
-      .nav-menu.active { display: flex; }
-      .nav-menu li { margin: 10px 0; width: 100%; text-align: center; }
-      .hero-content { flex-direction: column !important; text-align: center; }
-      .mining-row { flex-direction: column; align-items: center; }
-      .mining-right { align-items: center; text-align: center; }
-      .balance-container, .power-container, .rate-container, .points-container { align-items: center; }
-    }
-    /* ================= LEFT SIDEBAR ================= */
+        .logo-container img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
-    .sidebar-toggle {
-      position: absolute;
-      left: 0;
-      top: 25%;
-      transform: translateY(-50%);
-      margin: 0;
-      width: 38px;
-      height: 38px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
-      color: #334155;
-      cursor: pointer;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: .25s ease;
-    }
+        .brand-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
 
-    .sidebar-toggle:hover {
-      background: #e2e8f0;
-      transform: translateY(-1px);
-    }
+        /* =========================
+           SEARCH
+        ========================= */
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+        }
 
-    .left-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 285px;
-      max-width: 82vw;
-      height: 100vh;
-      background: #ffffff;
-      box-shadow: 8px 0 30px rgba(15, 23, 42, .18);
-      z-index: 99999;
-      transform: translateX(-105%);
-      transition: transform .3s ease;
-      direction: rtl;
-      padding: 18px 14px;
-      overflow-y: auto;
-    }
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #273244;
+            outline: none;
+            background: #1f2937;
+            color: white;
+            font-size: 15px;
+            direction: rtl;
+        }
 
-    .left-sidebar.active {
-      transform: translateX(0);
-    }
+        .search-box input::placeholder {
+            color: #9ca3af;
+        }
 
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 4px 14px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #e2e8f0;
-      color: #1e293b;
-      font-weight: 800;
-      font-size: 16px;
-    }
+        .search-box input:focus {
+            border-color: #2563eb;
+        }
 
-    .sidebar-items {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+        /* =========================
+           ACTIONS
+        ========================= */
+        .actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            min-width: 150px;
+        }
 
-    .sidebar-item {
-      width: 100%;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
-      color: #334155;
-      text-decoration: none;
-      font-family: "Cairo", sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: right;
-      transition: .2s ease;
-    }
+        /* =========================
+           BUTTON
+        ========================= */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
 
-    .sidebar-item:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
-      color: #2563eb;
-      transform: translateX(2px);
-    }
+        .subscribe {
+            background: #22c55e;
+            color: white;
+        }
 
-    .sidebar-icon {
-      width: 26px;
-      text-align: center;
-      font-size: 17px;
-      flex-shrink: 0;
-    }
+        .subscribe:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
 
-    .sidebar-logout {
-      color: #dc2626;
-      background: #fff7f7;
-    }
+        /* =========================
+           PROFILE
+        ========================= */
+        .profile {
+            display: none;
+        }
 
-    .sidebar-logout:hover {
-      background: #fef2f2;
-      border-color: #fca5a5;
-      color: #b91c1c;
-    }
+        .profile img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .45);
-      z-index: 99998;
-      opacity: 0;
-      visibility: hidden;
-      transition: .3s ease;
-    }
+        /* =========================
+           MAIN & HERO
+        ========================= */
+        .hero {
+            text-align: center;
+            padding: 70px 20px 40px;
+        }
 
-    .sidebar-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
+        .hero h1 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 34px;
+        }
 
-    @media (max-width: 768px) {
-      .sidebar-toggle {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-      }
+        .hero p {
+            color: #9ca3af;
+            font-size: 17px;
+        }
 
-      .left-sidebar {
-        width: 270px;
-      }
-    }
+        #reference {
+            display: none;
+            color: white;
+            margin-top: 20px;
+        }
 
-    /* ================= END LEFT SIDEBAR ================= */
-\n  </style>
+        /* =========================
+           MOVING IMAGE ADS MARQUEE
+        ========================= */
+        .youtube-ad-marquee {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 30px;
+            overflow: hidden;
+            background: #111827;
+            border: 1px solid #273244;
+            border-radius: 12px;
+            padding: 15px 0;
+            direction: ltr;
+            position: relative;
+        }
+
+        .youtube-ad-marquee::before,
+        .youtube-ad-marquee::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .youtube-ad-marquee::before {
+            left: 0;
+            background: linear-gradient(to right, #111827, transparent);
+        }
+
+        .youtube-ad-marquee::after {
+            right: 0;
+            background: linear-gradient(to left, #111827, transparent);
+        }
+
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            transform: translate3d(0, 0, 0);
+            animation: xplusMarquee 30s linear infinite;
+            will-change: transform;
+        }
+
+        .marquee-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 0 0 auto;
+        }
+
+        .ad-card {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .ad-card:hover {
+            transform: translateY(-4px);
+            border-color: #2563eb;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
+        }
+
+        .ad-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .ad-card .ad-text {
+            padding: 12px 16px;
+            color: #f3f4f6;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            direction: rtl;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @keyframes xplusMarquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        .youtube-ad-marquee:hover .marquee-track {
+            animation-play-state: paused;
+        }
+
+        /* =========================
+           SCROLL CONTENT
+        ========================= */
+        .scroll-content {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 20px 100px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .scroll-card {
+            min-height: 220px;
+            padding: 30px;
+            background: #111827;
+            border: 1px solid #273244;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .scroll-card:hover {
+            transform: translateY(-5px);
+            border-color: #2563eb;
+        }
+
+        .scroll-card h2 {
+            margin: 0 0 15px;
+            font-size: 22px;
+        }
+
+        .scroll-card p {
+            margin: 0;
+            color: #9ca3af;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        /* =========================
+           AD
+        ========================= */
+        .ad-container {
+            width: 728px;
+            max-width: 100%;
+            min-height: 90px;
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ad-box {
+            max-width: 100%;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+        .footer {
+            margin-top: 80px;
+            padding: 25px;
+            text-align: center;
+            background: #111827;
+        }
+
+        .footer-one-row {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: #93c5fd;
+        }
+
+        .rights {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-wrap: wrap;
+                padding: 12px 18px;
+            }
+
+            .logo-container {
+                min-width: auto;
+            }
+
+            .actions {
+                min-width: auto;
+            }
+
+            .search-box {
+                order: 3;
+                flex-basis: 100%;
+                max-width: none;
+            }
+
+            .hero {
+                padding-top: 45px;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .scroll-content {
+                grid-template-columns: 1fr;
+                padding: 20px 15px 80px;
+            }
+
+            .scroll-card {
+                min-height: 180px;
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .navbar {
+                gap: 12px;
+                padding: 12px 15px;
+            }
+
+            .logo-container img {
+                width: 38px;
+                height: 38px;
+            }
+
+            .brand-name {
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 9px 15px;
+                font-size: 14px;
+            }
+
+            .hero {
+                padding: 35px 15px;
+            }
+
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .footer-one-row {
+                gap: 15px;
+                font-size: 14px;
+            }
+
+            .scroll-card h2 {
+                font-size: 20px;
+            }
+
+            .scroll-card p {
+                font-size: 14px;
+            }
+
+            .ad-card {
+                width: 260px;
+            }
+            
+            .ad-card img {
+                height: 130px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-  <nav class="navbar">
-    <div class="container">
-      <div class="nav-wrapper">
-        <a href="#" class="logo" onclick="openWallet(event)" title="💰 افتح المحفظة">
-          <svg class="logo-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-          <span class="logo-text">X Plus</span>
-          <span class="logo-tooltip">💰 افتح المحفظة</span>
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="navbar">
+        <a href="/" class="logo-container">
+            <img src="https://k.top4top.io/p_3886rtzn71.png" alt="X Plus">
+            <span class="brand-name">X Plus</span>
         </a>
-        <ul class="nav-menu" id="navMenu">
-          <li><a href="#hero" class="nav-link">الرئيسية</a></li>
-          <li><a href="#features" class="nav-link">المزايا</a></li>
-          <li><a href="#about" class="nav-link">عن المنصة</a></li>
-          <li><a href="#faq" class="nav-link">الأسئلة الشائعة</a></li>
-        </ul>
-        <div class="nav-actions" id="navActions">
 
-</div>
-        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="فتح الشريط الجانبي">☰</button>
-
-        <aside class="left-sidebar" id="leftSidebar">
-          <div class="sidebar-header">
-            <span>القائمة</span>
-          </div>
-
-          <div class="sidebar-items">
-            <a href="profile.html" class="sidebar-item">
-              <span class="sidebar-icon">👤</span>
-              <span>الملف الشخصي</span>
-            </a>
-
-            <a href="edit-profile.html" class="sidebar-item">
-              <span class="sidebar-icon">✏️</span>
-              <span>تعديل الملف الشخصي</span>
-            </a>
-
-            <a href="account-settings.html" class="sidebar-item">
-              <span class="sidebar-icon">⚙️</span>
-              <span>إعدادات الحساب</span>
-            </a>
-
-            <a href="rating.html" class="sidebar-item">
-              <span class="sidebar-icon">⭐</span>
-              <span>تقييم التطبيق</span>
-            </a>
-
-            <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button" onclick="logoutUser()">
-              <span class="sidebar-icon">🚪</span>
-              <span>تسجيل الخروج</span>
-            </button>
-          </div>
-        </aside>
-
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-      </div>
-    </div>
-  </nav>
-
-  <section id="hero" class="hero">
-    <div class="container">
-      <div class="hero-content" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px; justify-content: space-between;">
-        <div style="flex: 1; min-width: 300px;">
-          <div class="hero-badge"><span class="badge-dot"></span><span>منصة موثوقة ومعتمدة</span></div>
-          <h1 class="hero-title">ابدأ رحلتك في عالم <span class="gradient-text">التعدين السحابي</span> مع X Plus</h1>
-          <p class="hero-description">اجمع النقاط وشاهد إعلاناتك، وقم بالإيداع الحقيقي لبدء التعدين. سيتم تحويل نقاطك إلى عملة X Plus عند الإطلاق الرسمي.</p>
-          <div class="hero-stats">
-            <div class="stat-item"><div class="stat-value">+50K</div><div class="stat-label">مستخدم نشط</div></div>
-            <div class="stat-divider"></div>
-            <div class="stat-item"><div class="stat-value">$120M+</div><div class="stat-label">أرباح مدفوعة</div></div>
-          </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔎 ابحث...">
         </div>
-        
-        <div style="flex: 1; min-width: 320px;" class="mining-card-wrapper">
-          <div class="mining-card">
-            <div class="mining-row">
-              <div class="mining-circle">
-                <svg class="progress-ring" width="140" height="140">
-                  <circle class="progress-bg" cx="70" cy="70" r="62"></circle>
-                  <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
-                  <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
-                </svg>
-                <div class="timer" id="timer">00:00:00</div>
-                <div class="sub">MINING</div>
-              </div>
 
-              <div class="mining-right">
-                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.00000000</div></div>
-                <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
-                <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
-                <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
-                <div class="profit-info" id="profitInfo">⏱️ جاهز للبدء</div>
-                <button class="adBtn" id="adBtn" onclick="watchAd()">📺 شاهد إعلان (+10 نقاط)</button>
-              </div>
+        <div class="actions">
+            <!-- ✅ تم تعديل الرابط هنا ليوجه إلى login.html -->
+            <a href="login.html" class="btn subscribe">اشتراك</a>
+            
+            <div class="profile" id="profile">
+                <img src="/assets/images/default.png" alt="user">
             </div>
-            <button id="startBtn" class="mineBtn" onclick="startMining()">⛏️ ابدأ التعدين الآن</button>
-          </div>
         </div>
-      </div>
+    </header>
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+    <main>
+        <section class="hero">
+
+            <!-- =========================
+                 إعلان محتوى متحرك (صور)
+            ========================== -->
+            <div class="youtube-ad-marquee">
+                <div class="marquee-track">
+                    
+                    <!-- المجموعة الأولى -->
+                    <div class="marquee-group">
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/2563eb/ffffff?text=Premium+Service" alt="إعلان 1">
+                            <div class="ad-text">🔥 اكتشف أحدث خدمات X Plus المميزة</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/22c55e/ffffff?text=Music+Streaming" alt="إعلان 2">
+                            <div class="ad-text">🎵 استمتع بالموسيقى والمحتوى المتنوع</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/ef4444/ffffff?text=Latest+News" alt="إعلان 3">
+                            <div class="ad-text">📰 تابع آخر الأخبار والتحديثات الحصرية</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/f59e0b/ffffff?text=Digital+Tools" alt="إعلان 4">
+                            <div class="ad-text">🚀 أدوات رقمية سريعة وسهلة الاستخدام</div>
+                        </div>
+                    </div>
+                    
+                    <!-- المجموعة الثانية (نسخة طبق الأصل لضمان حركة لانهائية سلسة) -->
+                    <div class="marquee-group">
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/2563eb/ffffff?text=Premium+Service" alt="إعلان 1">
+                            <div class="ad-text">🔥 اكتشف أحدث خدمات X Plus المميزة</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/22c55e/ffffff?text=Music+Streaming" alt="إعلان 2">
+                            <div class="ad-text">🎵 استمتع بالموسيقى والمحتوى المتنوع</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/ef4444/ffffff?text=Latest+News" alt="إعلان 3">
+                            <div class="ad-text">📰 تابع آخر الأخبار والتحديثات الحصرية</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/f59e0b/ffffff?text=Digital+Tools" alt="إعلان 4">
+                            <div class="ad-text">🚀 أدوات رقمية سريعة وسهلة الاستخدام</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <h1>🌟 مرحباً بكم في X Plus 👋</h1>
+            <p>منصتك الرقمية لإدارة ومتابعة خدماتك</p>
+            <p id="reference"></p>
+
+        </section>
+
+        <!-- =========================
+             SCROLL CONTENT
+        ========================== -->
+        <section class="scroll-content">
+            <div class="scroll-card">
+                <h2>🚀 خدمات X Plus</h2>
+                <p>استمتع بخدماتنا الرقمية بطريقة سهلة وسريعة ومنظمة.</p>
+            </div>
+            <div class="scroll-card">
+                <h2>🎵 الموسيقى</h2>
+                <p>اكتشف مجموعة من المحتويات والخدمات المتنوعة داخل المنصة.</p>
+            </div>
+            <div class="scroll-card">
+                <h2>📰 الأخبار</h2>
+                <p>تابع آخر الأخبار والمحتويات الجديدة من خلال منصة X Plus.</p>
+            </div>
+            <div class="scroll-card">
+                <h2>📚 المقالات</h2>
+                <p>تصفح المقالات والمحتوى المفيد بسهولة.</p>
+            </div>
+            <div class="scroll-card">
+                <h2>🔎 البحث</h2>
+                <p>استخدم مربع البحث للوصول إلى المحتوى الذي تبحث عنه.</p>
+            </div>
+            <div class="scroll-card">
+                <h2>💎 X Plus</h2>
+                <p>تجربة رقمية بسيطة وسريعة ومناسبة لجميع الأجهزة.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- =========================
+         AD
+    ========================== -->
+    <div class="ad-container">
+        <div id="ad-box"></div>
     </div>
-  </section>
 
-  <section id="features" class="features section" style="padding: 40px 0;">
-    <div class="container">
-      <div class="section-header"><div class="section-badge">لماذا X Plus؟</div><h2 class="section-title">مزايا تجعلنا الخيار الأول</h2></div>
-      <div class="features-grid">
-        <div class="feature-card"><div class="feature-icon">⚡</div><h3 class="feature-title">تعدين فائق السرعة</h3></div>
-        <div class="feature-card"><div class="feature-icon">💰</div><h3 class="feature-title">أرباح يومية مضمونة</h3></div>
-        <div class="feature-card"><div class="feature-icon">🔒</div><h3 class="feature-title">أمان متقدم</h3></div>
-      </div>
-    </div>
-  </section>
+    <!-- =========================
+         FOOTER
+    ========================== -->
+    <footer class="footer">
+        <div class="footer-one-row">
+            <a href="/news">سياسة الخصوصية</a>
+            <a href="/music">الشروط والأحكام</a>
+            <a href="/articles">اتفاقية الترخيص</a>
+            <a href="/explore">مركز الدعم</a>
+        </div>
+        <span class="rights">جميع الحقوق محفوظة © X Plus 2026</span>
+    </footer>
 
-  <footer class="footer" style="padding: 20px; text-align: center; background: #0f172a; color: white;">
-    <p>© 2026 X Plus. جميع الحقوق محفوظة.</p>
-  </footer>
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+    <script>
+        async function handleSearch() {
+            const searchInput = document.getElementById("searchInput");
+            const search = searchInput.value.trim();
 
-  <div class="terms-modal" id="termsModal">
-    <div class="terms-content">
-      <button class="terms-close" onclick="closeTerms()">✕</button>
-      <div id="termsBody"></div>
-    </div>
-  </div>
+            if (!search) return;
 
-  <script>
-    const RING_CX = 70;
-    const RING_CY = 70;
-    const RING_R  = 62;
-    const RING_CIRC = 2 * Math.PI * RING_R;
-    
-    const CYCLE_SECONDS = 86400;
-    const RING_CYCLE    = 60;
-    const SCALE = 100000000;
-    
-    let balanceScaled = 0;
-    let currentPower = 150.50;
-    let isMining = false;
-    let sessionDone = false;
-    let startTime = 0;
-    let timerInterval = null;
-    let balanceInterval = null;
-    let lastSecond = -1;
-    let lastBalanceSecond = -1;
-
-    function formatScaled(scaled) {
-      const isNeg = scaled < 0;
-      const abs = Math.abs(scaled);
-      const intPart = Math.floor(abs / SCALE);
-      const fracPart = (abs % SCALE).toString().padStart(8, '0');
-      return (isNeg ? '-' : '') + intPart + '.' + fracPart;
-    }
-
-    function profitPerMsScaled() {
-      return (currentPower * 0.00000024 * SCALE) / 3600000;
-    }
-
-    async function apiFetch(url, options = {}) {
-      const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
-      const headers = { 'Content-Type': 'application/json', ...options.headers };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      
-      const response = await fetch(url, { ...options, headers });
-      if (response.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('auth_token');
-        if (window.location.pathname !== '/login.html') window.location.href = 'login.html';
-        throw new Error('انتهت صلاحية الجلسة');
-      }
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'خطأ في الخادم' }));
-        throw new Error(error.message || `HTTP ${response.status}`);
-      }
-      return response;
-    }
-    
-    const API_URL = window.location.hostname === 'localhost' 
-      ? 'http://localhost:3000/api'
-      : '/api';
-
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navMenu = document.getElementById('navMenu');
-    if (mobileToggle && navMenu) {
-      mobileToggle.addEventListener('click', () => { navMenu.classList.toggle('active'); });
-      document.querySelectorAll('.nav-link').forEach(link => { 
-        link.addEventListener('click', () => { navMenu.classList.remove('active'); }); 
-      });
-    }
-
-    document.querySelectorAll('.faq-question').forEach(question => {
-      question.addEventListener('click', () => { 
-        question.parentElement.classList.toggle('active'); 
-      });
-    });
-
-    const circle = document.getElementById('progressCircle');
-    const dot = document.getElementById('progressDot');
-    const radius = 62;
-    const circumference = 2 * Math.PI * radius;
-    circle.style.strokeDasharray = circumference;
-    circle.style.strokeDashoffset = circumference;
-
-    const balanceEl = document.getElementById('balance');
-    const pointsEl = document.getElementById('points');
-    const powerEl = document.getElementById('power');
-    const rateEl = document.getElementById('rate');
-    const timerEl = document.getElementById('timer');
-    const profitInfoEl = document.getElementById('profitInfo');
-    const startBtn = document.getElementById('startBtn');
-    const adBtn = document.getElementById('adBtn');
-
-    function resetRing() {
-      circle.style.strokeDasharray  = RING_CIRC;
-      circle.style.strokeDashoffset = RING_CIRC;
-      dot.setAttribute('cx', (RING_CX + RING_R).toFixed(3));
-      dot.setAttribute('cy', RING_CY);
-    }
-
-    function stopMining() {
-      isMining = false;
-      if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
-      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-      startBtn.disabled = false;
-      startBtn.innerText = "⛏️ ابدأ التعدين الآن";
-      profitInfoEl.textContent = "⏱️ جاهز للبدء";
-    }
-
-    function startLocalCounter() {
-      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-
-      const profitPerMs = profitPerMsScaled();
-
-      function tick() {
-        if (!isMining) return;
-        const now = Date.now();
-        const elapsedMs = now - startTime;
-        balanceScaled = profitPerMs * elapsedMs;
-        const sec = Math.floor(elapsedMs / 1000);
-        if (sec !== lastBalanceSecond) {
-          lastBalanceSecond = sec;
-          balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+            try {
+                const response = await fetch("/api/search?q=" + encodeURIComponent(search));
+                const data = await response.json();
+                console.log("نتائج البحث:", data);
+            } catch (error) {
+                console.error("Search error:", error);
+            }
         }
-      }
 
-      tick();
-      balanceInterval = setInterval(tick, 100);
-      timerInterval = setInterval(() => { updateTimer(); }, 100);
-    }
+        document.getElementById("searchInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                handleSearch();
+            }
+        });
 
-    function updateRing(elapsedSeconds) {
-      const t = Math.max(0, Math.min(elapsedSeconds, CYCLE_SECONDS));
-      const done = elapsedSeconds >= CYCLE_SECONDS;
-      const speedFactor = 0.1;
-      const fill = done ? 1 : ((t * speedFactor) % RING_CYCLE) / RING_CYCLE;
+        window.addEventListener("load", function() {
+            const box = document.getElementById("ad-box");
+            if (!box) return;
 
-      circle.style.strokeDasharray = RING_CIRC;
-      circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
+            box.innerHTML = "";
+            const script = document.createElement("script");
+            script.src = "https://www.highperformanceformat.com/29101711/invoke.js";
+            script.async = true;
+            box.appendChild(script);
+        });
 
-      const angle = fill * 2 * Math.PI;
-      dot.setAttribute('cx', (RING_CX + RING_R * Math.cos(angle)).toFixed(3));
-      dot.setAttribute('cy', (RING_CY + RING_R * Math.sin(angle)).toFixed(3));
-    }
+        const params = new URLSearchParams(window.location.search);
+        const reference = params.get("ref");
 
-    async function initPage() {
-      resetRing();
-      try {
-        const res = await apiFetch(`${API_URL}/user/init`);
-        const data = await res.json();
-        if (data.success) {
-          const depAddr = document.getElementById('depositAddress');
-          if (depAddr) depAddr.innerText = data.depositAddress;
-          balanceScaled = 0;
-          balanceEl.textContent = '0.00000000';
-          pointsEl.textContent = data.points;
-          currentPower = parseFloat(data.power) || 150.50;
-          powerEl.textContent = currentPower.toFixed(2);
-          rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
-          profitInfoEl.textContent = '⏱️ جاهز للبدء';
+        if (reference) {
+            const referenceElement = document.getElementById("reference");
+            referenceElement.textContent = "REF: " + reference;
+            referenceElement.style.display = "block";
         }
-      } catch (e) {
-        console.error("فشل الاتصال بالخادم:", e.message);
-        balanceEl.textContent = '0.00000000';
-        powerEl.textContent = currentPower.toFixed(2);
-        rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
-      }
-    }
 
-    initPage();
+        const token = localStorage.getItem("token");
 
-    async function startMining() {
+        if (token) {
+            const profile = document.getElementById("profile");
+            const subscribe = document.querySelector(".subscribe");
 
-      const token =
-        localStorage.getItem('token') ||
-        localStorage.getItem('auth_token');
-
-      if (!token) {
-        window.location.href = 'login.html';
-        return;
-      }
-
-      if (isMining || timerInterval || balanceInterval) return;
-      startBtn.disabled = true;
-      startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
-      startTime = Date.now();
-      isMining = true;
-      sessionDone = false;
-      balanceScaled = 0;
-      lastSecond = -1;
-      lastBalanceSecond = -1;
-      balanceEl.textContent = '0.00000000';
-      timerEl.textContent = '00:00:00';
-      resetRing();
-      updateTimer();
-      updateRing(0);
-      startLocalCounter();
-      
-      try {
-        const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
-        const data = await response.json();
-        if (data.success) {
-          startBtn.innerText = "⛏️ جاري التعدين (متصل)";
-          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
-          if (!window._pointsUpdater) {
-            window._pointsUpdater = setInterval(async () => {
-              try {
-                const res = await apiFetch(`${API_URL}/user/init`);
-                const data = await res.json();
-                if (data.success) pointsEl.textContent = data.points;
-              } catch(e) {}
-            }, 30000);
-          }
-        } else {
-          stopMining();
+            if (profile) profile.style.display = "block";
+            if (subscribe) subscribe.style.display = "none";
         }
-      } catch (error) {
-        console.error("فشل بدء التعدين:", error);
-        stopMining();
-        profitInfoEl.textContent = "❌ تأكد من تشغيل server.js";
-      }
-    }
-
-    async function watchAd() {
-      adBtn.innerHTML = "⏳ جاري عرض الإعلان...";
-      adBtn.disabled = true;
-      setTimeout(async () => {
-        try {
-          const res = await apiFetch(`${API_URL}/ad/watch`, { method: 'POST' });
-          const data = await res.json();
-          if(data.success) {
-            pointsEl.textContent = data.points;
-            adBtn.innerHTML = "✅ تمت إضافة 10 نقاط!";
-            adBtn.style.background = "rgba(34, 197, 94, 0.2)";
-            adBtn.style.borderColor = "#22c55e";
-            setTimeout(() => {
-              adBtn.innerHTML = "📺 شاهد إعلان (+10 نقاط)";
-              adBtn.disabled = false;
-              adBtn.style.background = "";
-              adBtn.style.borderColor = "";
-            }, 3000);
-          }
-        } catch(e) { 
-          console.error("فشل مشاهدة الإعلان:", e.message);
-          adBtn.innerHTML = "📺 شاهد إعلان (+10 نقاط)";
-          adBtn.disabled = false;
-        }
-      }, 3000);
-    }
-
-    function updateTimer() {
-      if (!isMining) return;
-      const now = Date.now();
-      const elapsedMs = now - startTime;
-      const elapsedSeconds = elapsedMs / 1000;
-      const elapsed = Math.min(elapsedSeconds, CYCLE_SECONDS);
-      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-      const s = String(Math.floor(elapsed % 60)).padStart(2, '0');
-      timerEl.textContent = `${h}:${m}:${s}`;
-      updateRing(elapsedSeconds);
-      if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
-        sessionDone = true;
-        isMining = false;
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-        timerEl.textContent = '24:00:00';
-        balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
-        updateRing(CYCLE_SECONDS);
-        profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
-        startBtn.disabled = false;
-        startBtn.innerText = '⛏️ بدء دورة جديدة';
-      }
-    }
-
-    const termsContent = {
-      terms: `<h2>📋 الشروط والأحكام</h2><p>يتم جمع النقاط والإيداعات لتحضير توزيع عملة X Plus الرسمية.</p>`,
-      privacy: `<h2>🔐 سياسة الخصوصية</h2><p>نحترم خصوصيتك ونحمي بياناتك.</p>`
-    };
-    
-    function openTerms(type) {
-      document.getElementById('termsBody').innerHTML = termsContent[type];
-      document.getElementById('termsModal').classList.add('active');
-    }
-    
-    function closeTerms() { 
-      document.getElementById('termsModal').classList.remove('active'); 
-    }
-    
-    document.getElementById('termsModal').addEventListener('click', (e) => { 
-      if (e.target.id === 'termsModal') closeTerms(); 
-    });
-
-    /* ═══════════════════════════════════════════════════════════
-       💰 فتح المحفظة مباشرة — بدون أي ربط بالتسجيل
-       سطر واحد فقط: يفتح wallet.html في نافذة جديدة
-    ═══════════════════════════════════════════════════════════ */
-    function openWallet(event) {
-      if (event) event.preventDefault();
-      window.open('wallet.html', '_blank');
-    }
-    /* ================= SIDEBAR CONTROL ================= */
-
-    const sidebarToggle = document.getElementById("sidebarToggle");
-    const leftSidebar = document.getElementById("leftSidebar");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-    function openSidebar() {
-      leftSidebar.classList.add("active");
-      sidebarOverlay.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeSidebar() {
-      leftSidebar.classList.remove("active");
-      sidebarOverlay.classList.remove("active");
-      document.body.style.overflow = "";
-    }
-
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener("click", openSidebar);
-    }
-
-    if (sidebarOverlay) {
-      sidebarOverlay.addEventListener("click", closeSidebar);
-    }
-
-    /* ================= END SIDEBAR CONTROL ================= */
-
-  
-function logoutUser() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("auth_token");
-  window.location.href = "login-user.html";
-}
-
-</script>
-
+    </script>
 
 </body>
 </html>
-<script>
-document.getElementById("sidebarLogout")?.addEventListener("click", function () {
-    localStorage.removeItem("token");
-    localStorage.removeItem("auth_token");
-    window.location.href = "login-user.html";
-});
-</script>

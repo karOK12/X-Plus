@@ -3,7 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const nodemailer = require("nodemailer");
 
 const pool = require("./server/config/database");
 const auth = require("./server/middleware/auth");
@@ -23,6 +22,10 @@ const app = express();
 // ══════════════════════════════════════════════════════
 
 app.use(cors());
+app.use("/api", (req, res, next) => {
+  console.log("🌐 API REQUEST:", req.method, req.originalUrl);
+  next();
+});
 
 app.use(
     express.json({
@@ -80,66 +83,6 @@ app.get("/", (req, res) => {
     );
 
 });
-
-
-// ══════════════════════════════════════════════════════
-// SMTP
-// ══════════════════════════════════════════════════════
-
-const transporter =
-    nodemailer.createTransport({
-
-        host: process.env.SMTP_HOST,
-
-        port: Number(
-            process.env.SMTP_PORT || 587
-        ),
-
-        secure: false,
-
-        auth: {
-
-            user: process.env.SMTP_USER,
-
-            pass: process.env.SMTP_PASS
-
-        }
-
-    });
-
-
-if (
-    process.env.SMTP_HOST &&
-    process.env.SMTP_USER &&
-    process.env.SMTP_PASS
-) {
-
-    transporter.verify()
-
-        .then(() => {
-
-            console.log(
-                "✅ SMTP Ready"
-            );
-
-        })
-
-        .catch((error) => {
-
-            console.log(
-                "❌ SMTP Error:",
-                error.message
-            );
-
-        });
-
-} else {
-
-    console.log(
-        "⚠️ SMTP environment variables are not configured"
-    );
-
-}
 
 
 // ══════════════════════════════════════════════════════

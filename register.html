@@ -770,7 +770,7 @@ async function sendOTP() {
     sessionStorage.setItem('pendingVerification', JSON.stringify({
       email: contact,
       twoFA: state.form.twoFA,
-      returnUrl: '/register.html'
+      returnUrl: '/login.html'
     }));
 
     sessionStorage.removeItem('otpVerified');
@@ -913,7 +913,7 @@ async function saveData(autoAfterVerify = false) {
     setTimeout(() => {
       // بعد اكتمال التسجيل والـ OTP والبيانات
       // العودة دائماً إلى واجهة تسجيل الدخول
-      window.location.href = '/login-user.html';
+      window.location.href = '/login.html';
     }, 1500);
     
   } catch (err) {

@@ -2,25 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const pool = require("../config/database");
 const auth = require("../middleware/auth");
 const Otp = require("../models/Otp");
-
-
-// ===============================
-// إعداد البريد
-// ===============================
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
 
 
 // ===============================
@@ -66,10 +53,15 @@ router.post("/otp/send-data", auth, async (req, res) => {
       new Date(Date.now() + 10 * 60 * 1000)
     );
 
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: user.email,
+    const { data, error } = await resend.emails.send({
+      from: "X Plus <no-reply@xplus.fun>",
+      to: [user.email],
       subject: "رمز التحقق - X Plus",
+      text: `مرحباً ${user.username}
+
+رمز التحقق لتحديث بياناتك في X Plus: ${otp}
+
+صلاحية الرمز 10 دقائق.`,
       html: `
         <div style="font-family:Arial;direction:rtl;padding:20px">
           <h2>مرحباً ${user.username}</h2>
@@ -91,6 +83,16 @@ router.post("/otp/send-data", auth, async (req, res) => {
           <p>صلاحية الرمز: 10 دقائق</p>
         </div>
       `
+    });
+
+    if (error) {
+      console.error("❌ PROFILE RESEND ERROR:", error);
+      throw new Error(error.message || "Resend email failed");
+    }
+
+    console.log("📧 Profile OTP sent:", {
+      id: data?.id,
+      to: user.email
     });
 
     console.log(`📧 Profile OTP sent to ${user.email}`);

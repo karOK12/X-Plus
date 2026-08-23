@@ -412,19 +412,17 @@ async function verifyOTP() {
 
       setTimeout(() => {
         window.location.href =
-          '/login-user.html';
+          '/login.html';
       }, 700);
 
       return;
     }
 
-    // حفظ جلسة المستخدم بعد نجاح التحقق
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      localStorage.removeItem('auth_token');
-    }
-
-    sessionStorage.setItem('otpVerified', 'true');
+    // لا يتم تسجيل الدخول تلقائياً بعد التسجيل
+    // المستخدم يرجع إلى login.html ويسجل الدخول يدوياً
+    localStorage.removeItem("token");
+    localStorage.removeItem("auth_token");
+    sessionStorage.setItem("otpVerified", "true");
 
     if (timerInterval) {
       clearInterval(timerInterval);
@@ -437,7 +435,7 @@ async function verifyOTP() {
     showAlert('✓ تم التحقق بنجاح', 'success');
 
     setTimeout(() => {
-      window.location.href = pending.returnUrl || '/user-data.html';
+      window.location.href = '/register.html';
     }, 700);
 
   } catch (error) {
@@ -455,7 +453,7 @@ async function verifyOTP() {
 }
 
 function goBack() {
-  window.location.href = '/user-data.html';
+  window.location.href = '/register.html';
 }
 
 const pending = JSON.parse(
