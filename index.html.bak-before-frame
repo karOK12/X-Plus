@@ -43,6 +43,9 @@
             direction: ltr;
         }
 
+        /* =========================
+           LOGO
+        ========================= */
         .logo-container {
             display: flex;
             align-items: center;
@@ -64,6 +67,9 @@
             font-weight: bold;
         }
 
+        /* =========================
+           SEARCH
+        ========================= */
         .search-box {
             flex: 1;
             max-width: 500px;
@@ -89,6 +95,9 @@
             border-color: #2563eb;
         }
 
+        /* =========================
+           ACTIONS
+        ========================= */
         .actions {
             display: flex;
             align-items: center;
@@ -96,6 +105,9 @@
             min-width: 150px;
         }
 
+        /* =========================
+           BUTTON
+        ========================= */
         .btn {
             padding: 10px 20px;
             border-radius: 8px;
@@ -117,6 +129,9 @@
             transform: translateY(-1px);
         }
 
+        /* =========================
+           PROFILE
+        ========================= */
         .profile {
             display: none;
         }
@@ -133,11 +148,11 @@
         ========================= */
         .hero {
             text-align: center;
-            padding: 50px 20px 40px; /* تم تقليل الـ padding العلوي لأن الإعلان أصبح فوقه */
+            padding: 70px 20px 40px;
         }
 
         .hero h1 {
-            margin-top: 10px;
+            margin-top: 30px;
             margin-bottom: 15px;
             font-size: 34px;
         }
@@ -154,30 +169,28 @@
         }
 
         /* =========================
-           MOVING IMAGE ADS MARQUEE (FULL WIDTH)
+           MOVING IMAGE ADS MARQUEE
         ========================= */
         .youtube-ad-marquee {
             width: 100%;
-            max-width: 100%; /* إزالة الحد الأقصى ليملأ الشاشة */
-            margin: 0 0 30px 0; /* إزالة المحاذاة من الجوانب */
+            max-width: 1100px;
+            margin: 0 auto 30px;
             overflow: hidden;
             background: #111827;
-            border-top: 1px solid #273244; /* إطار علوي فقط */
-            border-bottom: 1px solid #273244; /* إطار سفلي فقط */
-            border-radius: 0; /* إزالة الزوايا الدائرية ليصل إلى الحافة تماماً */
-            padding: 20px 0;
+            border: 1px solid #273244;
+            border-radius: 12px;
+            padding: 15px 0;
             direction: ltr;
             position: relative;
         }
 
-        /* تأثير التلاشي على الأطراف */
         .youtube-ad-marquee::before,
         .youtube-ad-marquee::after {
             content: "";
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 100px;
+            width: 80px;
             z-index: 2;
             pointer-events: none;
         }
@@ -370,7 +383,7 @@
             }
 
             .hero {
-                padding-top: 30px;
+                padding-top: 45px;
             }
 
             .hero h1 {
@@ -409,7 +422,7 @@
             }
 
             .hero {
-                padding: 25px 15px;
+                padding: 35px 15px;
             }
 
             .hero h1 {
@@ -460,7 +473,8 @@
         </div>
 
         <div class="actions">
-            <a href="/login.html" class="btn subscribe" id="subscribeBtn">اشتراك</a>
+            <!-- ✅ تم تعديل الرابط هنا ليوجه إلى login.html -->
+            <a href="login.html" class="btn subscribe">اشتراك</a>
             
             <div class="profile" id="profile">
                 <img src="/assets/images/default.png" alt="user">
@@ -472,63 +486,61 @@
          MAIN
     ========================== -->
     <main>
-
-        <!-- =========================
-             إعلان محتوى متحرك (صور) - تم نقله هنا ليأخذ عرض الشاشة الكامل من الحافة للحافة
-        ========================== -->
-        <div class="youtube-ad-marquee">
-            <div class="marquee-track">
-                
-                <!-- المجموعة الأولى -->
-                <div class="marquee-group">
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/2563eb/ffffff?text=Premium+Service" alt="إعلان 1">
-                        <div class="ad-text">🔥 اكتشف أحدث خدمات X Plus المميزة</div>
-                    </div>
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/22c55e/ffffff?text=Music+Streaming" alt="إعلان 2">
-                        <div class="ad-text">🎵 استمتع بالموسيقى والمحتوى المتنوع</div>
-                    </div>
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/ef4444/ffffff?text=Latest+News" alt="إعلان 3">
-                        <div class="ad-text">📰 تابع آخر الأخبار والتحديثات الحصرية</div>
-                    </div>
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/f59e0b/ffffff?text=Digital+Tools" alt="إعلان 4">
-                        <div class="ad-text">🚀 أدوات رقمية سريعة وسهلة الاستخدام</div>
-                    </div>
-                </div>
-                
-                <!-- المجموعة الثانية (نسخة طبق الأصل لضمان حركة لانهائية سلسة) -->
-                <div class="marquee-group">
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/2563eb/ffffff?text=Premium+Service" alt="إعلان 1">
-                        <div class="ad-text">🔥 اكتشف أحدث خدمات X Plus المميزة</div>
-                    </div>
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/22c55e/ffffff?text=Music+Streaming" alt="إعلان 2">
-                        <div class="ad-text">🎵 استمتع بالموسيقى والمحتوى المتنوع</div>
-                    </div>
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/ef4444/ffffff?text=Latest+News" alt="إعلان 3">
-                        <div class="ad-text">📰 تابع آخر الأخبار والتحديثات الحصرية</div>
-                    </div>
-                    <div class="ad-card">
-                        <img src="https://placehold.co/300x150/f59e0b/ffffff?text=Digital+Tools" alt="إعلان 4">
-                        <div class="ad-text">🚀 أدوات رقمية سريعة وسهلة الاستخدام</div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- =========================
-             HERO
-        ========================== -->
         <section class="hero">
+
+            <!-- =========================
+                 إعلان محتوى متحرك (صور)
+            ========================== -->
+            <div class="youtube-ad-marquee">
+                <div class="marquee-track">
+                    
+                    <!-- المجموعة الأولى -->
+                    <div class="marquee-group">
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/2563eb/ffffff?text=Premium+Service" alt="إعلان 1">
+                            <div class="ad-text">🔥 اكتشف أحدث خدمات X Plus المميزة</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/22c55e/ffffff?text=Music+Streaming" alt="إعلان 2">
+                            <div class="ad-text">🎵 استمتع بالموسيقى والمحتوى المتنوع</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/ef4444/ffffff?text=Latest+News" alt="إعلان 3">
+                            <div class="ad-text">📰 تابع آخر الأخبار والتحديثات الحصرية</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/f59e0b/ffffff?text=Digital+Tools" alt="إعلان 4">
+                            <div class="ad-text">🚀 أدوات رقمية سريعة وسهلة الاستخدام</div>
+                        </div>
+                    </div>
+                    
+                    <!-- المجموعة الثانية (نسخة طبق الأصل لضمان حركة لانهائية سلسة) -->
+                    <div class="marquee-group">
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/2563eb/ffffff?text=Premium+Service" alt="إعلان 1">
+                            <div class="ad-text">🔥 اكتشف أحدث خدمات X Plus المميزة</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/22c55e/ffffff?text=Music+Streaming" alt="إعلان 2">
+                            <div class="ad-text">🎵 استمتع بالموسيقى والمحتوى المتنوع</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/ef4444/ffffff?text=Latest+News" alt="إعلان 3">
+                            <div class="ad-text">📰 تابع آخر الأخبار والتحديثات الحصرية</div>
+                        </div>
+                        <div class="ad-card">
+                            <img src="https://placehold.co/300x150/f59e0b/ffffff?text=Digital+Tools" alt="إعلان 4">
+                            <div class="ad-text">🚀 أدوات رقمية سريعة وسهلة الاستخدام</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <h1>🌟 مرحباً بكم في X Plus 👋</h1>
             <p>منصتك الرقمية لإدارة ومتابعة خدماتك</p>
             <p id="reference"></p>
+
         </section>
 
         <!-- =========================
@@ -627,35 +639,16 @@
             referenceElement.style.display = "block";
         }
 
-        const logoutBtn = document.getElementById("logoutBtn");
-        const subscribeBtn = document.getElementById("subscribeBtn");
+        const token = localStorage.getItem("token");
 
-        // زر تسجيل الخروج يعمل دائمًا
-        if (logoutBtn) {
-            logoutBtn.style.display = "inline-flex";
-            logoutBtn.style.position = "relative";
-            logoutBtn.style.zIndex = "999999";
-            logoutBtn.style.pointerEvents = "auto";
-            logoutBtn.style.touchAction = "manipulation";
+        if (token) {
+            const profile = document.getElementById("profile");
+            const subscribe = document.querySelector(".subscribe");
 
-            logoutBtn.addEventListener("click", function (event) {
-                alert("LOGOUT CLICK");
-                event.preventDefault();
-                event.stopPropagation();
-
-                localStorage.removeItem("token");
-                localStorage.removeItem("auth_token");
-                sessionStorage.clear();
-
-                window.location.href = "/login.html";
-            });
+            if (profile) profile.style.display = "block";
+            if (subscribe) subscribe.style.display = "none";
         }
-
-        // زر الاشتراك يبقى موجودًا
-        if (subscribeBtn) {
-            subscribeBtn.style.display = "inline-flex";
-        }
-</script>
+    </script>
 
 </body>
 </html>

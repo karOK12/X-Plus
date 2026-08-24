@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="X Plus - منصة التعدين السحابي الاحترافية">
+  <title>X Plus - منصة التعدين السحابي</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+
+  <style>
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { 
+      overflow-x: hidden; 
+      overflow-y: auto; 
+      min-height: 100vh; 
+      background: #0b0f1a; 
+      color: #f8fafc;
+      font-family: 'Cairo', sans-serif;
+    }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    .logo-icon-svg { 
+      width: 28px; 
+      height: 28px; 
+      color: #3b82f6; 
+      transition: all 0.3s ease;
+    }
+    .logo:hover .logo-icon-svg {
+      color: #fbbf24;
+      transform: scale(1.1) rotate(-5deg);
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+    }
+    .logo {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: white;
+    }
+    .logo-text { font-size: 20px; font-weight: 800; }
+    .logo-tooltip {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fbbf24;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    .logo:hover .logo-tooltip { opacity: 1; }
+
+    .navbar { background: #111827; border-bottom: 1px solid #273244; padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
+    .nav-wrapper { display: flex; align-items: center; justify-content: space-between; }
+    
+    .nav-menu { display: flex; list-style: none; gap: 25px; margin: 0; padding: 0; }
+    .nav-link { color: #94a3b8; text-decoration: none; font-weight: 600; transition: 0.3s; }
+    .nav-link:hover { color: #3b82f6; }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-auth-btn {
+      text-decoration: none;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .login-btn { color: #e2e8f0; background: #1f2937; border: 1px solid #374151; }
+    .login-btn:hover { background: #374151; transform: translateY(-1px); }
+    .register-btn {
+      color: white;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+    }
+    .register-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 20px rgba(59, 130, 246, 0.35);
+    }
+
+    /* ================= LEFT SIDEBAR (تم إصلاح البياض) ================= */
+    .sidebar-toggle {
+      position: absolute;
+      left: 0;
+      top: 25%;
+      transform: translateY(-50%);
+      margin: 0;
+      width: 38px;
+      height: 38px;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      background: #1f2937;
+      color: #e2e8f0;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .25s ease;
+    }
+    .sidebar-toggle:hover { background: #374151; }
+
+    .left-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 285px;
+      max-width: 82vw;
+      height: 100vh;
+      background: #111827; /* تم التغيير من الأبيض إلى الداكن */
+      box-shadow: 8px 0 30px rgba(0, 0, 0, 0.5);
+      z-index: 99999;
+      transform: translateX(-105%);
+      transition: transform .3s ease;
+      direction: rtl;
+      padding: 18px 14px;
+      overflow-y: auto;
+      border-right: 1px solid #273244;
+    }
+    .left-sidebar.active { transform: translateX(0); }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 4px 14px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #273244;
+      color: #f8fafc;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .sidebar-items { display: flex; flex-direction: column; gap: 6px; }
+
+    .sidebar-item {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid #273244;
+      border-radius: 10px;
+      background: #1f2937; /* تم التغيير من الأبيض إلى الداكن */
+      color: #e2e8f0;
+      text-decoration: none;
+      font-family: "Cairo", sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: right;
+      transition: .2s ease;
+    }
+    .sidebar-item:hover {
+      background: #2563eb20;
+      border-color: #3b82f6;
+      color: #60a5fa;
+      transform: translateX(2px);
+    }
+
+    .sidebar-icon { width: 26px; text-align: center; font-size: 17px; flex-shrink: 0; }
+
+    .sidebar-logout {
+      color: #f87171;
+      background: #450a0a20;
+      border-color: #7f1d1d40;
+    }
+    .sidebar-logout:hover {
+      background: #7f1d1d40;
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 99998;
+      opacity: 0;
+      visibility: hidden;
+      transition: .3s ease;
+      backdrop-filter: blur(4px);
+    }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    /* ================= HERO & MINING ================= */
+    .hero { padding: 60px 0; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px;
+    }
+    .badge-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .hero-title { font-size: 34px; font-weight: 800; line-height: 1.3; margin-bottom: 15px; color: #f8fafc; }
+    .gradient-text { background: linear-gradient(90deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-description { color: #94a3b8; font-size: 16px; line-height: 1.7; margin-bottom: 30px; }
+
+    .hero-stats { display: flex; gap: 30px; margin-top: 30px; }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 24px; font-weight: 800; color: #f8fafc; }
+    .stat-label { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+    .stat-divider { width: 1px; background: #273244; }
+
+    .mining-card-wrapper { width: 100%; max-width: 520px; margin: 0 auto; }
+    .mining-card { 
+      padding: 24px; border-radius: 22px; 
+      background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%); 
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.15); 
+      backdrop-filter: blur(10px); position: relative; color: white; 
+    }
+    .mining-card::before { 
+      content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; 
+      background: linear-gradient(135deg, #3b82f6, #06b6d4, #3b82f6); 
+      border-radius: 24px; z-index: -1; opacity: 0.3; 
+    }
+    .mining-row { display: flex; justify-content: flex-start; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .mining-circle { 
+      width: 140px; height: 140px; border-radius: 50%; 
+      background: radial-gradient(circle, #1e293b, #0f172a); 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); position: relative; flex-shrink: 0; 
+    }
+    .mining-right { flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; min-width: 200px; }
+    
+    .progress-ring { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+    .progress-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 6; }
+    .progress-bar { fill: none; stroke: #3b82f6; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.2s linear; }
+    .progress-dot {
+      fill: #3b82f6;
+      filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.9));
+      animation: dotGlow 2s ease-in-out infinite;
+    }
+    @keyframes dotGlow {
+      0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8)); }
+      50%      { filter: drop-shadow(0 0 11px rgba(59, 130, 246, 1)); }
+    }
+    
+    .timer { font-size: 20px; font-weight: bold; color: #3b82f6; font-variant-numeric: tabular-nums; direction: ltr; }
+    .sub { font-size: 10px; opacity: 0.6; letter-spacing: 1px; color: #94a3b8; }
+    
+    .balance-container, .power-container, .rate-container, .points-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .balance-label, .power-label, .rate-label, .points-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+    .balance { font-size: 22px; font-weight: bold; color: #a78bfa; font-variant-numeric: tabular-nums; direction: ltr; }
+    .points { font-size: 18px; font-weight: bold; color: #fbbf24; font-variant-numeric: tabular-nums; direction: ltr; }
+    .power { font-size: 14px; color: #4ade80; font-variant-numeric: tabular-nums; direction: ltr; }
+    .rate { font-size: 13px; color: #fbbf24; font-weight: bold; font-variant-numeric: tabular-nums; direction: ltr; }
+    .profit-info { font-size: 10px; color: #94a3b8; text-align: right; opacity: 0.7; direction: ltr; }
+    
+    .adBtn { 
+      width: 100%; padding: 8px; border-radius: 10px; 
+      background: rgba(255,255,255,0.05); color: white; 
+      border: 1px solid rgba(255,255,255,0.1); cursor: pointer; margin-top: 4px; 
+      font-family: 'Cairo', sans-serif; font-size: 13px; transition: all 0.3s; 
+    }
+    .adBtn:hover { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
+    
+    .mineBtn { 
+      width: 100%; margin-top: 16px; padding: 14px; border: none; border-radius: 12px; 
+      background: linear-gradient(90deg, #3b82f6, #06b6d4); color: white; 
+      font-weight: bold; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 15px; 
+      transition: all 0.3s; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); 
+    }
+    .mineBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(59, 130, 246, 0.5); }
+    .mineBtn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    /* ================= أقسام جديدة مضافة ================= */
+    .section { padding: 60px 0; border-top: 1px solid #1f2937; }
+    .section-header { text-align: center; margin-bottom: 40px; }
+    .section-badge { 
+      display: inline-block; background: rgba(251, 191, 36, 0.1); color: #fbbf24; 
+      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; 
+      margin-bottom: 10px; border: 1px solid rgba(251, 191, 36, 0.2); 
+    }
+    .section-title { font-size: 28px; font-weight: 800; color: #f8fafc; margin: 0; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 60px; }
+    .stat-card { background: #111827; border: 1px solid #273244; border-radius: 16px; padding: 24px; text-align: center; transition: 0.3s; }
+    .stat-card:hover { border-color: #3b82f6; transform: translateY(-5px); }
+    .stat-card-icon { font-size: 32px; margin-bottom: 15px; }
+    .stat-card-value { font-size: 28px; font-weight: 800; color: #f8fafc; margin-bottom: 5px; }
+    .stat-card-label { color: #94a3b8; font-size: 14px; }
+
+    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+    .plan-card { background: #111827; border: 1px solid #273244; border-radius: 16px; padding: 30px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
+    .plan-card.featured { border-color: #fbbf24; box-shadow: 0 0 30px rgba(251, 191, 36, 0.1); }
+    .plan-card.featured::before { content: 'الأكثر طلباً'; position: absolute; top: 15px; left: -30px; background: #fbbf24; color: #000; padding: 4px 30px; font-size: 11px; font-weight: 800; transform: rotate(-45deg); }
+    .plan-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
+    .plan-name { font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
+    .plan-price { font-size: 32px; font-weight: 800; color: #3b82f6; margin-bottom: 20px; }
+    .plan-price span { font-size: 14px; color: #94a3b8; font-weight: 400; }
+    .plan-features { list-style: none; padding: 0; margin: 0 0 25px 0; text-align: right; }
+    .plan-features li { padding: 8px 0; color: #cbd5e1; font-size: 14px; border-bottom: 1px solid #1f2937; display: flex; align-items: center; gap: 8px; }
+    .plan-features li i { color: #22c55e; font-size: 12px; }
+    .plan-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #3b82f6; background: transparent; color: #3b82f6; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; }
+    .plan-btn:hover, .plan-card.featured .plan-btn { background: #3b82f6; color: white; }
+
+    .activity-list { background: #111827; border: 1px solid #273244; border-radius: 16px; overflow: hidden; }
+    .activity-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1f2937; transition: 0.2s; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: #1f293750; }
+    .activity-info { display: flex; align-items: center; gap: 15px; }
+    .activity-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .activity-icon.success { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    .activity-title { font-size: 14px; font-weight: 600; color: #f8fafc; }
+    .activity-time { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .activity-amount { font-size: 15px; font-weight: 700; color: #22c55e; direction: ltr; }
+
+    /* ================= Modal (تم إصلاح البياض) ================= */
+    .terms-modal { 
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+      background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px; 
+      backdrop-filter: blur(5px);
+    }
+    .terms-modal.active { display: flex; }
+    .terms-content { 
+      background: #111827; /* تم التغيير من الأبيض إلى الداكن */
+      border: 1px solid #273244;
+      border-radius: 16px; max-width: 400px; width: 90%; max-height: 70vh; 
+      overflow-y: auto; padding: 15px; position: relative; color: #e2e8f0;
+    }
+    .terms-close { 
+      position: absolute; top: 10px; left: 10px; 
+      background: #1f2937; border: 1px solid #374151;
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer; 
+      font-size: 14px; color: #94a3b8; transition: all 0.3s; 
+      display: flex; align-items: center; justify-content: center;
+    }
+    .terms-close:hover { background: #ef4444; border-color: #ef4444; color: white; }
+    .terms-content h2 { color: #f8fafc; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #3b82f6; font-size: 16px; }
+    .terms-content h3 { color: #cbd5e1; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
+    .terms-content p { color: #94a3b8; line-height: 1.5; margin-bottom: 8px; font-size: 12px; }
+    .terms-content ul { padding-right: 15px; color: #94a3b8; font-size: 12px; }
+    .terms-content li { margin-bottom: 4px; }
+
+    .footer { padding: 30px 0; text-align: center; background: #0f172a; border-top: 1px solid #1f2937; color: #64748b; font-size: 14px; }
+
+    @media (max-width: 768px) {
+      .nav-menu { 
+        position: absolute; top: 100%; right: 0; left: 0; 
+        background: #111827; flex-direction: column; padding: 20px; 
+        box-shadow: 0 10px 15px rgba(0,0,0,0.3); display: none; z-index: 100; 
+      }
+      .nav-menu.active { display: flex; }
+      .nav-menu li { margin: 10px 0; width: 100%; text-align: center; }
+      .hero-content { flex-direction: column !important; text-align: center; }
+      .mining-row { flex-direction: column; align-items: center; }
+      .mining-right { align-items: center; text-align: center; }
+      .balance-container, .power-container, .rate-container, .points-container { align-items: center; }
+      .sidebar-toggle { width: 36px; height: 36px; font-size: 18px; }
+      .left-sidebar { width: 270px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-wrapper">
+        <a href="#" class="logo" onclick="openWallet(event)" title="💰 افتح المحفظة">
+          <svg class="logo-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span class="logo-text">X Plus</span>
+          <span class="logo-tooltip">💰 افتح المحفظة</span>
+        </a>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#hero" class="nav-link">الرئيسية</a></li>
+          <li><a href="#stats" class="nav-link">الإحصائيات</a></li>
+          <li><a href="#plans" class="nav-link">خطط التعدين</a></li>
+          <li><a href="#activity" class="nav-link">السجل</a></li>
+        </ul>
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="فتح الشريط الجانبي">☰</button>
+
+        <aside class="left-sidebar" id="leftSidebar">
+          <div class="sidebar-header">
+            <span>القائمة</span>
+            <button onclick="closeSidebar()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:20px;">✕</button>
+          </div>
+          <div class="sidebar-items">
+            <a href="profile.html" class="sidebar-item">
+              <span class="sidebar-icon">👤</span>
+              <span>الملف الشخصي</span>
+            </a>
+            <a href="wallet.html" class="sidebar-item">
+              <span class="sidebar-icon">💰</span>
+              <span>المحفظة الرقمية</span>
+            </a>
+            <a href="edit-profile.html" class="sidebar-item">
+              <span class="sidebar-icon">✏️</span>
+              <span>تعديل الملف الشخصي</span>
+            </a>
+            <a href="account-settings.html" class="sidebar-item">
+              <span class="sidebar-icon">⚙️</span>
+              <span>إعدادات الحساب</span>
+            </a>
+            <a href="rating.html" class="sidebar-item">
+              <span class="sidebar-icon">⭐</span>
+              <span>تقييم التطبيق</span>
+            </a>
+            <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
+              <span class="sidebar-icon">🚪</span>
+              <span>تسجيل الخروج</span>
+            </button>
+          </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+      </div>
+    </div>
+  </nav>
+
+  <section id="hero" class="hero">
+    <div class="container">
+      <div class="hero-content" style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px; justify-content: space-between;">
+        <div style="flex: 1; min-width: 300px;">
+          <div class="hero-badge"><span class="badge-dot"></span><span>منصة موثوقة ومعتمدة</span></div>
+          <h1 class="hero-title">ابدأ رحلتك في عالم <span class="gradient-text">التعدين السحابي</span> مع X Plus</h1>
+          <p class="hero-description">اجمع النقاط وشاهد إعلاناتك، وقم بالإيداع الحقيقي لبدء التعدين. سيتم تحويل نقاطك إلى عملة X Plus عند الإطلاق الرسمي.</p>
+          <div class="hero-stats">
+            <div class="stat-item"><div class="stat-value">+50K</div><div class="stat-label">مستخدم نشط</div></div>
+            <div class="stat-divider"></div>
+            <div class="stat-item"><div class="stat-value">$120M+</div><div class="stat-label">أرباح مدفوعة</div></div>
+          </div>
+        </div>
+        
+        <div style="flex: 1; min-width: 320px;" class="mining-card-wrapper">
+          <div class="mining-card">
+            <div class="mining-row">
+              <div class="mining-circle">
+                <svg class="progress-ring" width="140" height="140">
+                  <circle class="progress-bg" cx="70" cy="70" r="62"></circle>
+                  <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
+                  <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
+                </svg>
+                <div class="timer" id="timer">00:00:00</div>
+                <div class="sub">MINING</div>
+              </div>
+
+              <div class="mining-right">
+                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.00000000</div></div>
+                <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
+                <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
+                <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
+                <div class="profit-info" id="profitInfo">⏱️ جاهز للبدء</div>
+                <button class="adBtn" id="adBtn" onclick="watchAd()">📺 شاهد إعلان (+10 نقاط)</button>
+              </div>
+            </div>
+            <button id="startBtn" class="mineBtn" onclick="startMining()">⛏️ ابدأ التعدين الآن</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم جديد: إحصائيات الشبكة -->
+  <section id="stats" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">بيانات حية</div>
+        <h2 class="section-title">إحصائيات شبكة X Plus</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon">⚡</div>
+          <div class="stat-card-value">45.2 PH/s</div>
+          <div class="stat-card-label">معدل التجزئة العالمي</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-card-value">12,450</div>
+          <div class="stat-card-label">معدّن نشط حالياً</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🏆</div>
+          <div class="stat-card-value">04:12:30</div>
+          <div class="stat-card-label">الوقت حتى المكافأة التالية</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم جديد: خطط التعدين -->
+  <section id="plans" class="section" style="background: #0f172a;">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">ترقية الحساب</div>
+        <h2 class="section-title">اختر خطة التعدين المناسبة لك</h2>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card">
+          <div class="plan-name">خطة المبتدئ</div>
+          <div class="plan-price">مجاناً</div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> قوة تعدين أساسية (150 H/s)</li>
+            <li><i class="fas fa-check"></i> سحب أرباح أسبوعي</li>
+            <li><i class="fas fa-check"></i> دعم فني عبر البريد</li>
+          </ul>
+          <button class="plan-btn">الخطة الحالية</button>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-name">خطة المحترف</div>
+          <div class="plan-price">$49 <span>/ شهرياً</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> قوة تعدين متقدمة (2,500 H/s)</li>
+            <li><i class="fas fa-check"></i> سحب أرباح يومي</li>
+            <li><i class="fas fa-check"></i> مكافآت إحالة مضاعفة</li>
+            <li><i class="fas fa-check"></i> دعم فني مباشر 24/7</li>
+          </ul>
+          <button class="plan-btn">ترقية الآن</button>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">خطة النخبة</div>
+          <div class="plan-price">$199 <span>/ شهرياً</span></div>
+          <ul class="plan-features">
+            <li><i class="fas fa-check"></i> قوة تعدين فائقة (15,000 H/s)</li>
+            <li><i class="fas fa-check"></i> سحب فوري بدون حدود</li>
+            <li><i class="fas fa-check"></i> مدير حساب خاص</li>
+            <li><i class="fas fa-check"></i> أولوية في توزيع المكافآت</li>
+          </ul>
+          <button class="plan-btn">ترقية الآن</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم جديد: سجل العمليات -->
+  <section id="activity" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">آخر التحديثات</div>
+        <h2 class="section-title">سجل العمليات الأخيرة</h2>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-info">
+            <div class="activity-icon success"><i class="fas fa-arrow-down"></i></div>
+            <div>
+              <div class="activity-title">تم إيداع بنجاح</div>
+              <div class="activity-time">منذ 2 ساعة</div>
+            </div>
+          </div>
+          <div class="activity-amount">+ 0.00450000 X+</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-info">
+            <div class="activity-icon"><i class="fas fa-tv"></i></div>
+            <div>
+              <div class="activity-title">مكافأة مشاهدة إعلان</div>
+              <div class="activity-time">منذ 5 ساعات</div>
+            </div>
+          </div>
+          <div class="activity-amount" style="color: #fbbf24;">+ 10 Points</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-info">
+            <div class="activity-icon success"><i class="fas fa-hammer"></i></div>
+            <div>
+              <div class="activity-title">اكتمال دورة تعدين (24 ساعة)</div>
+              <div class="activity-time">أمس</div>
+            </div>
+          </div>
+          <div class="activity-amount">+ 0.00125000 X+</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 X Plus. جميع الحقوق محفوظة. منصة التعدين السحابي الرائدة.</p>
+      <div style="margin-top: 10px; display: flex; justify-content: center; gap: 20px;">
+        <a href="#" onclick="openTerms('terms')" style="color: #64748b; text-decoration: none; font-size: 13px;">الشروط والأحكام</a>
+        <a href="#" onclick="openTerms('privacy')" style="color: #64748b; text-decoration: none; font-size: 13px;">سياسة الخصوصية</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="terms-modal" id="termsModal">
+    <div class="terms-content">
+      <button class="terms-close" onclick="closeTerms()">✕</button>
+      <div id="termsBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= JavaScript الأصلي بنسبة 100% بدون أي تغيير ================= -->
+  <script>
+    const RING_CX = 70;
+    const RING_CY = 70;
+    const RING_R  = 62;
+    const RING_CIRC = 2 * Math.PI * RING_R;
+    
+    const CYCLE_SECONDS = 86400;
+    const RING_CYCLE    = 60;
+    const SCALE = 100000000;
+    
+    let balanceScaled = 0;
+    let currentPower = 150.50;
+    let isMining = false;
+    let sessionDone = false;
+    let startTime = 0;
+    let timerInterval = null;
+    let balanceInterval = null;
+    let lastSecond = -1;
+    let lastBalanceSecond = -1;
+
+    function formatScaled(scaled) {
+      const isNeg = scaled < 0;
+      const abs = Math.abs(scaled);
+      const intPart = Math.floor(abs / SCALE);
+      const fracPart = (abs % SCALE).toString().padStart(8, '0');
+      return (isNeg ? '-' : '') + intPart + '.' + fracPart;
+    }
+
+    function profitPerMsScaled() {
+      return (currentPower * 0.00000024 * SCALE) / 3600000;
+    }
+
+    async function apiFetch(url, options = {}) {
+      const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+      const headers = { 'Content-Type': 'application/json', ...options.headers };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      
+      const response = await fetch(url, { ...options, headers });
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth_token');
+        if (window.location.pathname !== '/login.html') window.location.href = 'login.html';
+        throw new Error('انتهت صلاحية الجلسة');
+      }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'خطأ في الخادم' }));
+        throw new Error(error.message || `HTTP ${response.status}`);
+      }
+      return response;
+    }
+    
+    const API_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:3000/api'
+      : '/api';
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navMenu = document.getElementById('navMenu');
+    if (mobileToggle && navMenu) {
+      mobileToggle.addEventListener('click', () => { navMenu.classList.toggle('active'); });
+      document.querySelectorAll('.nav-link').forEach(link => { 
+        link.addEventListener('click', () => { navMenu.classList.remove('active'); }); 
+      });
+    }
+
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', () => { 
+        question.parentElement.classList.toggle('active'); 
+      });
+    });
+
+    const circle = document.getElementById('progressCircle');
+    const dot = document.getElementById('progressDot');
+    const radius = 62;
+    const circumference = 2 * Math.PI * radius;
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = circumference;
+
+    const balanceEl = document.getElementById('balance');
+    const pointsEl = document.getElementById('points');
+    const powerEl = document.getElementById('power');
+    const rateEl = document.getElementById('rate');
+    const timerEl = document.getElementById('timer');
+    const profitInfoEl = document.getElementById('profitInfo');
+    const startBtn = document.getElementById('startBtn');
+    const adBtn = document.getElementById('adBtn');
+
+    function resetRing() {
+      circle.style.strokeDasharray  = RING_CIRC;
+      circle.style.strokeDashoffset = RING_CIRC;
+      dot.setAttribute('cx', (RING_CX + RING_R).toFixed(3));
+      dot.setAttribute('cy', RING_CY);
+    }
+
+    function stopMining() {
+      isMining = false;
+      if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
+      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+      startBtn.disabled = false;
+      startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+      profitInfoEl.textContent = "⏱️ جاهز للبدء";
+    }
+
+    function startLocalCounter() {
+      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+
+      const profitPerMs = profitPerMsScaled();
+
+      function tick() {
+        if (!isMining) return;
+        const now = Date.now();
+        const elapsedMs = now - startTime;
+        balanceScaled = profitPerMs * elapsedMs;
+        const sec = Math.floor(elapsedMs / 1000);
+        if (sec !== lastBalanceSecond) {
+          lastBalanceSecond = sec;
+          balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+        }
+      }
+
+      tick();
+      balanceInterval = setInterval(tick, 100);
+      timerInterval = setInterval(() => { updateTimer(); }, 100);
+    }
+
+    function updateRing(elapsedSeconds) {
+      const t = Math.max(0, Math.min(elapsedSeconds, CYCLE_SECONDS));
+      const done = elapsedSeconds >= CYCLE_SECONDS;
+      const speedFactor = 0.1;
+      const fill = done ? 1 : ((t * speedFactor) % RING_CYCLE) / RING_CYCLE;
+
+      circle.style.strokeDasharray = RING_CIRC;
+      circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
+
+      const angle = fill * 2 * Math.PI;
+      dot.setAttribute('cx', (RING_CX + RING_R * Math.cos(angle)).toFixed(3));
+      dot.setAttribute('cy', (RING_CY + RING_R * Math.sin(angle)).toFixed(3));
+    }
+
+    async function initPage() {
+      resetRing();
+      try {
+        const res = await apiFetch(`${API_URL}/user/init`);
+        const data = await res.json();
+        if (data.success) {
+          const depAddr = document.getElementById('depositAddress');
+          if (depAddr) depAddr.innerText = data.depositAddress;
+          balanceScaled = 0;
+          balanceEl.textContent = '0.00000000';
+          pointsEl.textContent = data.points;
+          currentPower = parseFloat(data.power) || 150.50;
+          powerEl.textContent = currentPower.toFixed(2);
+          rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+          profitInfoEl.textContent = '⏱️ جاهز للبدء';
+        }
+      } catch (e) {
+        console.error("فشل الاتصال بالخادم:", e.message);
+        balanceEl.textContent = '0.00000000';
+        powerEl.textContent = currentPower.toFixed(2);
+        rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+      }
+    }
+
+    initPage();
+
+    async function startMining() {
+
+      const token =
+        localStorage.getItem('token') ||
+        localStorage.getItem('auth_token');
+
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      if (isMining || timerInterval || balanceInterval) return;
+      startBtn.disabled = true;
+      startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
+      startTime = Date.now();
+      isMining = true;
+      sessionDone = false;
+      balanceScaled = 0;
+      lastSecond = -1;
+      lastBalanceSecond = -1;
+      balanceEl.textContent = '0.00000000';
+      timerEl.textContent = '00:00:00';
+      resetRing();
+      updateTimer();
+      updateRing(0);
+      startLocalCounter();
+      
+      try {
+        const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
+        const data = await response.json();
+        if (data.success) {
+          startBtn.innerText = "⛏️ جاري التعدين (متصل)";
+          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
+          if (!window._pointsUpdater) {
+            window._pointsUpdater = setInterval(async () => {
+              try {
+                const res = await apiFetch(`${API_URL}/user/init`);
+                const data = await res.json();
+                if (data.success) pointsEl.textContent = data.points;
+              } catch(e) {}
+            }, 30000);
+          }
+        } else {
+          stopMining();
+        }
+      } catch (error) {
+        console.error("فشل بدء التعدين:", error);
+        stopMining();
+        profitInfoEl.textContent = "❌ تأكد من تشغيل server.js";
+      }
+    }
+
+    async function watchAd() {
+      adBtn.innerHTML = "⏳ جاري عرض الإعلان...";
+      adBtn.disabled = true;
+      setTimeout(async () => {
+        try {
+          const res = await apiFetch(`${API_URL}/ad/watch`, { method: 'POST' });
+          const data = await res.json();
+          if(data.success) {
+            pointsEl.textContent = data.points;
+            adBtn.innerHTML = "✅ تمت إضافة 10 نقاط!";
+            adBtn.style.background = "rgba(34, 197, 94, 0.2)";
+            adBtn.style.borderColor = "#22c55e";
+            setTimeout(() => {
+              adBtn.innerHTML = "📺 شاهد إعلان (+10 نقاط)";
+              adBtn.disabled = false;
+              adBtn.style.background = "";
+              adBtn.style.borderColor = "";
+            }, 3000);
+          }
+        } catch(e) { 
+          console.error("فشل مشاهدة الإعلان:", e.message);
+          adBtn.innerHTML = "📺 شاهد إعلان (+10 نقاط)";
+          adBtn.disabled = false;
+        }
+      }, 3000);
+    }
+
+    function updateTimer() {
+      if (!isMining) return;
+      const now = Date.now();
+      const elapsedMs = now - startTime;
+      const elapsedSeconds = elapsedMs / 1000;
+      const elapsed = Math.min(elapsedSeconds, CYCLE_SECONDS);
+      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const s = String(Math.floor(elapsed % 60)).padStart(2, '0');
+      timerEl.textContent = `${h}:${m}:${s}`;
+      updateRing(elapsedSeconds);
+      if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
+        sessionDone = true;
+        isMining = false;
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+        if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+        timerEl.textContent = '24:00:00';
+        balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+        updateRing(CYCLE_SECONDS);
+        profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
+        startBtn.disabled = false;
+        startBtn.innerText = '⛏️ بدء دورة جديدة';
+      }
+    }
+
+    const termsContent = {
+      terms: `<h2>📋 الشروط والأحكام</h2><p>يتم جمع النقاط والإيداعات لتحضير توزيع عملة X Plus الرسمية.</p>`,
+      privacy: `<h2>🔐 سياسة الخصوصية</h2><p>نحترم خصوصيتك ونحمي بياناتك.</p>`
+    };
+    
+    function openTerms(type) {
+      document.getElementById('termsBody').innerHTML = termsContent[type];
+      document.getElementById('termsModal').classList.add('active');
+    }
+    
+    function closeTerms() { 
+      document.getElementById('termsModal').classList.remove('active'); 
+    }
+    
+    document.getElementById('termsModal').addEventListener('click', (e) => { 
+      if (e.target.id === 'termsModal') closeTerms(); 
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       💰 فتح المحفظة مباشرة — بدون أي ربط بالتسجيل
+       سطر واحد فقط: يفتح wallet.html في نافذة جديدة
+    ═══════════════════════════════════════════════════════════ */
+    function openWallet(event) {
+      if (event) event.preventDefault();
+      window.open('wallet.html', '_blank');
+    }
+    /* ================= SIDEBAR CONTROL ================= */
+
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const leftSidebar = document.getElementById("leftSidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+    function openSidebar() {
+      if (!leftSidebar || !sidebarOverlay) return;
+      leftSidebar.classList.add("active");
+      sidebarOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeSidebar() {
+      if (!leftSidebar || !sidebarOverlay) return;
+      leftSidebar.classList.remove("active");
+      sidebarOverlay.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    /* إغلاق الشريط عند لمس أي مكان خارجه */
+    document.addEventListener("touchstart", function(e) {
+      if (!leftSidebar || !leftSidebar.classList.contains("active")) return;
+
+      const touchedInsideSidebar = leftSidebar.contains(e.target);
+      const touchedToggle = sidebarToggle && sidebarToggle.contains(e.target);
+
+      if (!touchedInsideSidebar && !touchedToggle) {
+        closeSidebar();
+      }
+    }, { passive: true });
+
+    /* إغلاقه أيضاً عند الضغط خارج الشريط */
+    document.addEventListener("click", function(e) {
+      if (!leftSidebar || !leftSidebar.classList.contains("active")) return;
+
+      const clickedInsideSidebar = leftSidebar.contains(e.target);
+      const clickedToggle = sidebarToggle && sidebarToggle.contains(e.target);
+
+      if (!clickedInsideSidebar && !clickedToggle) {
+        closeSidebar();
+      }
+    });
+
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener("click", openSidebar);
+    }
+
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener("click", closeSidebar);
+    }
+
+    /* ================= END SIDEBAR CONTROL ================= */
+  </script>
+
+</body>
+</html>

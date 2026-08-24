@@ -296,6 +296,8 @@ function checkRegistrationStatus() {
     console.log("❌ إنشاء حساب / متابعة / Google / Facebook / Phone مخفية");
 }
 
+document.addEventListener("DOMContentLoaded", checkRegistrationStatus);
+window.addEventListener("load", checkRegistrationStatus);
 
 async function login() {
 
@@ -333,7 +335,7 @@ async function login() {
 localStorage.setItem("token", data.token);
 localStorage.removeItem("auth_token");
 
-window.location.href = "/dashboard/home.html";
+window.location.href = "/";
 
     } catch (error) {
 

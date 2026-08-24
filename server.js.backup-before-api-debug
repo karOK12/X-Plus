@@ -12,7 +12,6 @@ const authRoutes = require("./server/routes/auth");
 const profileRoutes = require("./server/routes/profile");
 const walletRoutes = require("./server/routes/wallet");
 const ratingRoutes = require("./server/routes/rating");
-const miningRoutes = require("./server/routes/mining");
 const uploadRoutes = require("./api/index");
 
 const app = express();
@@ -23,10 +22,6 @@ const app = express();
 // ══════════════════════════════════════════════════════
 
 app.use(cors());
-app.use("/api", (req, res, next) => {
-  console.log("🌐 API REQUEST:", req.method, req.originalUrl);
-  next();
-});
 
 app.use(
     express.json({
@@ -432,6 +427,56 @@ app.get(
 // Start Mining
 // ══════════════════════════════════════════════════════
 
+app.post(
+    "/api/mining/start",
+    auth,
+    async (req, res) => {
+
+        try {
+
+            await pool.query(
+                `
+                UPDATE users
+                SET mining_start_time = $1
+                WHERE id = $2
+                `,
+                [
+                    Date.now(),
+                    req.user.id
+                ]
+            );
+
+
+            res.json({
+
+                success: true,
+
+                message:
+                    "تم بدء التعدين"
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "❌ /api/mining/start:",
+                error
+            );
+
+            res.status(500).json({
+
+                success: false,
+
+                error: error.message
+
+            });
+
+        }
+
+    }
+);
+
+
 // ══════════════════════════════════════════════════════
 // Watch Advertisement
 // ══════════════════════════════════════════════════════
@@ -500,11 +545,6 @@ app.post(
     }
 );
 
-
-app.use(
-    "/api/mining",
-    miningRoutes
-);
 
 // ══════════════════════════════════════════════════════
 // Authentication Routes

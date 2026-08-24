@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const nodemailer = require("nodemailer");
 
 const pool = require("./server/config/database");
 const auth = require("./server/middleware/auth");
@@ -12,7 +13,6 @@ const authRoutes = require("./server/routes/auth");
 const profileRoutes = require("./server/routes/profile");
 const walletRoutes = require("./server/routes/wallet");
 const ratingRoutes = require("./server/routes/rating");
-const miningRoutes = require("./server/routes/mining");
 const uploadRoutes = require("./api/index");
 
 const app = express();
@@ -23,10 +23,6 @@ const app = express();
 // ══════════════════════════════════════════════════════
 
 app.use(cors());
-app.use("/api", (req, res, next) => {
-  console.log("🌐 API REQUEST:", req.method, req.originalUrl);
-  next();
-});
 
 app.use(
     express.json({
@@ -84,6 +80,66 @@ app.get("/", (req, res) => {
     );
 
 });
+
+
+// ══════════════════════════════════════════════════════
+// SMTP
+// ══════════════════════════════════════════════════════
+
+const transporter =
+    nodemailer.createTransport({
+
+        host: process.env.SMTP_HOST,
+
+        port: Number(
+            process.env.SMTP_PORT || 587
+        ),
+
+        secure: false,
+
+        auth: {
+
+            user: process.env.SMTP_USER,
+
+            pass: process.env.SMTP_PASS
+
+        }
+
+    });
+
+
+if (
+    process.env.SMTP_HOST &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASS
+) {
+
+    transporter.verify()
+
+        .then(() => {
+
+            console.log(
+                "✅ SMTP Ready"
+            );
+
+        })
+
+        .catch((error) => {
+
+            console.log(
+                "❌ SMTP Error:",
+                error.message
+            );
+
+        });
+
+} else {
+
+    console.log(
+        "⚠️ SMTP environment variables are not configured"
+    );
+
+}
 
 
 // ══════════════════════════════════════════════════════
@@ -432,6 +488,56 @@ app.get(
 // Start Mining
 // ══════════════════════════════════════════════════════
 
+app.post(
+    "/api/mining/start",
+    auth,
+    async (req, res) => {
+
+        try {
+
+            await pool.query(
+                `
+                UPDATE users
+                SET mining_start_time = $1
+                WHERE id = $2
+                `,
+                [
+                    Date.now(),
+                    req.user.id
+                ]
+            );
+
+
+            res.json({
+
+                success: true,
+
+                message:
+                    "تم بدء التعدين"
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "❌ /api/mining/start:",
+                error
+            );
+
+            res.status(500).json({
+
+                success: false,
+
+                error: error.message
+
+            });
+
+        }
+
+    }
+);
+
+
 // ══════════════════════════════════════════════════════
 // Watch Advertisement
 // ══════════════════════════════════════════════════════
@@ -500,11 +606,6 @@ app.post(
     }
 );
 
-
-app.use(
-    "/api/mining",
-    miningRoutes
-);
 
 // ══════════════════════════════════════════════════════
 // Authentication Routes

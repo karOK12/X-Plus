@@ -34,11 +34,11 @@ async function sendOTPEmail(email, otp, username) {
   });
 
   // منع إرسال عناوين تحتوي أحرفاً غير صالحة
-  if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+  if (!cleanEmail || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(cleanEmail)) {
     throw new Error("عنوان البريد الإلكتروني غير صالح");
   }
 
-  if (!/^[\x00-\x7F]+$/.test(cleanEmail)) {
+  if (!/^[\\x00-\\x7F]+$/.test(cleanEmail)) {
     throw new Error("عنوان البريد الإلكتروني يجب أن يحتوي على أحرف إنجليزية فقط");
   }
 
@@ -692,22 +692,7 @@ exports.sendOTP = async (req, res) => {
     }
 
     const cleanUsername = username.trim();
-    const cleanEmail = String(email).trim().toLowerCase();
-
-    // التحقق من البريد قبل إنشاء OTP أو إرساله
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      return res.status(400).json({
-        success: false,
-        message: "عنوان البريد الإلكتروني غير صالح"
-      });
-    }
-
-    if (!/^[\x00-\x7F]+$/.test(cleanEmail)) {
-      return res.status(400).json({
-        success: false,
-        message: "عنوان البريد الإلكتروني يجب أن يحتوي على أحرف إنجليزية فقط"
-      });
-    }
+    const cleanEmail = email.trim().toLowerCase();
 
     if (cleanUsername.length < 3) {
       return res.status(400).json({

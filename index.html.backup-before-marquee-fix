@@ -197,46 +197,66 @@
         }
 
 
-        /* =========================
-           MOVING TEXT
-        ========================= */
-
-        .youtube-ad-marquee {
-            width: 100%;
-
-            overflow: hidden;
-
-            margin-bottom: 35px;
-        }
-
-        .marquee-content {
-            display: flex;
-
-            width: max-content;
-
-            gap: 40px;
-
-            white-space: nowrap;
-
-            color: #9ca3af;
-
-            font-size: 15px;
-
-            animation: marqueeMove 15s linear infinite;
-        }
-
-        @keyframes marqueeMove {
-
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-50%);
             }
 
         }
 
+
+
+/* =========================
+   MOVING TEXT
+========================= */
+
+.youtube-ad-marquee {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    overflow: hidden;
+    background: #111827;
+    border: 1px solid #273244;
+    border-radius: 12px;
+    padding: 14px 0;
+    white-space: nowrap;
+    direction: ltr;
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    transform: translate3d(0, 0, 0);
+    animation: xplusMarquee 16s linear infinite;
+    will-change: transform;
+}
+
+.marquee-group {
+    display: flex;
+    align-items: center;
+    gap: 45px;
+    flex-shrink: 0;
+    padding-right: 45px;
+}
+
+.marquee-group span {
+    color: #60a5fa;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+@keyframes xplusMarquee {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+
+    to {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.youtube-ad-marquee:hover .marquee-track {
+    animation-play-state: paused;
+}
 
         /* =========================
            HERO TITLE
@@ -558,7 +578,7 @@
         <div class="actions">
 
             <a
-                href="/login"
+                href="/register.html"
                 class="btn subscribe"
             >
                 اشتراك
@@ -602,25 +622,33 @@
 
 <div class="youtube-ad-marquee">
 
-    <div class="marquee-content">
+    <div class="marquee-track">
 
-        <span>🔥 اكتشف أحدث محتويات X Plus</span>
+        <div class="marquee-group">
+            <span>🔥 اكتشف أحدث محتويات X Plus</span>
+            <span>🎵 استمتع بالموسيقى والمحتوى المتنوع</span>
+            <span>📰 تابع آخر الأخبار والتحديثات</span>
+            <span>📚 اقرأ أحدث المقالات والمحتويات</span>
+            <span>🚀 خدمات رقمية سريعة وسهلة</span>
+            <span>💎 تجربة X Plus بانتظارك</span>
+            <span>🔎 ابحث واكتشف المحتوى الذي تريده</span>
+            <span>🌟 أهلاً بك في منصة X Plus</span>
+        </div>
 
-        <span>🎵 استمتع بالموسيقى والمحتوى المتنوع</span>
-
-        <span>📰 تابع آخر الأخبار والتحديثات</span>
-
-        <span>📚 اقرأ أحدث المقالات والمحتويات</span>
-
-        <span>🚀 خدمات رقمية سريعة وسهلة</span>
-
-        <span>💎 تجربة X Plus بانتظارك</span>
-
-        <span>🔎 ابحث واكتشف المحتوى الذي تريده</span>
-
-        <span>🌟 أهلاً بك في منصة X Plus</span>
+        <div class="marquee-group">
+            <span>🔥 اكتشف أحدث محتويات X Plus</span>
+            <span>🎵 استمتع بالموسيقى والمحتوى المتنوع</span>
+            <span>📰 تابع آخر الأخبار والتحديثات</span>
+            <span>📚 اقرأ أحدث المقالات والمحتويات</span>
+            <span>🚀 خدمات رقمية سريعة وسهلة</span>
+            <span>💎 تجربة X Plus بانتظارك</span>
+            <span>🔎 ابحث واكتشف المحتوى الذي تريده</span>
+            <span>🌟 أهلاً بك في منصة X Plus</span>
+        </div>
 
     </div>
+
+</div>
 
 </div>
 

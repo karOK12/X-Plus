@@ -1,0 +1,759 @@
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
+}
+
+html {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: #273244 #0b0f1a;
+}
+
+body {
+    min-height: 100vh;
+
+    font-family: Arial, sans-serif;
+
+    background: #0b0f1a;
+    color: #ffffff;
+
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+html::-webkit-scrollbar {
+    width: 8px;
+}
+
+html::-webkit-scrollbar-track {
+    background: #0b0f1a;
+}
+
+html::-webkit-scrollbar-thumb {
+    background: #273244;
+    border-radius: 10px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.navbar {
+    width: 100%;
+    min-height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    padding: 15px 25px;
+
+    background: #111827;
+
+    direction: ltr;
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.logo-container {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 150px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+}
+
+.logo-container img {
+    display: block;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-box {
+    flex: 1;
+
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-box input {
+    display: block;
+
+    width: 100%;
+    height: 44px;
+
+    padding: 0 16px;
+
+    border: 1px solid #273244;
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #1f2937;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    direction: rtl;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.search-box input::placeholder {
+    color: #9ca3af;
+}
+
+.search-box input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.actions {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    min-width: 150px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 20px;
+
+    border: 0;
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* =========================================================
+   SUBSCRIBE
+========================================================= */
+
+.subscribe {
+    background: #22c55e;
+
+    color: #ffffff;
+}
+
+.subscribe:hover {
+    background: #16a34a;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile {
+    display: none;
+
+    align-items: center;
+}
+
+.profile img {
+    display: block;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main {
+    width: 100%;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+    width: 100%;
+
+    padding:
+        60px 20px 40px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   MOVING CONTENT ADVERTISEMENT
+========================================================= */
+
+.youtube-ad-marquee {
+    width: 100%;
+    height: 32px;
+
+    margin-bottom: 35px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    direction: ltr;
+}
+
+.marquee-content {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    display: flex;
+    align-items: center;
+
+    width: max-content;
+    height: 32px;
+
+    gap: 55px;
+
+    white-space: nowrap;
+
+    color: #9ca3af;
+
+    font-size: 15px;
+
+    transform: translate3d(100vw, 0, 0);
+
+    animation: marqueeMove 18s linear infinite;
+
+    will-change: transform;
+}
+
+@keyframes marqueeMove {
+
+    0% {
+        transform: translate3d(100vw, 0, 0);
+    }
+
+    100% {
+        transform: translate3d(calc(-100% - 100vw), 0, 0);
+    }
+
+}
+
+/* =========================================================
+   HERO TITLE
+========================================================= */
+
+.hero h1 {
+    margin:
+        30px 0 15px;
+
+    font-size: 34px;
+
+    line-height: 1.4;
+}
+
+.hero p {
+    margin:
+        10px 0;
+
+    color: #9ca3af;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   REFERENCE
+========================================================= */
+
+#reference {
+    display: none;
+
+    margin-top: 20px;
+
+    color: #ffffff;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   SCROLL CONTENT
+========================================================= */
+
+.scroll-content {
+    width: 100%;
+
+    max-width: 1100px;
+
+    margin:
+        0 auto;
+
+    padding:
+        20px 20px 100px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 25px;
+}
+
+
+/* =========================================================
+   SCROLL CARD
+========================================================= */
+
+.scroll-card {
+    width: 100%;
+
+    min-height: 220px;
+
+    padding: 30px;
+
+    background: #111827;
+
+    border:
+        1px solid #273244;
+
+    border-radius: 16px;
+
+    text-align: center;
+
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.scroll-card:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        #2563eb;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.scroll-card h2 {
+    margin:
+        0 0 15px;
+
+    font-size: 22px;
+
+    line-height: 1.5;
+}
+
+.scroll-card p {
+    margin: 0;
+
+    color: #9ca3af;
+
+    font-size: 16px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   AD CONTAINER
+========================================================= */
+
+.ad-container {
+    width: 100%;
+
+    max-width: 728px;
+
+    min-height: 90px;
+
+    margin:
+        20px auto 40px;
+
+    padding:
+        0 15px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+#ad-box {
+    width: 100%;
+
+    max-width: 728px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding:
+        25px 20px;
+
+    background: #111827;
+
+    text-align: center;
+}
+
+.footer-one-row {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 25px;
+
+    margin-bottom: 15px;
+}
+
+.footer a {
+    color: #60a5fa;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    transition:
+        color 0.2s ease;
+}
+
+.footer a:hover {
+    color: #93c5fd;
+}
+
+.rights {
+    color: #9ca3af;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .navbar {
+        flex-wrap: wrap;
+
+        gap: 15px;
+
+        padding:
+            12px 18px;
+    }
+
+    .logo-container {
+        min-width: auto;
+    }
+
+    .actions {
+        min-width: auto;
+    }
+
+    .search-box {
+        order: 3;
+
+        flex-basis: 100%;
+
+        max-width: none;
+    }
+
+
+    /* HERO */
+
+    .hero {
+        padding:
+            45px 20px 35px;
+    }
+
+    .hero h1 {
+        font-size: 27px;
+    }
+
+
+    /* MOVING ADVERTISEMENT */
+
+    .youtube-ad-marquee {
+        height: 32px;
+
+        margin-bottom: 30px;
+    }
+
+    .marquee-content {
+        height: 32px;
+
+        gap: 55px;
+
+        animation-duration:
+            20s;
+    }
+
+    .marquee-content span {
+        height: 32px;
+
+        font-size: 14px;
+
+        line-height: 32px;
+    }
+
+
+    /* CONTENT */
+
+    .scroll-content {
+        grid-template-columns:
+            1fr;
+
+        padding:
+            20px 15px 80px;
+    }
+
+    .scroll-card {
+        min-height: 180px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 500px) {
+
+    .navbar {
+        gap: 12px;
+
+        padding:
+            12px 15px;
+    }
+
+    .logo-container img {
+        width: 38px;
+        height: 38px;
+    }
+
+    .brand-name {
+        font-size: 15px;
+    }
+
+    .actions {
+        min-width: auto;
+    }
+
+    .btn {
+        padding:
+            9px 15px;
+
+        font-size: 14px;
+    }
+
+
+    /* HERO */
+
+    .hero {
+        padding:
+            35px 15px 30px;
+    }
+
+    .hero h1 {
+        font-size: 24px;
+    }
+
+    .hero p {
+        font-size: 15px;
+    }
+
+
+    /* MOVING ADVERTISEMENT */
+
+    .youtube-ad-marquee {
+        height: 30px;
+
+        margin-bottom: 28px;
+    }
+
+    .marquee-content {
+        height: 30px;
+
+        gap: 40px;
+
+        animation-duration:
+            17s;
+    }
+
+    .marquee-content span {
+        height: 30px;
+
+        font-size: 13px;
+
+        line-height: 30px;
+    }
+
+
+    /* CONTENT */
+
+    .scroll-content {
+        padding:
+            15px 15px 70px;
+
+        gap: 15px;
+    }
+
+    .scroll-card {
+        min-height: 170px;
+
+        padding: 20px;
+    }
+
+    .scroll-card h2 {
+        font-size: 19px;
+    }
+
+    .scroll-card p {
+        font-size: 14px;
+    }
+
+
+    /* FOOTER */
+
+    .footer {
+        padding:
+            22px 15px;
+    }
+
+    .footer-one-row {
+        gap: 15px;
+
+        font-size: 14px;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .marquee-content {
+        animation: none;
+
+        transform: none;
+
+        position: relative;
+
+        left: auto;
+
+        width: 100%;
+
+        justify-content: center;
+    }
+
+}

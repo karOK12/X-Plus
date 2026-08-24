@@ -263,7 +263,12 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
         <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg></span>
           <div>نوع المحفظة<small>داخلية</small></div><span class="end" style="color:var(--green);font-size:.72rem;font-weight:800">آمنة ✓</span></div>
       </div>
-      <button class="btn-ghost" style="width:100%;padding:13px" onclick="doLogout()">تسجيل الخروج</button>
+      <button id="logoutBtn"
+class="btn-ghost"
+style="width:100%;padding:13px;position:relative;z-index:99999;pointer-events:auto"
+type="button">
+تسجيل الخروج
+</button>
       <footer>X Plus © 2026</footer>
     </section>
   </main>
@@ -519,18 +524,17 @@ function go(v) {
   document.querySelector('main').scrollTop = 0;
   if (v === 'history') renderHistory(hF);
 }
-/* ═══════════ تسجيل الخروج — يمسح الجلسة فقط، بدون تحويل ═══════════ */
-function doLogout() {
-  if (confirm('تسجيل الخروج من المحفظة؟')) {
+/* ═══════════ تسجيل الخروج ═══════════ */
+window.doLogout = function () {
+  try {
     localStorage.removeItem('token');
     localStorage.removeItem('auth_token');
 
-    toast('تم تسجيل الخروج — أغلق هذه التبويبة');
-
-    // لا يوجد تحويل إلى login.html
-    // المستخدم يغلق التبويبة يدوياً
+    window.location.replace('/');
+  } catch (e) {
+    console.error('Logout error:', e);
   }
-}
+};
 
 /* ═══════════ الاستلام ═══════════ */
 async function claim() {
@@ -747,6 +751,24 @@ function renderHistory(f) {
 }
 
 init();
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const logout = document.getElementById('logoutBtn');
+
+  if (logout) {
+    logout.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('auth_token');
+
+      window.location.replace('/');
+    });
+  }
+});
+</script>
 </script>
 </body>
 </html>

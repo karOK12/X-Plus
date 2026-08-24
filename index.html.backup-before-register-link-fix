@@ -197,42 +197,6 @@
         }
 
 
-        /* =========================
-           MOVING TEXT
-        ========================= */
-
-        .youtube-ad-marquee {
-            width: 100%;
-
-            overflow: hidden;
-
-            margin-bottom: 35px;
-        }
-
-        .marquee-content {
-            display: flex;
-
-            width: max-content;
-
-            gap: 40px;
-
-            white-space: nowrap;
-
-            color: #9ca3af;
-
-            font-size: 15px;
-
-            animation: marqueeMove 15s linear infinite;
-        }
-
-        @keyframes marqueeMove {
-
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-50%);
             }
 
         }

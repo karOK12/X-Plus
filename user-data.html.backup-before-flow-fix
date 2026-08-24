@@ -723,7 +723,6 @@ async function sendOTP() {
   }
 
   const contact = state.form.email.trim().toLowerCase();
-  console.log('DEBUG EMAIL:', JSON.stringify(contact), 'TWOFA:', state.form.twoFA, 'VALID:', validateEmail(contact));
   state.form.email = contact;
 
   if (!contact) {
@@ -932,8 +931,14 @@ const restoredAfterVerify = restoreVerifyFormData();
 
 if (restoredAfterVerify) {
   console.log('🟢 تم استعادة بيانات التسجيل بعد OTP');
+
+  setTimeout(() => {
+    console.log('🚀 STARTING AUTO SAVE NOW');
+    saveData(true);
+  }, 300);
+
 } else {
-  console.log('🆕 تسجيل جديد — النموذج فارغ');
+  loadUserData();
 }
 
 console.log('✅ صفحة بيانات المستخدم جاهزة');
