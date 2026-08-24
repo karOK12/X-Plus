@@ -764,28 +764,55 @@
 
     async function initPage() {
       resetRing();
+
+      const token =
+        localStorage.getItem('token') ||
+        localStorage.getItem('auth_token');
+
+      if (!token) {
+        window.location.href = '../login.html';
+        return;
+      }
+
       try {
         const res = await apiFetch(`${API_URL}/user/init`);
         const data = await res.json();
-        if (data.success) {
-          const depAddr = document.getElementById('depositAddress');
-          if (depAddr) depAddr.innerText = data.depositAddress;
-          balanceScaled = 0;
-          balanceEl.textContent = '0.00000000';
-          pointsEl.textContent = data.points;
-          currentPower = parseFloat(data.power) || 150.50;
-          powerEl.textContent = currentPower.toFixed(2);
-          rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
-          profitInfoEl.textContent = '⏱️ جاهز للبدء';
+
+        if (!data.success) {
+          throw new Error(data.message || 'فشل تحميل بيانات المستخدم');
         }
-      } catch (e) {
-        console.error("فشل الاتصال بالخادم:", e.message);
-        balanceEl.textContent = '0.00000000';
+
+        const depAddr = document.getElementById('depositAddress');
+
+        if (depAddr) {
+          depAddr.innerText = data.depositAddress || 'غير متوفر';
+        }
+
+        const serverBalance = Number(data.balance || 0);
+
+        balanceScaled = Math.floor(serverBalance * SCALE);
+        balanceEl.textContent = formatScaled(balanceScaled);
+
+        pointsEl.textContent = Number(data.points || 0);
+
+        currentPower = Number(data.power || 0);
         powerEl.textContent = currentPower.toFixed(2);
-        rateEl.textContent = `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+
+        rateEl.textContent =
+          `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+
+        profitInfoEl.textContent = '⏱️ جاهز للبدء';
+
+      } catch (e) {
+
+        console.error("فشل تحميل بيانات المستخدم:", e);
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth_token');
+
+        window.location.href = '../login.html';
       }
     }
-
     initPage();
 
     async function startMining() {
