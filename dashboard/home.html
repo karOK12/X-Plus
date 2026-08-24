@@ -664,7 +664,7 @@
       if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('auth_token');
-        if (window.location.pathname !== '/login.html') window.location.href = 'login.html';
+        if (window.location.pathname !== '/login.html') window.location.href = '../login.html';
         throw new Error('انتهت صلاحية الجلسة');
       }
       if (!response.ok) {
@@ -822,7 +822,7 @@
         localStorage.getItem('auth_token');
 
       if (!token) {
-        window.location.href = 'login.html';
+        window.location.href = '../login.html';
         return;
       }
 
