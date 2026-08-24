@@ -35,15 +35,15 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
     .logo-icon-svg { 
-      width: 28px; 
-      height: 28px; 
+      width: 50px; 
+      height: 50px; 
       color: #3b82f6; 
-      transition: all 0.3s ease;
+      transition: none !important;
     }
     .logo:hover .logo-icon-svg {
-      color: #fbbf24;
-      transform: scale(1.1) rotate(-5deg);
-      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+      color: #3b82f6 !important;
+      transform: none !important;
+      filter: none !important;
     }
     .logo {
       position: relative;
@@ -56,20 +56,7 @@
     }
     .logo-text { font-size: 20px; font-weight: 800; }
     .logo-tooltip {
-      position: absolute;
-      bottom: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1e293b;
-      color: #fbbf24;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-      border: 1px solid rgba(251, 191, 36, 0.3);
+      display: none !important;
     }
     .logo:hover .logo-tooltip { opacity: 0 !important; }
 
@@ -422,7 +409,7 @@
   <nav class="navbar">
     <div class="container">
       <div class="nav-wrapper">
-        <a href="#" class="logo" onclick="openWallet(event)" title="💰 افتح المحفظة">
+        <a href="#" class="logo" onclick="openWallet(event)">
           <svg class="logo-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
           <span class="logo-text">X Plus</span>
           <span class="logo-tooltip">💰 افتح المحفظة</span>
