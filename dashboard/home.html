@@ -35,15 +35,15 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
     .logo-icon-svg { 
-      width: 50px;
-      height: 50px;
+      width: 38px; 
+      height: 38px; 
       color: #3b82f6; 
-      transition: none !important;
+      transition: all 0.3s ease;
     }
     .logo:hover .logo-icon-svg {
-      color: #3b82f6 !important;
-      transform: none !important;
-      filter: none !important;
+      color: #fbbf24;
+      transform: scale(1.1) rotate(-5deg);
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
     }
     .logo {
       position: relative;
@@ -54,13 +54,26 @@
       text-decoration: none;
       color: white;
     }
-    .logo-text { font-size: 20px; font-weight: 800; }
+    .logo-text { display: none; }
     .logo-tooltip {
-      display: none !important;
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fbbf24;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      border: 1px solid rgba(251, 191, 36, 0.3);
     }
-    .logo:hover .logo-tooltip { opacity: 0 !important; }
+    .logo:hover .logo-tooltip { opacity: 1; }
 
-    .navbar { background: #111827; border-bottom: 1px solid #273244; padding: 15px 0; width: 100%; margin: 0; position: sticky; top: 0; z-index: 1000; }
+    .navbar { background: #111827; border-bottom: 1px solid #273244; padding: 12px 0; position: sticky; top: 0; z-index: 1000; }
     .nav-wrapper { display: flex; align-items: center; justify-content: space-between; }
     
     .nav-menu { display: flex; list-style: none; gap: 25px; margin: 0; padding: 0; }
@@ -90,15 +103,15 @@
       box-shadow: 0 9px 20px rgba(59, 130, 246, 0.35);
     }
 
-    /* ================= LEFT SIDEBAR ================= */
+    /* ================= LEFT SIDEBAR (تم إصلاح البياض) ================= */
     .sidebar-toggle {
       position: fixed !important;
-      left: 6px !important;
-      top: 8px !important;
+      left: 2px !important;
+      top: 8% !important;
       transform: none !important;
       margin: 0 !important;
-      width: 40px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       border: 1px solid #374151;
       border-radius: 10px;
       background: #1f2937;
@@ -111,27 +124,27 @@
       transition: none !important;
       z-index: 100000;
     }
-
     .sidebar-toggle:hover { background: #374151; }
 
     .left-sidebar {
       position: fixed !important;
-      box-sizing: border-box;
       top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100vw !important;
-      max-width: 100vw !important;
+      left: 0;
+      width: 285px;
+      max-width: 82vw;
       height: 100vh;
-      margin: 0 !important;
-      padding: 18px 14px;
-      background: #111827;
+      background: #111827; /* تم التغيير من الأبيض إلى الداكن */
       box-shadow: 8px 0 30px rgba(0, 0, 0, 0.5);
       z-index: 99999;
       transform: translateX(-105%);
+      transition: transform .3s ease;
       direction: rtl;
+      padding: 18px 14px;
       overflow-y: auto;
       border-right: 1px solid #273244;
+    }
+    /* فتح الشريط بدون أي حركة أو تحريك لمحتوى الصفحة */
+    .left-sidebar {
       transition: none !important;
       will-change: auto;
     }
@@ -140,6 +153,7 @@
       transform: translateX(0);
     }
 
+    /* الشريط لا يسبب أي تغيير في تخطيط الصفحة */
     body.sidebar-open {
       overflow: hidden;
       position: relative;
@@ -312,13 +326,13 @@
     .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
     .plan-card { background: #111827; border: 1px solid #273244; border-radius: 16px; padding: 30px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
     .plan-card.featured { border-color: #fbbf24; box-shadow: 0 0 30px rgba(251, 191, 36, 0.1); }
-    .plan-card.featured::before { content: 'الأكثر طلباً'; position: absolute; top: 8px; left: -30px; background: #fbbf24; color: #000; padding: 4px 30px; font-size: 11px; font-weight: 800; transform: rotate(-45deg); }
+    .plan-card.featured::before { content: 'الأكثر طلباً'; position: absolute; top: 15px; left: -30px; background: #fbbf24; color: #000; padding: 4px 30px; font-size: 11px; font-weight: 800; transform: rotate(-45deg); }
     .plan-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
     .plan-name { font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
     .plan-price { font-size: 32px; font-weight: 800; color: #3b82f6; margin-bottom: 20px; }
     .plan-price span { font-size: 14px; color: #94a3b8; font-weight: 400; }
     .plan-features { list-style: none; padding: 0; margin: 0 0 25px 0; text-align: right; }
-    .plan-features li { padding: 15px 0; color: #cbd5e1; font-size: 14px; border-bottom: 1px solid #1f2937; display: flex; align-items: center; gap: 8px; }
+    .plan-features li { padding: 8px 0; color: #cbd5e1; font-size: 14px; border-bottom: 1px solid #1f2937; display: flex; align-items: center; gap: 8px; }
     .plan-features li i { color: #22c55e; font-size: 12px; }
     .plan-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #3b82f6; background: transparent; color: #3b82f6; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; }
     .plan-btn:hover, .plan-card.featured .plan-btn { background: #3b82f6; color: white; }
@@ -328,7 +342,7 @@
     .activity-item:last-child { border-bottom: none; }
     .activity-item:hover { background: #1f293750; }
     .activity-info { display: flex; align-items: center; gap: 15px; }
-    .activity-icon { width: 46px; height: 46px; border-radius: 10px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 21px; }
+    .activity-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .activity-icon.success { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
     .activity-title { font-size: 14px; font-weight: 600; color: #f8fafc; }
     .activity-time { font-size: 12px; color: #64748b; margin-top: 2px; }
@@ -348,15 +362,15 @@
       overflow-y: auto; padding: 15px; position: relative; color: #e2e8f0;
     }
     .terms-close { 
-      position: absolute; top: 8px; left: 10px; 
+      position: absolute; top: 10px; left: 10px; 
       background: #1f2937; border: 1px solid #374151;
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer; 
+      width: 38px; height: 38px; border-radius: 50%; cursor: pointer; 
       font-size: 14px; color: #94a3b8; transition: all 0.3s; 
       display: flex; align-items: center; justify-content: center;
     }
     .terms-close:hover { background: #ef4444; border-color: #ef4444; color: white; }
     .terms-content h2 { color: #f8fafc; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #3b82f6; font-size: 16px; }
-    .terms-content h3 { color: #cbd5e1; margin-top: 8px; margin-bottom: 5px; font-size: 14px; }
+    .terms-content h3 { color: #cbd5e1; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
     .terms-content p { color: #94a3b8; line-height: 1.5; margin-bottom: 8px; font-size: 12px; }
     .terms-content ul { padding-right: 15px; color: #94a3b8; font-size: 12px; }
     .terms-content li { margin-bottom: 4px; }
@@ -364,30 +378,6 @@
     .footer { padding: 30px 0; text-align: center; background: #0f172a; border-top: 1px solid #1f2937; color: #64748b; font-size: 14px; }
 
     @media (max-width: 768px) {
-      html, body {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow-x: hidden;
-      }
-      .navbar {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 10px 0 !important;
-      }
-      .navbar .container {
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
-      .navbar .container {
-        width: 100% !important;
-        max-width: none !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
       .nav-menu { 
         position: absolute; top: 100%; right: 0; left: 0; 
         background: #111827; flex-direction: column; padding: 20px; 
@@ -399,8 +389,8 @@
       .mining-row { flex-direction: column; align-items: center; }
       .mining-right { align-items: center; text-align: center; }
       .balance-container, .power-container, .rate-container, .points-container { align-items: center; }
-      .sidebar-toggle { width: 40px !important; height: 44px !important; font-size: 21px; }
-      .left-sidebar { width: 285px !important; max-width: 82vw !important; left: 0 !important; right: auto !important; margin: 0 !important; }
+      .sidebar-toggle { width: 36px; height: 36px; font-size: 18px; }
+      .left-sidebar { width: 270px; }
     }
   </style>
 </head>
@@ -409,8 +399,9 @@
   <nav class="navbar">
     <div class="container">
       <div class="nav-wrapper">
-        <a href="#" class="logo" onclick="openWallet(event)">
+        <a href="#" class="logo" onclick="openWallet(event)" title="💰 افتح المحفظة">
           <svg class="logo-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span class="logo-text">X Plus</span>
           <span class="logo-tooltip">💰 افتح المحفظة</span>
         </a>
         <ul class="nav-menu" id="navMenu">
@@ -617,7 +608,7 @@
   <footer class="footer">
     <div class="container">
       <p>© 2026 X Plus. جميع الحقوق محفوظة. منصة التعدين السحابي الرائدة.</p>
-      <div style="margin-top: 8px; display: flex; justify-content: center; gap: 20px;">
+      <div style="margin-top: 10px; display: flex; justify-content: center; gap: 20px;">
         <a href="#" onclick="openTerms('terms')" style="color: #64748b; text-decoration: none; font-size: 13px;">الشروط والأحكام</a>
         <a href="#" onclick="openTerms('privacy')" style="color: #64748b; text-decoration: none; font-size: 13px;">سياسة الخصوصية</a>
       </div>
@@ -642,7 +633,6 @@
     const RING_CYCLE    = 60;
     const SCALE = 100000000;
     
-    let balanceScaled = 0;
     let currentPower = 150.50;
     let isMining = false;
     let sessionDone = false;
@@ -673,7 +663,7 @@
       if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('auth_token');
-        if (window.location.pathname !== '/login.html') window.location.href = '../login.html';
+        if (window.location.pathname !== '/login.html') window.location.href = 'login.html';
         throw new Error('انتهت صلاحية الجلسة');
       }
       if (!response.ok) {
@@ -831,7 +821,7 @@
         localStorage.getItem('auth_token');
 
       if (!token) {
-        window.location.href = '../login.html';
+        window.location.href = 'login.html';
         return;
       }
 
@@ -841,10 +831,8 @@
       startTime = Date.now();
       isMining = true;
       sessionDone = false;
-      balanceScaled = 0;
       lastSecond = -1;
       lastBalanceSecond = -1;
-      balanceEl.textContent = '0.00000000';
       timerEl.textContent = '00:00:00';
       resetRing();
       updateTimer();
@@ -952,7 +940,7 @@
     ═══════════════════════════════════════════════════════════ */
     function openWallet(event) {
       if (event) event.preventDefault();
-      window.location.href = 'wallet.html';
+      window.open('wallet.html', '_blank');
     }
     /* ================= SIDEBAR CONTROL ================= */
 
