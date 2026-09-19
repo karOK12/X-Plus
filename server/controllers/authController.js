@@ -1,5 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const User = require("../models/User");
 const Otp = require("../models/Otp");
@@ -113,6 +116,103 @@ function createToken(user) {
 // =====================================================
 // REGISTER
 // =====================================================
+
+// ===============================
+// GOOGLE LOGIN
+// ===============================
+exports.googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: "رمز Google غير موجود"
+      });
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
+      return res.status(500).json({
+        success: false,
+        message: "إعدادات Google غير مكتملة"
+      });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: clientId
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.sub || !payload.email) {
+      return res.status(401).json({
+        success: false,
+        message: "بيانات حساب Google غير صالحة"
+      });
+    }
+
+    if (payload.email_verified !== true) {
+      return res.status(401).json({
+        success: false,
+        message: "البريد الإلكتروني في Google غير موثّق"
+      });
+    }
+
+    const googleId = payload.sub;
+    const email = payload.email.trim().toLowerCase();
+
+    let user = await User.findByGoogleId(googleId);
+
+    if (!user) {
+      const existingUser = await User.findByEmail(email);
+
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: "هذا البريد مرتبط بحساب X Plus موجود. سجّل الدخول بالطريقة الأصلية أولاً."
+        });
+      }
+
+      const username = String(
+        payload.name ||
+        email.split("@")[0] ||
+        `google_${googleId.slice(-8)}`
+      ).trim().slice(0, 50);
+
+      user = await User.createGoogle(
+        username,
+        email,
+        googleId
+      );
+    }
+
+    const token = createToken(user);
+
+    return res.json({
+      success: true,
+      message: "تم تسجيل الدخول عبر Google بنجاح",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        registration_completed: user.registration_completed === true
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ GOOGLE LOGIN ERROR:", error.message);
+
+    return res.status(401).json({
+      success: false,
+      message: "تعذر التحقق من حساب Google"
+    });
+  }
+};
+
 
 exports.register = async (req, res) => {
 

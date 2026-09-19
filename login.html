@@ -221,6 +221,7 @@
         <p class="error-msg" id="errorMsg"></p>
     </div>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
 const emailInput = document.getElementById("email");
 const loginEmail = new URLSearchParams(window.location.search).get("email");
@@ -352,8 +353,72 @@ function register() {
     window.location.href = "/register.html";
 }
 
+let googleInitialized = false;
+
 function socialLogin(provider) {
-    window.location.href = "/" + provider + "-login";
+    if (provider !== "google") {
+        window.location.href = "/" + provider + "-login";
+        return;
+    }
+
+    if (!window.google || !google.accounts || !google.accounts.id) {
+        document.getElementById("errorMsg").textContent =
+            "تعذر تحميل تسجيل الدخول عبر Google، حاول مرة أخرى.";
+        return;
+    }
+
+    if (!googleInitialized) {
+        google.accounts.id.initialize({
+            client_id: "169913148669-u3sse2n078i67pkseftujtgul8n0k2o3.apps.googleusercontent.com",
+            callback: handleGoogleCredential,
+            ux_mode: "popup"
+        });
+
+        googleInitialized = true;
+    }
+
+    google.accounts.id.prompt();
+}
+
+async function handleGoogleCredential(response) {
+    const errorMsg = document.getElementById("errorMsg");
+
+    try {
+        errorMsg.textContent = "";
+
+        if (!response || !response.credential) {
+            errorMsg.textContent = "لم يتم استلام بيانات Google.";
+            return;
+        }
+
+        const result = await fetch("/api/auth/google", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                credential: response.credential
+            })
+        });
+
+        const data = await result.json();
+
+        if (!result.ok || !data.success) {
+            errorMsg.textContent =
+                data.message || "تعذر تسجيل الدخول عبر Google.";
+            return;
+        }
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("registrationCompleted", "true");
+
+        window.location.href = "/dashboard/home.html";
+
+    } catch (error) {
+        console.error("Google login error:", error);
+        errorMsg.textContent =
+            "حدث خطأ أثناء تسجيل الدخول عبر Google.";
+    }
 }
 
 function phoneVerification() {

@@ -441,59 +441,150 @@ app.post(
     auth,
     async (req, res) => {
 
+        const client = await pool.connect();
+
         try {
 
-            const result =
-                await pool.query(
-                    `
-                    UPDATE users
-                    SET points = points + 10
-                    WHERE id = $1
-                    RETURNING points
-                    `,
-                    [req.user.id]
-                );
+            await client.query("BEGIN");
 
+            const userId = Number(req.user.id);
 
-            if (
-                result.rows.length === 0
-            ) {
+            if (!Number.isInteger(userId) || userId <= 0) {
 
-                return res.status(404).json({
+                await client.query("ROLLBACK");
 
+                return res.status(401).json({
                     success: false,
-
-                    message:
-                        "المستخدم غير موجود"
-
+                    message: "هوية المستخدم غير صالحة"
                 });
 
             }
 
+            const walletResult = await client.query(
+                `
+                SELECT
+                    user_id,
+                    points
+                FROM xp_wallets
+                WHERE user_id = $1
+                FOR UPDATE
+                `,
+                [userId]
+            );
 
-            res.json({
+            if (walletResult.rows.length === 0) {
 
+                await client.query("ROLLBACK");
+
+                return res.status(404).json({
+                    success: false,
+                    message: "محفظة XP غير موجودة"
+                });
+
+            }
+
+            const reward = 10;
+
+            const updated = await client.query(
+                `
+                UPDATE xp_wallets
+                SET points = points + $1
+                WHERE user_id = $2
+                RETURNING points
+                `,
+                [reward, userId]
+            );
+
+            await client.query(
+                `
+                INSERT INTO wallet_transactions
+                    (
+                        user_id,
+                        type,
+                        title,
+                        sub,
+                        amount,
+                        unit,
+                        sign,
+                        status,
+                        reference,
+                        note
+                    )
+                VALUES
+                    (
+                        $1,
+                        'earn',
+                        'مكافأة مشاهدة إعلان',
+                        'مكافأة إعلان',
+                        $2,
+                        'points',
+                        1,
+                        'completed',
+                        $3,
+                        'Ad reward'
+                    )
+                `,
+                [
+                    userId,
+                    reward,
+                    `AD-${Date.now()}-${userId}`
+                ]
+            );
+
+            await client.query(
+                `
+                INSERT INTO activity_logs
+                    (
+                        user_id,
+                        action,
+                        description,
+                        metadata
+                    )
+                VALUES
+                    (
+                        $1,
+                        'ad_reward',
+                        'تمت إضافة نقاط مكافأة الإعلان',
+                        $2::jsonb
+                    )
+                `,
+                [
+                    userId,
+                    JSON.stringify({
+                        points: reward,
+                        source: "ad",
+                        status: "completed"
+                    })
+                ]
+            );
+
+            await client.query("COMMIT");
+
+            return res.json({
                 success: true,
-
-                points:
-                    result.rows[0].points
-
+                points: Number(updated.rows[0].points),
+                reward
             });
 
         } catch (error) {
+
+            try {
+                await client.query("ROLLBACK");
+            } catch (_) {}
 
             console.error(
                 "❌ /api/ad/watch:",
                 error
             );
 
-            res.status(500).json({
-
+            return res.status(500).json({
                 success: false,
-
-                error: error.message
-
+                message: "خطأ في الخادم"
             });
+
+        } finally {
+
+            client.release();
 
         }
 

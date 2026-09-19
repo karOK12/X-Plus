@@ -40,6 +40,65 @@ const User = {
 
 
   // ===============================
+  // البحث عن مستخدم بواسطة Google ID
+  // ===============================
+  async findByGoogleId(googleId) {
+
+    const result = await db.query(
+      `
+      SELECT *
+      FROM users
+      WHERE google_id = $1
+      LIMIT 1
+      `,
+      [googleId]
+    );
+
+    return result.rows[0] || null;
+  },
+
+
+  // ===============================
+  // إنشاء مستخدم بواسطة Google
+  // ===============================
+  async createGoogle(username, email, googleId) {
+
+    const result = await db.query(
+      `
+      INSERT INTO users (
+        username,
+        email,
+        password,
+        google_id,
+        balance,
+        points,
+        power,
+        mining_start_time,
+        registration_completed
+      )
+      VALUES ($1, $2, NULL, $3, 0, 0, 150.50, NULL, true)
+      RETURNING
+        id,
+        username,
+        email,
+        balance,
+        points,
+        power,
+        mining_start_time,
+        registration_completed
+      `,
+      [
+        username.trim(),
+        email.trim().toLowerCase(),
+        googleId
+      ]
+    );
+
+    return result.rows[0];
+  },
+
+
+  // ===============================
   // البحث عن مستخدم بالبريد
   // ===============================
   async findByEmail(email) {
