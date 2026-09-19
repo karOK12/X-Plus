@@ -181,19 +181,19 @@ exports.googleLogin = async (req, res) => {
             message: "تعذر ربط حساب Google بحساب X Plus."
           });
         }
+      } else {
+        const username = String(
+          payload.name ||
+          email.split("@")[0] ||
+          `google_${googleId.slice(-8)}`
+        ).trim().slice(0, 50);
+
+        user = await User.createGoogle(
+          username,
+          email,
+          googleId
+        );
       }
-
-      const username = String(
-        payload.name ||
-        email.split("@")[0] ||
-        `google_${googleId.slice(-8)}`
-      ).trim().slice(0, 50);
-
-      user = await User.createGoogle(
-        username,
-        email,
-        googleId
-      );
     }
 
     const token = createToken(user);
