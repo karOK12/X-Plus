@@ -170,10 +170,17 @@ exports.googleLogin = async (req, res) => {
       const existingUser = await User.findByEmail(email);
 
       if (existingUser) {
-        return res.status(409).json({
-          success: false,
-          message: "هذا البريد مرتبط بحساب X Plus موجود. سجّل الدخول بالطريقة الأصلية أولاً."
-        });
+        user = await User.linkGoogleId(
+          existingUser.id,
+          googleId
+        );
+
+        if (!user) {
+          return res.status(500).json({
+            success: false,
+            message: "تعذر ربط حساب Google بحساب X Plus."
+          });
+        }
       }
 
       const username = String(

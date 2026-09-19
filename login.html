@@ -377,7 +377,15 @@ function socialLogin(provider) {
         googleInitialized = true;
     }
 
-    google.accounts.id.prompt();
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+            console.log("Google One Tap لم يتم عرضه:", notification.getNotDisplayedReason());
+        }
+
+        if (notification.isSkippedMoment()) {
+            console.log("تم تخطي نافذة Google");
+        }
+    });
 }
 
 async function handleGoogleCredential(response) {

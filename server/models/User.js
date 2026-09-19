@@ -59,6 +59,25 @@ const User = {
 
 
   // ===============================
+  // ربط حساب Google بمستخدم موجود
+  // ===============================
+  async linkGoogleId(userId, googleId) {
+
+    const result = await db.query(
+      `
+      UPDATE users
+      SET google_id = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [googleId, userId]
+    );
+
+    return result.rows[0] || null;
+  },
+
+
+  // ===============================
   // إنشاء مستخدم بواسطة Google
   // ===============================
   async createGoogle(username, email, googleId) {
