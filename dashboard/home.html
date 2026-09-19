@@ -813,7 +813,64 @@
         window.location.href = '../login.html';
       }
     }
-    initPage();
+    async function loadMiningStatus() {
+      try {
+        const response = await apiFetch(`${API_URL}/mining/status`);
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'فشل تحميل حالة التعدين');
+        }
+
+        if (data.isMining && data.miningStartTime) {
+          startTime = Number(data.miningStartTime);
+          isMining = true;
+          sessionDone = false;
+          lastSecond = -1;
+          lastBalanceSecond = -1;
+
+          currentPower = Number(data.power || currentPower || 0);
+
+          const elapsedSeconds = Math.max(
+            0,
+            Math.floor((Date.now() - startTime) / 1000)
+          );
+
+          if (elapsedSeconds >= CYCLE_SECONDS) {
+            isMining = false;
+            sessionDone = true;
+            timerEl.textContent = '24:00:00';
+            updateRing(CYCLE_SECONDS);
+            profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
+            startBtn.disabled = false;
+            startBtn.innerText = '⛏️ بدء دورة جديدة';
+            return;
+          }
+
+          startBtn.disabled = true;
+          startBtn.innerText = "⛏️ جاري التعدين (متصل)";
+          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
+
+          updateTimer();
+          updateRing(elapsedSeconds);
+          startLocalCounter();
+
+        } else {
+          isMining = false;
+          startTime = 0;
+          profitInfoEl.textContent = '⏱️ جاهز للبدء';
+          startBtn.disabled = false;
+          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+        }
+
+      } catch (error) {
+        console.error("فشل تحميل حالة التعدين:", error);
+      }
+    }
+
+    initPage().then(() => {
+      loadMiningStatus();
+    });
 
     async function startMining() {
 
