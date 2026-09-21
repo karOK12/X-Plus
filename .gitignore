@@ -4,3 +4,9 @@ node_modules/
 .env*
 .env
 env.
+
+# Google OAuth local secrets
+/google-oauth-client.json
+
+# Local backup files
+*.backup-*

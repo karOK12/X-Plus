@@ -361,31 +361,9 @@ function socialLogin(provider) {
         return;
     }
 
-    if (!window.google || !google.accounts || !google.accounts.id) {
-        document.getElementById("errorMsg").textContent =
-            "تعذر تحميل تسجيل الدخول عبر Google، حاول مرة أخرى.";
-        return;
-    }
-
-    if (!googleInitialized) {
-        google.accounts.id.initialize({
-            client_id: "169913148669-u3sse2n078i67pkseftujtgul8n0k2o3.apps.googleusercontent.com",
-            callback: handleGoogleCredential,
-            ux_mode: "popup"
-        });
-
-        googleInitialized = true;
-    }
-
-    google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-            console.log("Google One Tap لم يتم عرضه:", notification.getNotDisplayedReason());
-        }
-
-        if (notification.isSkippedMoment()) {
-            console.log("تم تخطي نافذة Google");
-        }
-    });
+    // Google OAuth 2.0 الرسمي
+    // سيتم عرض شاشة Google الرسمية للموافقة قبل إكمال الدخول
+    window.location.href = "/api/auth/google/start";
 }
 
 async function handleGoogleCredential(response) {
@@ -432,6 +410,50 @@ async function handleGoogleCredential(response) {
 function phoneVerification() {
     window.location.href = "/phone";
 }
+
+// ============================================
+// استقبال نتيجة Google OAuth
+// ============================================
+(function handleGoogleOAuthResult() {
+    const params = new URLSearchParams(window.location.search);
+
+    const googleToken = params.get("google_token");
+    const googleError = params.get("google_error");
+
+    if (googleError) {
+        const errorMsg = document.getElementById("errorMsg");
+
+        if (errorMsg) {
+            errorMsg.textContent = googleError;
+        }
+
+        // تنظيف الرابط من المعاملات
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+
+        return;
+    }
+
+    if (!googleToken) {
+        return;
+    }
+
+    localStorage.setItem("token", googleToken);
+    localStorage.setItem("registrationCompleted", "true");
+
+    // تنظيف الرابط بعد استلام التوكن
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+
+    window.location.href = "/dashboard/home.html";
+})();
+
 </script>
 </body>
 </html>

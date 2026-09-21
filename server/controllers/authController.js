@@ -118,6 +118,152 @@ function createToken(user) {
 // =====================================================
 
 // ===============================
+// GOOGLE OAUTH 2.0
+// ===============================
+
+const googleOAuthClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
+
+exports.googleOAuthStart = (req, res) => {
+  try {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+
+    if (!clientId || !clientSecret || !redirectUri) {
+      return res.status(500).json({
+        success: false,
+        message: "إعدادات Google OAuth غير مكتملة"
+      });
+    }
+
+    const url = googleOAuthClient.generateAuthUrl({
+      access_type: "online",
+      scope: [
+        "openid",
+        "email",
+        "profile"
+      ],
+      prompt: "consent",
+      include_granted_scopes: true
+    });
+
+    return res.redirect(url);
+
+  } catch (error) {
+    console.error("❌ GOOGLE OAUTH START ERROR:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "تعذر بدء تسجيل الدخول عبر Google"
+    });
+  }
+};
+
+exports.googleOAuthCallback = async (req, res) => {
+  try {
+    const { code, error } = req.query;
+
+    if (error) {
+      return res.redirect(
+        "/login.html?google_error=" +
+        encodeURIComponent("تم إلغاء تسجيل الدخول عبر Google")
+      );
+    }
+
+    if (!code) {
+      return res.redirect(
+        "/login.html?google_error=" +
+        encodeURIComponent("لم يتم استلام رمز Google")
+      );
+    }
+
+    const { tokens } = await googleOAuthClient.getToken(code);
+
+    if (!tokens.id_token) {
+      return res.redirect(
+        "/login.html?google_error=" +
+        encodeURIComponent("لم يتم استلام بيانات Google")
+      );
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.sub || !payload.email) {
+      return res.redirect(
+        "/login.html?google_error=" +
+        encodeURIComponent("بيانات حساب Google غير صالحة")
+      );
+    }
+
+    if (payload.email_verified !== true) {
+      return res.redirect(
+        "/login.html?google_error=" +
+        encodeURIComponent("البريد الإلكتروني في Google غير موثّق")
+      );
+    }
+
+    const googleId = payload.sub;
+    const email = payload.email.trim().toLowerCase();
+
+    let user = await User.findByGoogleId(googleId);
+
+    if (!user) {
+      const existingUser = await User.findByEmail(email);
+
+      if (existingUser) {
+        user = await User.linkGoogleId(
+          existingUser.id,
+          googleId
+        );
+      } else {
+        const username = String(
+          payload.name ||
+          email.split("@")[0] ||
+          `google_${googleId.slice(-8)}`
+        ).trim().slice(0, 50);
+
+        user = await User.createGoogle(
+          username,
+          email,
+          googleId
+        );
+      }
+    }
+
+    if (!user) {
+      return res.redirect(
+        "/login.html?google_error=" +
+        encodeURIComponent("تعذر إنشاء أو ربط حساب X Plus")
+      );
+    }
+
+    const token = createToken(user);
+
+    return res.redirect(
+      "/login.html?google_token=" +
+      encodeURIComponent(token)
+    );
+
+  } catch (error) {
+    console.error("❌ GOOGLE OAUTH CALLBACK ERROR:", error.message);
+
+    return res.redirect(
+      "/login.html?google_error=" +
+      encodeURIComponent("تعذر إكمال تسجيل الدخول عبر Google")
+    );
+  }
+};
+
+// ===============================
 // GOOGLE LOGIN
 // ===============================
 exports.googleLogin = async (req, res) => {
