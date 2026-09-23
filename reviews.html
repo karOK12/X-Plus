@@ -32,20 +32,20 @@ border-bottom:1px solid rgba(255,255,255,.1);
 
 .review-head{
 display:flex;
-flex-direction:column;
 align-items:flex-start;
-gap:5px;
 }
 
 .user-row{
 display:flex;
-align-items:center;
-gap:9px;
+align-items:flex-start;
+gap:10px;
+width:100%;
 }
 
 .avatar{
-width:42px;
-height:42px;
+width:44px;
+height:44px;
+min-width:44px;
 border-radius:50%;
 object-fit:cover;
 display:block;
@@ -53,9 +53,26 @@ background:#172536;
 border:1px solid rgba(255,255,255,.12);
 }
 
+.user-info{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+min-width:0;
+}
+
 .username{
 font-weight:800;
 font-size:15px;
+line-height:1.4;
+color:#fff;
+}
+
+.rating-date{
+display:flex;
+align-items:center;
+gap:9px;
+margin-top:4px;
+direction:ltr;
 }
 
 .stars{
@@ -64,24 +81,19 @@ direction:ltr;
 margin:0;
 letter-spacing:1px;
 line-height:1;
+font-size:15px;
 }
 
 .date{
 color:#8193a8;
 font-size:12px;
 line-height:1;
-}
-
-.rating-date{
-display:flex;
-align-items:center;
-gap:10px;
 direction:ltr;
-margin-top:2px;
 }
 
 .comment{
-margin-top:1px;
+margin-top:12px;
+padding-right:54px;
 line-height:1.9;
 color:#d9e3ed;
 white-space:pre-wrap;
@@ -120,6 +132,30 @@ align-items:center;
 justify-content:center;
 transform:translateY(-1px);
 }
+
+@media(max-width:480px){
+body{
+padding:16px;
+}
+
+.avatar{
+width:42px;
+height:42px;
+min-width:42px;
+}
+
+.username{
+font-size:15px;
+}
+
+.stars{
+font-size:14px;
+}
+
+.comment{
+padding-right:52px;
+}
+}
 </style>
 </head>
 
@@ -129,7 +165,6 @@ transform:translateY(-1px);
 
 <a class="back" href="rating.html">
 <span class="back-icon">‹</span>
-
 </a>
 
 <h1>مراجعات X Plus</h1>
@@ -137,8 +172,6 @@ transform:translateY(-1px);
 <div id="reviews">
 <div class="empty">جاري تحميل المراجعات...</div>
 </div>
-
-<!-- زر الرجوع نُقل إلى أعلى الصفحة -->
 
 </div>
 
@@ -158,14 +191,14 @@ return fetch(url,{
 ...options,
 headers:{
 "Content-Type":"application/json",
-...(token?{Authorization:`Bearer ${token}`}:{ }),
-...(options.headers||{})
+...(token ? {Authorization:`Bearer ${token}`} : {}),
+...(options.headers || {})
 }
 });
 }
 
 function escapeHtml(value){
-return String(value||"")
+return String(value || "")
 .replaceAll("&","&amp;")
 .replaceAll("<","&lt;")
 .replaceAll(">","&gt;")
@@ -174,12 +207,19 @@ return String(value||"")
 }
 
 function formatDate(value){
-if(!value)return "";
+
+if(!value) return "";
 
 try{
+
 const date=new Date(value);
 
+if(Number.isNaN(date.getTime())){
+return "";
+}
+
 return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`;
+
 }catch{
 return "";
 }
@@ -187,19 +227,23 @@ return "";
 
 function renderStars(rating){
 
-const value=Number(rating);
+let value=Number(rating);
 
-if(!value)return "";
+if(!Number.isFinite(value)){
+return "";
+}
+
+value=Math.max(0,Math.min(5,Math.round(value)));
 
 return `
 <div class="stars">
 ${"★".repeat(value)}${"☆".repeat(5-value)}
 </div>
 `;
-
 }
 
 function getAvatar(review){
+
 return review.avatar ||
 review.avatarUrl ||
 review.profileImage ||
@@ -207,8 +251,31 @@ review.profile_image ||
 review.photo ||
 review.image ||
 review.userAvatar ||
-(review.user && (review.user.avatar || review.user.avatarUrl || review.user.profileImage)) ||
+(
+review.user &&
+(
+review.user.avatar ||
+review.user.avatarUrl ||
+review.user.profileImage ||
+review.user.profile_image ||
+review.user.photo ||
+review.user.image
+)
+) ||
 "";
+}
+
+function getUsername(review){
+
+return review.username ||
+review.userName ||
+review.name ||
+(review.user && (
+review.user.username ||
+review.user.userName ||
+review.user.name
+)) ||
+"مستخدم";
 }
 
 async function loadReviews(){
@@ -221,10 +288,10 @@ const res=await apiFetch(`${API_URL}/rating`);
 const data=await res.json();
 
 if(!res.ok || !data.success){
-throw new Error(data.message||"تعذر تحميل المراجعات");
+throw new Error(data.message || "تعذر تحميل المراجعات");
 }
 
-const items=data.reviews||[];
+const items=data.reviews || [];
 
 if(!items.length){
 
@@ -232,46 +299,66 @@ container.innerHTML=
 `<div class="empty">لا توجد مراجعات بعد.</div>`;
 
 return;
-
 }
 
-container.innerHTML=items.map(review=>`
+container.innerHTML=items.map(review=>{
+
+const avatar=getAvatar(review);
+const username=getUsername(review);
+
+return `
 
 <article class="review">
 
 <div class="review-head">
 
 <div class="user-row">
-${getAvatar(review) ? `
+
+${
+avatar
+? `
 <img
 class="avatar"
-src="${escapeHtml(getAvatar(review))}"
-alt="صورة بروفايل ${escapeHtml(review.username||"مستخدم")}"
+src="${escapeHtml(avatar)}"
+alt="صورة بروفايل ${escapeHtml(username)}"
 >
-` : `
+`
+: `
 <div class="avatar"></div>
-`}
+`
+}
+
+<div class="user-info">
+
 <div class="username">
-${escapeHtml(review.username||"مستخدم")}
-</div>
+${escapeHtml(username)}
 </div>
 
 <div class="rating-date">
+
+${renderStars(review.rating)}
+
 <div class="date">
 ${formatDate(review.createdAt)}
 </div>
-${renderStars(review.rating)}
+
+</div>
+
+</div>
+
 </div>
 
 </div>
 
 <div class="comment">
-${escapeHtml(review.comment||"")}
+${escapeHtml(review.comment || "")}
 </div>
 
 </article>
 
-`).join("");
+`;
+
+}).join("");
 
 }catch(error){
 
