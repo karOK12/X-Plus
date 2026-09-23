@@ -271,7 +271,7 @@ function renderStars(rating){
 let value=Number(rating);
 
 if(!Number.isFinite(value)){
-return "";
+value=0;
 }
 
 value=Math.max(0,Math.min(5,Math.round(value)));
@@ -292,17 +292,14 @@ review.profile_image ||
 review.photo ||
 review.image ||
 review.userAvatar ||
-(
-review.user &&
-(
+(review.user && (
 review.user.avatar ||
 review.user.avatarUrl ||
 review.user.profileImage ||
 review.user.profile_image ||
 review.user.photo ||
 review.user.image
-)
-) ||
+)) ||
 "";
 }
 
@@ -318,6 +315,20 @@ review.user.name
 )) ||
 "مستخدم";
 }
+
+function getReviewDate(review){
+
+return review.createdAt ||
+review.created_at ||
+review.date ||
+review.created ||
+(review.user && (
+review.user.createdAt ||
+review.user.created_at
+)) ||
+"";
+}
+
 
 async function loadReviews(){
 
@@ -346,6 +357,7 @@ container.innerHTML=items.map(review=>{
 
 const avatar=getAvatar(review);
 const username=getUsername(review);
+const reviewId=review.id || review._id || "";
 
 return `
 
@@ -380,7 +392,7 @@ ${escapeHtml(username)}
 ${renderStars(review.rating)}
 
 <div class="date">
-${formatDate(review.createdAt)}
+${formatDate(getReviewDate(review))}
 </div>
 
 </div>
@@ -402,7 +414,7 @@ ${escapeHtml(review.comment || "")}
 <button
 class="review-action"
 type="button"
-data-review-id="${escapeHtml(review.id || review._id || "")}"
+data-review-id="${escapeHtml(reviewId)}"
 data-vote="no"
 >
 لا
@@ -411,7 +423,7 @@ data-vote="no"
 <button
 class="review-action"
 type="button"
-data-review-id="${escapeHtml(review.id || review._id || "")}"
+data-review-id="${escapeHtml(reviewId)}"
 data-vote="yes"
 >
 نعم
