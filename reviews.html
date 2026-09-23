@@ -32,24 +32,44 @@ border-bottom:1px solid rgba(255,255,255,.1);
 
 .review-head{
 display:flex;
-justify-content:space-between;
-gap:10px;
+flex-direction:column;
+align-items:flex-start;
+gap:7px;
+}
+
+.user-row{
+display:flex;
+align-items:center;
+gap:9px;
+}
+
+.avatar{
+width:42px;
+height:42px;
+border-radius:50%;
+object-fit:cover;
+display:block;
+background:#172536;
+border:1px solid rgba(255,255,255,.12);
 }
 
 .username{
 font-weight:800;
-}
-
-.date{
-color:#8193a8;
-font-size:12px;
+font-size:15px;
 }
 
 .stars{
 color:#ffd43b;
 direction:ltr;
-margin-top:6px;
+margin:0;
 letter-spacing:1px;
+line-height:1;
+}
+
+.date{
+color:#8193a8;
+font-size:12px;
+line-height:1;
 }
 
 .comment{
@@ -178,6 +198,18 @@ ${"★".repeat(value)}${"☆".repeat(5-value)}
 
 }
 
+function getAvatar(review){
+return review.avatar ||
+review.avatarUrl ||
+review.profileImage ||
+review.profile_image ||
+review.photo ||
+review.image ||
+review.userAvatar ||
+(review.user && (review.user.avatar || review.user.avatarUrl || review.user.profileImage)) ||
+"";
+}
+
 async function loadReviews(){
 
 const container=document.getElementById("reviews");
@@ -208,17 +240,28 @@ container.innerHTML=items.map(review=>`
 
 <div class="review-head">
 
+<div class="user-row">
+${getAvatar(review) ? `
+<img
+class="avatar"
+src="${escapeHtml(getAvatar(review))}"
+alt="صورة بروفايل ${escapeHtml(review.username||"مستخدم")}"
+>
+` : `
+<div class="avatar"></div>
+`}
 <div class="username">
 ${escapeHtml(review.username||"مستخدم")}
 </div>
+</div>
+
+${renderStars(review.rating)}
 
 <div class="date">
 ${formatDate(review.createdAt)}
 </div>
 
 </div>
-
-${renderStars(review.rating)}
 
 <div class="comment">
 ${escapeHtml(review.comment||"")}
