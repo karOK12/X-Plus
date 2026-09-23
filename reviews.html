@@ -34,7 +34,7 @@ border-bottom:1px solid rgba(255,255,255,.1);
 display:flex;
 flex-direction:column;
 align-items:flex-start;
-gap:7px;
+gap:5px;
 }
 
 .user-row{
@@ -72,8 +72,14 @@ font-size:12px;
 line-height:1;
 }
 
+.rating-date{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
 .comment{
-margin-top:9px;
+margin-top:3px;
 line-height:1.9;
 color:#d9e3ed;
 white-space:pre-wrap;
@@ -248,10 +254,11 @@ ${escapeHtml(review.username||"مستخدم")}
 </div>
 </div>
 
-${renderStars(review.rating)}
-
+<div class="rating-date">
 <div class="date">
 ${formatDate(review.createdAt)}
+</div>
+${renderStars(review.rating)}
 </div>
 
 </div>
