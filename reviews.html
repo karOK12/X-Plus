@@ -166,22 +166,15 @@ return String(value||"")
 }
 
 function formatDate(value){
-
 if(!value)return "";
 
 try{
-return new Date(value).toLocaleDateString(
-"ar-IQ",
-{
-year:"numeric",
-month:"long",
-day:"numeric"
-}
-);
+const date=new Date(value);
+
+return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 }catch{
 return "";
 }
-
 }
 
 function renderStars(rating){
