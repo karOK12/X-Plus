@@ -91,12 +91,53 @@ line-height:1;
 direction:ltr;
 }
 
-.comment{
+.comment-row{
+display:flex;
+align-items:flex-start;
+justify-content:space-between;
+gap:12px;
 margin-top:5px;
+}
+
+.comment{
+margin:0;
 padding-right:54px;
 line-height:1.9;
 color:#d9e3ed;
 white-space:pre-wrap;
+flex:1;
+}
+
+.review-actions{
+display:flex;
+align-items:center;
+gap:5px;
+direction:rtl;
+flex-shrink:0;
+}
+
+.review-action{
+border:1px solid rgba(255,255,255,.12);
+background:#101d2c;
+color:#9fb0c3;
+border-radius:6px;
+min-width:38px;
+height:30px;
+padding:0 7px;
+font-family:inherit;
+font-size:12px;
+cursor:pointer;
+}
+
+.review-action:hover{
+background:#17283b;
+color:#fff;
+}
+
+.review-action.active{
+background:#1d3550;
+color:#fff;
+border-color:rgba(255,255,255,.2);
 }
 
 .empty{
@@ -350,8 +391,34 @@ ${formatDate(review.createdAt)}
 
 </div>
 
+<div class="comment-row">
+
 <div class="comment">
 ${escapeHtml(review.comment || "")}
+</div>
+
+<div class="review-actions">
+
+<button
+class="review-action"
+type="button"
+data-review-id="${escapeHtml(review.id || review._id || "")}"
+data-vote="no"
+>
+لا
+</button>
+
+<button
+class="review-action"
+type="button"
+data-review-id="${escapeHtml(review.id || review._id || "")}"
+data-vote="yes"
+>
+نعم
+</button>
+
+</div>
+
 </div>
 
 </article>
@@ -371,7 +438,23 @@ container.innerHTML=
 
 }
 
-loadReviews();
+
+document.addEventListener("click",function(e){
+
+const button=e.target.closest(".review-action");
+
+if(!button)return;
+
+const row=button.parentElement;
+
+row.querySelectorAll(".review-action").forEach(btn=>{
+btn.classList.remove("active");
+});
+
+button.classList.add("active");
+
+});
+\nloadReviews();
 
 </script>
 
