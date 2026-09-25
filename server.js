@@ -12,6 +12,7 @@ const authRoutes = require("./server/routes/auth");
 const profileRoutes = require("./server/routes/profile");
 const walletRoutes = require("./server/routes/wallet");
 const ratingRoutes = require("./server/routes/rating");
+const installRoutes = require("./server/routes/install");
 const miningRoutes = require("./server/routes/mining");
 const uploadRoutes = require("./api/index");
 
@@ -642,6 +643,14 @@ app.use(
 app.use(
     "/api/rating",
     ratingRoutes
+);
+
+// ══════════════════════════════════════════════════════
+// App Install Routes
+// ══════════════════════════════════════════════════════
+app.use(
+    "/api/install",
+    installRoutes
 );
 
 // Temporary DB Diagnostic

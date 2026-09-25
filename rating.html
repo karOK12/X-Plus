@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- X Plus PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" type="image/png" href="/xplus-icon.png">
+
 <title>تقييم التطبيق - X Plus</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -368,7 +374,7 @@ color:#2563eb;
 <span>مناسب لأعمار 12 عاما وما فوق</span>
 </div>
 <div class="stat">
-<strong id="downloadCount">10 مليار</strong>
+<strong id="downloadCount">0</strong>
 <span>عمليات تنزيل</span>
 </div>
 
@@ -523,7 +529,46 @@ style="margin-top:5px;"
 
 <script>
 
+
 const API_URL="/api";
+
+/* ══════════════════════════════════════════════════════
+   App Install Counter
+   ══════════════════════════════════════════════════════ */
+
+function formatInstallCount(value){
+  const count = Number(value) || 0;
+
+  if(count < 1000000){
+    return String(count);
+  }
+
+  return `+${Math.floor(count / 1000000)} مليون`;
+}
+
+async function loadInstallCount(){
+  try{
+    const res = await apiFetch(`${API_URL}/install/count`);
+    const data = await res.json();
+
+    if(res.ok && data.success){
+      const downloadCount =
+        document.getElementById("downloadCount");
+
+      if(downloadCount){
+        downloadCount.textContent =
+          formatInstallCount(data.count);
+      }
+    }
+  }catch(error){
+    console.error("❌ تعذر تحميل عدد التثبيتات:", error);
+  }
+}
+
+/*
+  تحميل العدد الحالي عند فتح الصفحة.
+*/
+loadInstallCount();
 
 let selectedRating=null;
 

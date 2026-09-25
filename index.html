@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- X Plus PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0b1220">
+    <link rel="icon" type="image/png" href="/xplus-icon.png">
+
     <link rel="stylesheet" href="style.css">
 
     <title>X Plus</title>
@@ -656,6 +661,106 @@
             subscribeBtn.style.display = "inline-flex";
         }
 </script>
+
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/sw.js")
+            .then(function () {
+                console.log("✅ X Plus Service Worker registered");
+            })
+            .catch(function (error) {
+                console.error("❌ Service Worker error:", error);
+            });
+    });
+}
+</script>
+
+<script>
+/*
+  X Plus App Install Counter
+  التسجيل يتم فقط بعد تثبيت الـPWA.
+*/
+
+function getXPlusInstallId() {
+    let installId = localStorage.getItem("xplus_install_id");
+
+    if (!installId) {
+        if (window.crypto && typeof crypto.randomUUID === "function") {
+            installId = crypto.randomUUID();
+        } else {
+            installId =
+                Date.now().toString(36) +
+                "-" +
+                Math.random().toString(36).slice(2) +
+                "-" +
+                Math.random().toString(36).slice(2);
+        }
+
+        localStorage.setItem("xplus_install_id", installId);
+    }
+
+    return installId;
+}
+
+
+async function registerXPlusInstall() {
+    const token =
+        localStorage.getItem("token") ||
+        localStorage.getItem("auth_token");
+
+    /*
+      تسجيل الدخول إجباري.
+      إذا لا يوجد توكن، لا نرسل أي طلب.
+    */
+    if (!token) {
+        console.log("ℹ️ المستخدم غير مسجل دخول، لم يتم تسجيل التثبيت.");
+        return;
+    }
+
+    const installId = getXPlusInstallId();
+
+    try {
+        const response = await fetch("/api/install", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                installId: installId
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            console.log(
+                data.counted
+                    ? "✅ تم تسجيل تثبيت X Plus"
+                    : "ℹ️ هذا التثبيت محسوب مسبقًا",
+                data
+            );
+        } else {
+            console.error("❌ فشل تسجيل التثبيت:", data);
+        }
+
+    } catch (error) {
+        console.error("❌ خطأ أثناء تسجيل التثبيت:", error);
+    }
+}
+
+
+/*
+  هذا الحدث يعمل عند تثبيت الـPWA فعليًا.
+*/
+window.addEventListener("appinstalled", function () {
+    console.log("📱 تم تثبيت X Plus");
+    registerXPlusInstall();
+});
+</script>
+
 
 </body>
 </html>
