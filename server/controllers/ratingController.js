@@ -275,3 +275,76 @@ exports.saveRating = async (req, res) => {
     });
   }
 };
+
+exports.replyToReview = async (req, res) => {
+  try {
+    const replyKey = req.headers["x-developer-key"];
+
+    if (!replyKey || replyKey !== process.env.DEVELOPER_REPLY_KEY) {
+      return res.status(403).json({
+        success: false,
+        message: "غير مصرح"
+      });
+    }
+
+    const reviewId = Number(req.body.reviewId);
+    const reply = String(req.body.reply || "").trim();
+
+    if (!Number.isInteger(reviewId) || reviewId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "معرف المراجعة غير صالح"
+      });
+    }
+
+    if (!reply) {
+      return res.status(400).json({
+        success: false,
+        message: "الرد مطلوب"
+      });
+    }
+
+    if (reply.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "الرد يجب ألا يتجاوز 1000 حرف"
+      });
+    }
+
+    const result = await db.query(
+      `
+      UPDATE app_ratings
+      SET
+        developer_reply = $1,
+        developer_reply_at = NOW()
+      WHERE id = $2
+      RETURNING
+        id,
+        developer_reply,
+        developer_reply_at
+      `,
+      [reply, reviewId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "المراجعة غير موجودة"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "تم حفظ رد المطوّر بنجاح",
+      data: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("❌ REPLY REVIEW ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "فشل حفظ رد المطوّر"
+    });
+  }
+};

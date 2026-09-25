@@ -5,10 +5,12 @@ const auth = require("../middleware/auth");
 
 const {
   getRating,
-  saveRating
+  saveRating,
+  replyToReview
 } = require("../controllers/ratingController");
 
 router.get("/", auth, getRating);
 router.post("/", auth, saveRating);
+router.post("/reply", replyToReview);
 
 module.exports = router;
