@@ -233,13 +233,6 @@ exports.saveRating = async (req, res) => {
       });
     }
 
-    if (rating === null && !comment) {
-      return res.status(400).json({
-        success: false,
-        message: "أضف تقييمًا أو تعليقًا قبل الإرسال"
-      });
-    }
-
     const result = await db.query(
       `
       INSERT INTO app_ratings (

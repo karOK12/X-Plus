@@ -723,11 +723,12 @@ value!==null && rating<=value
 
 stars.forEach(star=>{
 
-star.addEventListener("click",()=>{
+star.addEventListener("click",async()=>{
 
 const clickedRating=Number(star.dataset.rating);
 
 if(selectedRating===clickedRating){
+
 selectedRating=null;
 showStars(null);
 
@@ -736,10 +737,37 @@ topRatingStar.classList.remove("active");
 }
 
 ratingText.textContent="اختر عدد النجوم لتقييم X Plus";
+
+message.textContent="⏳ جاري إلغاء التقييم...";
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating`,{
+method:"POST",
+body:JSON.stringify({
+rating:null,
+comment:comment.value.trim()||null
+})
+});
+
+const data=await res.json();
+
+if(!res.ok||!data.success){
+throw new Error(data.message||"تعذر إلغاء التقييم");
+}
+
+message.textContent="تم إلغاء التقييم.";
 commentArea.style.display="none";
-comment.value="";
-charCount.textContent="0";
-message.textContent="";
+
+}catch(error){
+
+console.error("❌ CLEAR RATING ERROR:",error);
+
+message.textContent=
+error.message||"تعذر إلغاء التقييم.";
+
+}
+
 return;
 }
 
