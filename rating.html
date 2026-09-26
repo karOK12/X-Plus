@@ -725,8 +725,25 @@ stars.forEach(star=>{
 
 star.addEventListener("click",()=>{
 
-selectedRating=Number(star.dataset.rating);
+const clickedRating=Number(star.dataset.rating);
 
+if(selectedRating===clickedRating){
+selectedRating=null;
+showStars(null);
+
+if(topRatingStar){
+topRatingStar.classList.remove("active");
+}
+
+ratingText.textContent="اختر عدد النجوم لتقييم X Plus";
+commentArea.style.display="none";
+comment.value="";
+charCount.textContent="0";
+message.textContent="";
+return;
+}
+
+selectedRating=clickedRating;
 showStars(selectedRating);
 
 const topRatingStar=document.querySelector(".top-rating-star");
