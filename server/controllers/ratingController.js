@@ -126,8 +126,17 @@ exports.getRating = async (req, res) => {
     const userRating = userResult.rows[0] || null;
     const stats = statsResult.rows[0];
 
+    const developerEmail =
+      String(process.env.DEVELOPER_EMAIL || "").trim().toLowerCase();
+
+    const isDeveloper =
+      !!developerEmail &&
+      String(req.user?.email || "").trim().toLowerCase() === developerEmail;
+
     return res.json({
       success: true,
+
+      isDeveloper,
 
       rating: userRating?.rating ?? 0,
 
@@ -278,9 +287,13 @@ exports.saveRating = async (req, res) => {
 
 exports.replyToReview = async (req, res) => {
   try {
-    const replyKey = req.headers["x-developer-key"];
+    const developerEmail =
+      String(process.env.DEVELOPER_EMAIL || "").trim().toLowerCase();
 
-    if (!replyKey || replyKey !== process.env.DEVELOPER_REPLY_KEY) {
+    const userEmail =
+      String(req.user?.email || "").trim().toLowerCase();
+
+    if (!developerEmail || !userEmail || userEmail !== developerEmail) {
       return res.status(403).json({
         success: false,
         message: "غير مصرح"

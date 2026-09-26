@@ -11,6 +11,6 @@ const {
 
 router.get("/", auth, getRating);
 router.post("/", auth, saveRating);
-router.post("/reply", replyToReview);
+router.post("/reply", auth, replyToReview);
 
 module.exports = router;

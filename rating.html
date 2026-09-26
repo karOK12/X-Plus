@@ -310,6 +310,93 @@ margin-bottom:4px;
 color:#fff;
 }
 
+.developer-reply-head{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+margin-bottom:5px;
+}
+
+.developer-reply-head strong{
+margin:0;
+}
+
+.developer-reply-head span{
+color:#7f91a6;
+font-size:11px;
+white-space:nowrap;
+}
+
+.developer-reply-text{
+white-space:pre-wrap;
+overflow-wrap:anywhere;
+}
+
+.developer-reply-editor{
+margin-top:12px;
+padding:12px;
+border-radius:12px;
+background:rgba(11,18,32,.72);
+border:1px solid rgba(37,99,235,.25);
+}
+
+.developer-reply-editor-title{
+font-size:13px;
+font-weight:700;
+color:#d9e5f2;
+margin-bottom:8px;
+}
+
+.developer-reply-textarea{
+width:100%;
+min-height:96px;
+resize:vertical;
+box-sizing:border-box;
+padding:10px 11px;
+border-radius:10px;
+border:1px solid rgba(255,255,255,.10);
+background:#0b1220;
+color:#fff;
+font-family:inherit;
+font-size:13px;
+line-height:1.8;
+outline:none;
+}
+
+.developer-reply-textarea:focus{
+border-color:rgba(37,99,235,.65);
+}
+
+.developer-reply-textarea::placeholder{
+color:#6f8196;
+}
+
+.developer-reply-btn{
+margin-top:8px;
+width:100%;
+padding:10px 14px;
+border:0;
+border-radius:10px;
+background:#2563eb;
+color:#fff;
+font-family:inherit;
+font-size:13px;
+font-weight:700;
+cursor:pointer;
+}
+
+.developer-reply-btn:disabled{
+opacity:.6;
+cursor:not-allowed;
+}
+
+.developer-reply-status{
+margin-top:7px;
+font-size:12px;
+color:#8fa4bb;
+}
+
 .rating-back{display:flex;align-items:center;justify-content:flex-start;width:36px;height:36px;margin:0;position:fixed;top:-14px;right:2px;padding:0;min-height:0;gap:0;color:#91acd0;text-decoration:none;font-size:32px;font-weight:400;line-height:1;transform:scaleY(1.36) translateX(-3px) translateY(2px);}
 
 @media(max-width:560px){
@@ -571,6 +658,7 @@ async function loadInstallCount(){
 loadInstallCount();
 
 let selectedRating=null;
+let isDeveloper=false;
 
 const stars=document.querySelectorAll(".star");
 const ratingText=document.getElementById("ratingText");
@@ -736,8 +824,43 @@ reviews.innerHTML=items.map(review=>{
 const reply=review.developerReply
 ?`
 <div class="developer-reply">
-<strong>رد فريق X Plus</strong>
-<div>${escapeHtml(review.developerReply)}</div>
+<div class="developer-reply-head">
+<strong>إدارة X Plus</strong>
+<span>${formatReplyDate(review.developerReplyAt)}</span>
+</div>
+
+<div class="developer-reply-text">
+${escapeHtml(review.developerReply)}
+</div>
+</div>
+`
+:"";
+
+const developerEditor=isDeveloper
+?`
+<div class="developer-reply-editor">
+<div class="developer-reply-editor-title">
+رد المطوّر
+</div>
+
+<textarea
+class="developer-reply-textarea"
+data-review-id="${review.id}"
+maxlength="1000"
+placeholder="اكتب ردك على هذه المراجعة..."
+>${escapeHtml(review.developerReply||"")}</textarea>
+
+<button
+type="button"
+class="developer-reply-btn"
+data-review-id="${review.id}">
+حفظ الرد
+</button>
+
+<div
+class="developer-reply-status"
+data-status-for="${review.id}">
+</div>
 </div>
 `
 :"";
@@ -769,12 +892,107 @@ ${escapeHtml(review.comment||"")}
 
 ${reply}
 
+${developerEditor}
+
 </article>
 `;
 
 }).join("");
 
 }
+
+function formatReplyDate(value){
+if(!value)return "";
+
+try{
+return new Date(value).toLocaleDateString(
+"ar-IQ",
+{
+year:"numeric",
+month:"2-digit",
+day:"2-digit"
+}
+);
+}catch{
+return "";
+}
+}
+
+reviews.addEventListener("click",async(event)=>{
+
+const button=event.target.closest(".developer-reply-btn");
+
+if(!button||!isDeveloper)return;
+
+const reviewId=Number(button.dataset.reviewId);
+
+const editor=button.closest(".developer-reply-editor");
+
+if(!editor)return;
+
+const textarea=editor.querySelector(".developer-reply-textarea");
+const status=editor.querySelector(".developer-reply-status");
+
+if(!textarea)return;
+
+const reply=textarea.value.trim();
+
+if(!reply){
+
+status.textContent="اكتب الرد أولاً.";
+return;
+
+}
+
+if(reply.length>1000){
+
+status.textContent="الرد يجب ألا يتجاوز 1000 حرف.";
+return;
+
+}
+
+button.disabled=true;
+button.textContent="جاري الحفظ...";
+status.textContent="";
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating/reply`,{
+method:"POST",
+body:JSON.stringify({
+reviewId,
+reply
+})
+});
+
+const data=await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||"تعذر حفظ الرد"
+);
+
+}
+
+status.textContent="تم حفظ الرد بنجاح.";
+button.textContent="تم الحفظ";
+
+await loadRating();
+
+}catch(error){
+
+console.error("❌ DEVELOPER REPLY ERROR:",error);
+
+status.textContent=
+error.message||"تعذر حفظ الرد.";
+
+button.disabled=false;
+button.textContent="حفظ الرد";
+
+}
+
+});
 
 function escapeHtml(value){
 
@@ -806,6 +1024,8 @@ throw new Error(
 data.message||"تعذر تحميل التقييمات"
 );
 }
+
+isDeveloper = data.isDeveloper === true;
 
 if(data.rating){
 
