@@ -681,6 +681,30 @@ const commentArea=document.getElementById("commentArea");
 const topRatingStar=document.querySelector(".top-rating-star");
 const reviewStat=document.getElementById("reviewStat");
 
+function resetRatingSelection(){
+
+stars.forEach(star=>{
+star.classList.remove("active");
+});
+
+selectedRating=null;
+
+if(topRatingStar){
+topRatingStar.classList.remove("active");
+}
+
+ratingText.textContent=
+"اختر عدد النجوم لتقييم X Plus";
+
+commentArea.style.display="none";
+
+comment.value="";
+charCount.textContent="0";
+
+message.textContent="";
+
+}
+
 if(reviewStat){
 reviewStat.addEventListener("click",()=>{
 window.location.href="reviews.html";
@@ -755,19 +779,7 @@ selectedRating=Number(otherStar.dataset.rating);
 
 if(selectedRating===null){
 
-if(topRatingStar){
-topRatingStar.classList.remove("active");
-}
-
-ratingText.textContent=
-"اختر عدد النجوم لتقييم X Plus";
-
-commentArea.style.display="none";
-
-comment.value="";
-charCount.textContent="0";
-
-message.textContent="";
+resetRatingSelection();
 
 }else{
 
