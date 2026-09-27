@@ -514,7 +514,7 @@ color:#2563eb;
 
 <section class="card" id="ratingSection">
 
-<h2>تقييمك</h2>
+<h2>تقييم هذا التطبيق</h2>
 
 <div class="stars" id="stars">
 <button type="button" class="star" data-rating="1">★</button>
@@ -530,7 +530,7 @@ color:#2563eb;
 
 <div id="commentArea" style="display:none;">
 
-<label class="label" for="comment">صف تجربتك</label>
+<label class="label" for="comment">صف تجربتك (اختياري)</label>
 
 <textarea
 id="comment"
@@ -552,6 +552,34 @@ style="margin-top:12px;"
 </button>
 
 </div>
+
+<button
+type="button"
+class="action send"
+id="shareRatingBtn"
+style="margin-top:5px;"
+>
+مشاركة تقييمك
+</button>
+
+<div class="message" id="message"></div>
+
+</section>
+
+<section class="card">
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+<h2 style="margin:0;">التعليقات</h2>
+</div>
+
+<button
+type="button"
+class="action comment-only"
+id="commentOnlyBtn"
+style="margin-bottom:12px;"
+>
+اكتب تعليقًا
+</button>
 
 <div id="commentOnlyArea" style="display:none;">
 
@@ -580,35 +608,10 @@ style="margin-top:12px;"
 
 </div>
 
-<button
-type="button"
-class="action send"
-id="shareRatingBtn"
-style="margin-top:5px;"
->
-مشاركة تقييمك
-</button>
-
-<button
-type="button"
-class="action comment-only"
-id="commentOnlyBtn"
-style="margin-top:5px;"
->
-اكتب تعليقًا
-</button>
-
-<div class="message" id="message"></div>
-
-</section>
-
-<section class="card">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-<h2 style="margin:0;">التعليقات</h2>
-</div>
 <div id="comments">
 <div class="empty">جاري تحميل التعليقات...</div>
 </div>
+
 </section>
 
 
