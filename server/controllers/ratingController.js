@@ -245,6 +245,7 @@ exports.saveRating = async (req, res) => {
       DO UPDATE SET
         rating = EXCLUDED.rating,
         comment = EXCLUDED.comment,
+        created_at = NOW(),
         updated_at = NOW()
       RETURNING
         id,
