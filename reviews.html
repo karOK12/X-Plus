@@ -208,7 +208,40 @@ padding-right:52px;
 <span class="back-icon">‹</span>
 </a>
 
-<h1>مراجعات X Plus</h1>
+<div id="writeReview" style="display:none;">
+
+<h1 style="margin-bottom:10px;">كتابة مراجعة</h1>
+
+<div id="selectedStars" class="stars" style="text-align:center;font-size:28px;letter-spacing:3px;margin:18px 0;"></div>
+
+<label for="reviewComment" style="display:block;margin-bottom:8px;color:#9fb0c3;font-size:14px;">
+صف تجربتك (اختياري)
+</label>
+
+<textarea
+id="reviewComment"
+maxlength="500"
+placeholder="اكتب رأيك أو تجربتك في X Plus..."
+style="width:100%;min-height:140px;box-sizing:border-box;background:#0d1a29;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px;font-family:inherit;font-size:15px;resize:vertical;outline:none;"
+></textarea>
+
+<div style="display:flex;justify-content:flex-start;margin-top:14px;">
+<button
+id="publishReview"
+type="button"
+style="border:0;border-radius:10px;background:#1677ff;color:#fff;padding:10px 22px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;"
+>
+نشر
+</button>
+</div>
+
+<div id="writeMessage" class="empty" style="padding:16px 0;"></div>
+
+</div>
+
+<div id="reviewList">
+
+<h1 id="reviewsTitle">مراجعات X Plus</h1>
 
 <div id="reviews">
 <div class="empty">جاري تحميل المراجعات...</div>
@@ -216,9 +249,37 @@ padding-right:52px;
 
 </div>
 
+</div>
+
 <script>
 
 const API_URL="/api";
+
+const params=new URLSearchParams(window.location.search);
+const selectedRating=Number(params.get("rating"));
+
+const writeReview=document.getElementById("writeReview");
+const reviewList=document.getElementById("reviewList");
+const selectedStars=document.getElementById("selectedStars");
+const reviewComment=document.getElementById("reviewComment");
+const publishReview=document.getElementById("publishReview");
+const writeMessage=document.getElementById("writeMessage");
+
+const isWritingReview=
+Number.isInteger(selectedRating) &&
+selectedRating >= 1 &&
+selectedRating <= 5;
+
+if(isWritingReview){
+
+writeReview.style.display="block";
+reviewList.style.display="none";
+
+selectedStars.textContent=
+"★".repeat(selectedRating)+
+"☆".repeat(5-selectedRating);
+
+}
 
 function getToken(){
 return localStorage.getItem("token") ||
@@ -328,6 +389,56 @@ review.user.created_at
 )) ||
 "";
 }
+
+
+async function publishSelectedReview(){
+
+if(!isWritingReview){
+return;
+}
+
+const text=reviewComment.value.trim();
+
+if(text.length>500){
+writeMessage.textContent="⚠️ المراجعة يجب ألا تتجاوز 500 حرف.";
+return;
+}
+
+publishReview.disabled=true;
+writeMessage.textContent="⏳ جاري نشر المراجعة...";
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating`,{
+method:"POST",
+body:JSON.stringify({
+rating:selectedRating,
+comment:text || null
+})
+});
+
+const data=await res.json();
+
+if(!res.ok || !data.success){
+throw new Error(data.message || "تعذر نشر المراجعة");
+}
+
+window.location.href="rating.html";
+
+}catch(error){
+
+console.error(error);
+
+writeMessage.textContent=
+error.message || "تعذر نشر المراجعة حاليًا.";
+
+publishReview.disabled=false;
+
+}
+
+}
+
+publishReview.addEventListener("click",publishSelectedReview);
 
 
 async function loadReviews(){

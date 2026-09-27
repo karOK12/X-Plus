@@ -516,6 +516,10 @@ color:#2563eb;
 
 <h2>تقييم هذا التطبيق</h2>
 
+<div style="margin-top:6px;color:#9fb0c3;font-size:14px;">
+أخبر الآخرين برأيك
+</div>
+
 <div class="stars" id="stars">
 <button type="button" class="star" data-rating="1">★</button>
 <button type="button" class="star" data-rating="2">★</button>
@@ -528,38 +532,13 @@ color:#2563eb;
 اختر عدد النجوم لتقييم X Plus
 </div>
 
-<div id="commentArea" style="display:none;">
-
-<label class="label" for="comment">صف تجربتك (اختياري)</label>
-
-<textarea
-id="comment"
-maxlength="500"
-placeholder="اكتب تجربتك أو رأيك في X Plus..."
-></textarea>
-
-<div class="counter">
-<span id="charCount">0</span> / 500
-</div>
-
-<button
-type="button"
-class="action send"
-id="sendBtn"
-style="margin-top:12px;"
->
-مشاركة
-</button>
-
-</div>
-
 <button
 type="button"
 class="action send"
 id="shareRatingBtn"
-style="margin-top:5px;"
+style="margin-top:8px;"
 >
-مشاركة تقييمك
+كتابة مراجعة
 </button>
 
 <div class="message" id="message"></div>
@@ -679,6 +658,15 @@ const reviews=document.getElementById("reviews");
 const commentArea=document.getElementById("commentArea");
 const topRatingStar=document.querySelector(".top-rating-star");
 const reviewStat=document.getElementById("reviewStat");
+const shareRatingBtn=document.getElementById("shareRatingBtn");
+
+shareRatingBtn.addEventListener("click",()=>{
+if(!selectedRating){
+message.textContent="⚠️ اختر عدد النجوم أولاً.";
+return;
+}
+window.location.href=`reviews.html?rating=${selectedRating}`;
+});
 
 function resetRatingSelection(){
 
