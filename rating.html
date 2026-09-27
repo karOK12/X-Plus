@@ -251,92 +251,211 @@ font-weight:700;
 }
 
 .review{
-border-top:1px solid rgba(255,255,255,.075);
-padding:18px 0;
+position:relative;
+display:flex;
+align-items:flex-start;
+gap:12px;
+direction:ltr;
+padding:0;
+margin:0 0 24px;
 }
 
 .review:first-child{
-border-top:0;
-padding-top:10px;
+padding-top:0;
 }
 
-.review-head{
+.review-main{
+flex:1;
+min-width:0;
+direction:rtl;
+}
+
+.review-user{
 display:flex;
 align-items:center;
-justify-content:space-between;
-gap:10px;
+gap:9px;
 }
 
-.username{
+.review-avatar{
+width:42px;
+height:42px;
+border-radius:50%;
+object-fit:cover;
+flex:none;
+background:#172235;
+border:1px solid rgba(255,255,255,.08);
+}
+
+.review-avatar-fallback{
+width:42px;
+height:42px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+flex:none;
+background:#172235;
+color:#9fb0c3;
+font-size:19px;
+border:1px solid rgba(255,255,255,.08);
+}
+
+.review-username{
 font-weight:800;
+color:#fff;
+font-size:14px;
+}
+
+.review-meta{
+display:flex;
+align-items:center;
+gap:8px;
+margin-top:4px;
+}
+
+.review-stars{
+direction:ltr;
+display:inline-flex;
+align-items:center;
+gap:1px;
+font-size:15px;
+line-height:1;
+}
+
+.review-stars .filled{
+color:#1687ff;
+}
+
+.review-stars .empty-star{
+color:transparent;
+-webkit-text-stroke:1px #111;
 }
 
 .review-date{
 color:#7f91a6;
 font-size:11px;
-}
-
-.review-stars{
-color:#ffd43b;
-direction:ltr;
-display:inline-block;
-margin-top:5px;
-letter-spacing:1px;
+white-space:nowrap;
 }
 
 .review-comment{
-margin-top:10px;
-padding:12px 13px;
-border-radius:12px;
-background:rgba(255,255,255,.045);
-border:1px solid rgba(255,255,255,.075);
+margin-top:8px;
+padding:0;
+border:0;
+background:none;
+border-radius:0;
 color:#d9e3ed;
 line-height:1.9;
 font-size:13px;
 white-space:pre-wrap;
-overflow-wrap:anywhere;
+word-break:break-word;
+}
+
+.review-actions{
+width:52px;
+flex:none;
+direction:rtl;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:8px;
+padding-top:1px;
+position:relative;
+}
+
+.review-more{
+width:34px;
+height:30px;
+border:0;
+background:transparent;
+color:#9fb0c3;
+font-size:23px;
+line-height:1;
+cursor:pointer;
+padding:0;
+}
+
+.review-votes{
+display:flex;
+align-items:center;
+gap:5px;
+}
+
+.review-vote{
+border:1px solid rgba(255,255,255,.12);
+background:transparent;
+color:#9fb0c3;
+border-radius:8px;
+font-size:11px;
+padding:4px 7px;
+cursor:pointer;
+}
+
+.review-vote.active{
+color:#fff;
+background:rgba(22,135,255,.18);
+border-color:rgba(22,135,255,.45);
+}
+
+.review-menu{
+position:absolute;
+left:44px;
+top:30px;
+z-index:50;
+min-width:155px;
+background:#111a29;
+border:1px solid rgba(255,255,255,.1);
+border-radius:10px;
+box-shadow:0 10px 25px rgba(0,0,0,.35);
+padding:5px;
+direction:rtl;
+display:none;
+}
+
+.review-menu.open{
+display:block;
+}
+
+.review-report-option{
+display:block;
+width:100%;
+border:0;
+background:transparent;
+color:#fff;
+text-align:right;
+padding:9px 10px;
+border-radius:7px;
+font-size:12px;
+cursor:pointer;
+}
+
+.review-report-option:hover{
+background:rgba(255,255,255,.07);
 }
 
 .developer-reply{
 margin-top:12px;
-padding:12px 13px;
-border-radius:12px;
-background:rgba(37,99,235,.09);
-border-right:3px solid #2563eb;
-color:#d9e5f2;
-line-height:1.8;
-font-size:13px;
+padding:0;
+direction:rtl;
 }
 
 .developer-reply strong{
-display:block;
-margin-bottom:4px;
-color:#fff;
-}
-
-.developer-reply-head{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:10px;
-margin-bottom:5px;
-}
-
-.developer-reply-head strong{
-margin:0;
-}
-
-.developer-reply-head span{
-color:#7f91a6;
-font-size:11px;
-white-space:nowrap;
+color:#1687ff;
 }
 
 .developer-reply-text{
+color:#d8e1ec;
+font-size:13px;
+line-height:1.8;
 white-space:pre-wrap;
-overflow-wrap:anywhere;
+word-break:break-word;
 }
 
+.developer-reply-date{
+margin-top:3px;
+font-size:11px;
+color:#718096;
+}
+/* أدوات رد المطوّر في لوحة الإدارة */
 .developer-reply-editor{
 margin-top:12px;
 padding:12px;
@@ -897,7 +1016,7 @@ if(!commentsContainer)return;
 
 try{
 
-const res=await apiFetch(`${API_URL}/rating/comments`);
+const res=await apiFetch(`${API_URL}/rating`);
 
 const data=await res.json();
 
@@ -909,7 +1028,9 @@ data.message||"تعذر تحميل التعليقات"
 
 }
 
-const items=data.comments||[];
+const items=Array.isArray(data.reviews)
+?data.reviews
+:[];
 
 if(!items.length){
 
@@ -920,47 +1041,301 @@ return;
 
 }
 
-commentsContainer.innerHTML=items.map(item=>{
+const formatCommentDate=(value)=>{
 
-const username=
-item.username||"مستخدم";
+if(!value)return "";
 
-const date=
-formatDate(item.createdAt||item.created_at);
+const d=new Date(value);
 
-const commentText=
-item.comment||"";
+if(Number.isNaN(d.getTime()))return "";
 
-const avatar=
-item.profileImage||item.profile_image||"";
+return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+
+};
+
+const renderStars=(rating)=>{
+
+const n=Math.max(
+0,
+Math.min(5,Number(rating)||0)
+);
 
 return `
-<article class="review">
+<span class="review-stars">
+${Array.from(
+{length:5},
+(_,i)=>
+`<span class="${i<n?"filled":"empty-star"}">${i<n?"★":"☆"}</span>`
+).join("")}
+</span>
+`;
 
-<div class="review-head">
+};
 
-<div class="username">
+const renderAvatar=(item)=>{
+
+const avatar=String(
+item.profileImage||
+item.profile_image||
+""
+).trim();
+
+if(avatar){
+
+return `
+<img
+class="review-avatar"
+src="${escapeHtml(avatar)}"
+alt=""
+loading="lazy"
+onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+>
+<div
+class="review-avatar-fallback"
+style="display:none;"
+>
+👤
+</div>
+`;
+
+}
+
+return `
+<div class="review-avatar-fallback">
+👤
+</div>
+`;
+
+};
+
+commentsContainer.innerHTML=`
+
+${items.map((item,index)=>{
+
+const id=String(item.id||index);
+
+const username=
+String(item.username||"مستخدم");
+
+const date=
+formatCommentDate(
+item.createdAt||
+item.created_at
+);
+
+const text=
+String(item.comment||"").trim();
+
+const reply=
+String(
+item.developerReply||
+item.developer_reply||
+""
+).trim();
+
+const replyDate=
+formatCommentDate(
+item.developerReplyAt||
+item.developer_reply_at
+);
+
+return `
+<article
+class="review"
+data-review-id="${escapeHtml(id)}"
+>
+
+<div class="review-actions">
+
+<button
+type="button"
+class="review-more"
+data-review-more="${escapeHtml(id)}"
+aria-label="خيارات التعليق"
+>⋮</button>
+
+<div class="review-votes">
+
+<button
+type="button"
+class="review-vote"
+data-vote="no"
+>لا</button>
+
+<button
+type="button"
+class="review-vote"
+data-vote="yes"
+>نعم</button>
+
+</div>
+
+<div
+class="review-menu"
+data-review-menu="${escapeHtml(id)}"
+>
+
+<button
+type="button"
+class="review-report-option"
+data-report-reason="محتوى غير ملائم"
+>
+محتوى غير ملائم
+</button>
+
+<button
+type="button"
+class="review-report-option"
+data-report-reason="غير مرغوب فيه"
+>
+غير مرغوب فيه
+</button>
+
+</div>
+
+</div>
+
+<div class="review-main">
+
+<div class="review-user">
+
+${renderAvatar(item)}
+
+<div class="review-username">
 ${escapeHtml(username)}
 </div>
 
-<div class="review-date">
-${escapeHtml(date)}
 </div>
+
+<div class="review-meta">
+
+${renderStars(item.rating)}
+
+<span class="review-date">
+${escapeHtml(date)}
+</span>
 
 </div>
 
 <div class="review-comment">
-${escapeHtml(commentText)}
+${escapeHtml(text)}
+</div>
+
+${reply?`
+
+<div class="developer-reply">
+
+<strong>رد المطوّر</strong>
+
+<div class="developer-reply-text">
+${escapeHtml(reply)}
+</div>
+
+${replyDate?`
+<div class="developer-reply-date">
+${escapeHtml(replyDate)}
+</div>
+`:""}
+
+</div>
+
+`:""}
+
 </div>
 
 </article>
 `;
 
-}).join("");
+}).join("")}
+
+`;
+
+commentsContainer
+.querySelectorAll("[data-review-more]")
+.forEach(button=>{
+
+button.addEventListener("click",(event)=>{
+
+event.stopPropagation();
+
+const id=
+button.getAttribute("data-review-more");
+
+const menu=
+commentsContainer.querySelector(
+`[data-review-menu="${CSS.escape(id)}"]`
+);
+
+commentsContainer
+.querySelectorAll(".review-menu.open")
+.forEach(other=>{
+
+if(other!==menu){
+other.classList.remove("open");
+}
+
+});
+
+if(menu){
+menu.classList.toggle("open");
+}
+
+});
+
+});
+
+commentsContainer
+.querySelectorAll(".review-report-option")
+.forEach(option=>{
+
+option.addEventListener("click",()=>{
+
+const reason=
+option.getAttribute("data-report-reason")||"";
+
+const review=
+option.closest(".review");
+
+if(review){
+review.dataset.reportReason=reason;
+}
+
+option.closest(".review-menu")
+?.classList.remove("open");
+
+});
+
+});
+
+commentsContainer
+.querySelectorAll(".review-vote")
+.forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+const review=
+button.closest(".review");
+
+if(!review)return;
+
+review
+.querySelectorAll(".review-vote")
+.forEach(vote=>{
+vote.classList.remove("active");
+});
+
+button.classList.add("active");
+
+});
+
+});
 
 }catch(error){
 
-console.error("❌ COMMENTS ERROR:",error);
+console.error(
+"❌ COMMENTS ERROR:",
+error
+);
 
 commentsContainer.innerHTML=
 `<div class="empty">تعذر تحميل التعليقات حاليًا.</div>`;
@@ -968,7 +1343,6 @@ commentsContainer.innerHTML=
 }
 
 }
-
 function escapeHtml(value){
 
 return String(value)
