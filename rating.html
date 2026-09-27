@@ -603,16 +603,12 @@ style="margin-top:5px;"
 </section>
 
 <section class="card">
-
 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-<h2 style="margin:0;">آخر المراجعات</h2>
-
+<h2 style="margin:0;">التعليقات</h2>
 </div>
-
-<div id="reviews">
-<div class="empty">جاري تحميل المراجعات...</div>
+<div id="comments">
+<div class="empty">جاري تحميل التعليقات...</div>
 </div>
-
 </section>
 
 
@@ -854,89 +850,98 @@ function updateStats(stats){
 
 if(!stats)return;
 
-document.getElementById("averageRating").textContent=
-Number(stats.averageRating||0).toFixed(1);
+const averageRating=Number(stats.averageRating||0);
+const totalRatings=Number(stats.totalRatings||0);
+const totalReviews=Number(stats.totalReviews||0);
 
-document.getElementById("totalRatings").textContent=
-Number(stats.totalRatings||0);
+const averageElement=document.getElementById("averageRating");
 
-document.getElementById("totalReviews").textContent=
-Number(stats.totalReviews||0);
+if(averageElement){
+averageElement.textContent=
+averageRating.toFixed(1);
+}
 
-const total=Number(stats.totalRatings||0);
+const totalRatingsElement=document.getElementById("totalRatings");
+
+if(totalRatingsElement){
+totalRatingsElement.textContent=
+totalRatings;
+}
+
+const totalReviewsElement=document.getElementById("totalReviews");
+
+if(totalReviewsElement){
+totalReviewsElement.textContent=
+totalReviews;
+}
+
+const total=totalRatings;
 
 for(let i=1;i<=5;i++){
 
 const count=Number(stats.distribution?.[i]||0);
 
-document.getElementById(`count${i}`).textContent=count;
+const countElement=document.getElementById(`count${i}`);
 
+if(countElement){
+countElement.textContent=count;
+}
+
+const barElement=document.getElementById(`bar${i}`);
+
+if(barElement){
 const percentage=total>0?(count/total)*100:0;
-
-document.getElementById(`bar${i}`).style.width=
-`${percentage}%`;
-}
+barElement.style.width=`${percentage}%`;
 }
 
-function renderReviews(items){
+}
 
-if(!items||!items.length){
+}
 
-reviews.innerHTML=
-`<div class="empty">لا توجد مراجعات بعد. كن أول من يشارك تجربته.</div>`;
+async function loadComments(){
+
+const commentsContainer=document.getElementById("comments");
+
+if(!commentsContainer)return;
+
+try{
+
+const res=await apiFetch(`${API_URL}/rating/comments`);
+
+const data=await res.json();
+
+if(!res.ok||!data.success){
+
+throw new Error(
+data.message||"تعذر تحميل التعليقات"
+);
+
+}
+
+const items=data.comments||[];
+
+if(!items.length){
+
+commentsContainer.innerHTML=
+`<div class="empty">لا توجد تعليقات بعد. كن أول من يشارك رأيه.</div>`;
 
 return;
+
 }
 
-reviews.innerHTML=items.map(review=>{
+commentsContainer.innerHTML=items.map(item=>{
 
-const reply=review.developerReply
-?`
-<div class="developer-reply">
-<div class="developer-reply-head">
-<strong>إدارة X Plus</strong>
-<span>${formatReplyDate(review.developerReplyAt)}</span>
-</div>
+const username=
+item.username||"مستخدم";
 
-<div class="developer-reply-text">
-${escapeHtml(review.developerReply)}
-</div>
-</div>
-`
-:"";
+const date=
+formatDate(item.createdAt||item.created_at);
 
-const developerEditor=isDeveloper
-?`
-<div class="developer-reply-editor">
-<div class="developer-reply-editor-title">
-رد المطوّر
-</div>
+const commentText=
+item.comment||"";
 
-<textarea
-class="developer-reply-textarea"
-data-review-id="${review.id}"
-maxlength="1000"
-placeholder="اكتب ردك على هذه المراجعة..."
->${escapeHtml(review.developerReply||"")}</textarea>
-
-<button
-type="button"
-class="developer-reply-btn"
-data-review-id="${review.id}">
-حفظ الرد
-</button>
-
-<div
-class="developer-reply-status"
-data-status-for="${review.id}">
-</div>
-</div>
-`
-:"";
-
-const rating=review.rating
-?`<div class="review-stars">${renderStars(review.rating)}</div>`
-:`<div class="review-date">تعليق بدون تقييم نجوم</div>`;
+const avatar=
+item.profileImage||item.profile_image||"";
 
 return `
 <article class="review">
@@ -944,124 +949,34 @@ return `
 <div class="review-head">
 
 <div class="username">
-${escapeHtml(review.username||"مستخدم")}
+${escapeHtml(username)}
 </div>
 
 <div class="review-date">
-${formatDate(review.createdAt)}
+${escapeHtml(date)}
 </div>
 
 </div>
-
-${rating}
 
 <div class="review-comment">
-${escapeHtml(review.comment||"")}
+${escapeHtml(commentText)}
 </div>
-
-${reply}
-
-${developerEditor}
 
 </article>
 `;
 
 }).join("");
 
-}
-
-function formatReplyDate(value){
-if(!value)return "";
-
-try{
-return new Date(value).toLocaleDateString(
-"ar-IQ",
-{
-year:"numeric",
-month:"2-digit",
-day:"2-digit"
-}
-);
-}catch{
-return "";
-}
-}
-
-reviews.addEventListener("click",async(event)=>{
-
-const button=event.target.closest(".developer-reply-btn");
-
-if(!button||!isDeveloper)return;
-
-const reviewId=Number(button.dataset.reviewId);
-
-const editor=button.closest(".developer-reply-editor");
-
-if(!editor)return;
-
-const textarea=editor.querySelector(".developer-reply-textarea");
-const status=editor.querySelector(".developer-reply-status");
-
-if(!textarea)return;
-
-const reply=textarea.value.trim();
-
-if(!reply){
-
-status.textContent="اكتب الرد أولاً.";
-return;
-
-}
-
-if(reply.length>1000){
-
-status.textContent="الرد يجب ألا يتجاوز 1000 حرف.";
-return;
-
-}
-
-button.disabled=true;
-button.textContent="جاري الحفظ...";
-status.textContent="";
-
-try{
-
-const res=await apiFetch(`${API_URL}/rating/reply`,{
-method:"POST",
-body:JSON.stringify({
-reviewId,
-reply
-})
-});
-
-const data=await res.json();
-
-if(!res.ok||!data.success){
-
-throw new Error(
-data.message||"تعذر حفظ الرد"
-);
-
-}
-
-status.textContent="تم حفظ الرد بنجاح.";
-button.textContent="تم الحفظ";
-
-await loadRating();
-
 }catch(error){
 
-console.error("❌ DEVELOPER REPLY ERROR:",error);
+console.error("❌ COMMENTS ERROR:",error);
 
-status.textContent=
-error.message||"تعذر حفظ الرد.";
-
-button.disabled=false;
-button.textContent="حفظ الرد";
+commentsContainer.innerHTML=
+`<div class="empty">تعذر تحميل التعليقات حاليًا.</div>`;
 
 }
 
-});
+}
 
 function escapeHtml(value){
 
@@ -1071,6 +986,7 @@ return String(value)
 .replaceAll(">","&gt;")
 .replaceAll('"',"&quot;")
 .replaceAll("'","&#039;");
+
 }
 
 async function loadRating(){
@@ -1078,6 +994,7 @@ async function loadRating(){
 if(!getToken()){
 
 window.location.href="login.html";
+
 return;
 
 }
@@ -1085,6 +1002,7 @@ return;
 try{
 
 const res=await apiFetch(`${API_URL}/rating`);
+
 const data=await res.json();
 
 if(!res.ok||!data.success){
@@ -1092,9 +1010,8 @@ if(!res.ok||!data.success){
 throw new Error(
 data.message||"تعذر تحميل التقييمات"
 );
-}
 
-isDeveloper = data.isDeveloper === true;
+}
 
 if(data.rating){
 
@@ -1121,14 +1038,10 @@ data.comment.length;
 }
 
 updateStats(data.stats);
-renderReviews(data.reviews);
 
 }catch(err){
 
-console.error(err);
-
-reviews.innerHTML=
-`<div class="empty">تعذر تحميل المراجعات حاليًا.</div>`;
+console.error("❌ RATING LOAD ERROR:",err);
 
 }
 
@@ -1264,12 +1177,11 @@ message.textContent=
 
 try{
 
-const res=await apiFetch(`${API_URL}/rating`,{
+const res=await apiFetch(`${API_URL}/rating/comments`,{
 
 method:"POST",
 
 body:JSON.stringify({
-rating:null,
 comment:text
 })
 
@@ -1293,7 +1205,7 @@ commentOnlyCount.textContent="0";
 
 commentOnlyArea.style.display="none";
 
-await loadRating();
+await loadComments();
 
 }catch(err){
 
@@ -1311,6 +1223,7 @@ submitCommentOnly.disabled=false;
 });
 
 loadRating();
+loadComments();
 
 </script>
 

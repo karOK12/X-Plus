@@ -27,7 +27,7 @@ const validateRating = (value) => {
 
 // ==========================================
 // GET /api/rating
-// تقييم المستخدم + إحصائيات التطبيق + المراجعات
+// تقييم المستخدم + إحصائيات التطبيق + مراجعات التقييم
 // ==========================================
 exports.getRating = async (req, res) => {
   try {
@@ -58,13 +58,38 @@ exports.getRating = async (req, res) => {
       `
       SELECT
         COUNT(rating)::integer AS total_ratings,
-        COUNT(*) FILTER (WHERE comment IS NOT NULL AND LENGTH(TRIM(comment)) > 0)::integer AS total_reviews,
-        COALESCE(ROUND(AVG(rating)::numeric, 2), 0) AS average_rating,
-        COUNT(*) FILTER (WHERE rating = 5)::integer AS five_star,
-        COUNT(*) FILTER (WHERE rating = 4)::integer AS four_star,
-        COUNT(*) FILTER (WHERE rating = 3)::integer AS three_star,
-        COUNT(*) FILTER (WHERE rating = 2)::integer AS two_star,
-        COUNT(*) FILTER (WHERE rating = 1)::integer AS one_star
+
+        COUNT(*) FILTER (
+          WHERE rating IS NOT NULL
+            AND comment IS NOT NULL
+            AND LENGTH(TRIM(comment)) > 0
+        )::integer AS total_reviews,
+
+        COALESCE(
+          ROUND(AVG(rating)::numeric, 2),
+          0
+        ) AS average_rating,
+
+        COUNT(*) FILTER (
+          WHERE rating = 5
+        )::integer AS five_star,
+
+        COUNT(*) FILTER (
+          WHERE rating = 4
+        )::integer AS four_star,
+
+        COUNT(*) FILTER (
+          WHERE rating = 3
+        )::integer AS three_star,
+
+        COUNT(*) FILTER (
+          WHERE rating = 2
+        )::integer AS two_star,
+
+        COUNT(*) FILTER (
+          WHERE rating = 1
+        )::integer AS one_star
+
       FROM app_ratings
       `
     );
@@ -74,27 +99,48 @@ exports.getRating = async (req, res) => {
       SELECT
         COUNT(*) FILTER (
           WHERE birth_date IS NOT NULL
-            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 13 AND 17
+            AND DATE_PART(
+              'year',
+              AGE(CURRENT_DATE, birth_date)
+            ) BETWEEN 13 AND 17
         )::integer AS age_13_17,
+
         COUNT(*) FILTER (
           WHERE birth_date IS NOT NULL
-            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 18 AND 24
+            AND DATE_PART(
+              'year',
+              AGE(CURRENT_DATE, birth_date)
+            ) BETWEEN 18 AND 24
         )::integer AS age_18_24,
+
         COUNT(*) FILTER (
           WHERE birth_date IS NOT NULL
-            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 25 AND 34
+            AND DATE_PART(
+              'year',
+              AGE(CURRENT_DATE, birth_date)
+            ) BETWEEN 25 AND 34
         )::integer AS age_25_34,
+
         COUNT(*) FILTER (
           WHERE birth_date IS NOT NULL
-            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) BETWEEN 35 AND 44
+            AND DATE_PART(
+              'year',
+              AGE(CURRENT_DATE, birth_date)
+            ) BETWEEN 35 AND 44
         )::integer AS age_35_44,
+
         COUNT(*) FILTER (
           WHERE birth_date IS NOT NULL
-            AND DATE_PART('year', AGE(CURRENT_DATE, birth_date)) >= 45
+            AND DATE_PART(
+              'year',
+              AGE(CURRENT_DATE, birth_date)
+            ) >= 45
         )::integer AS age_45_plus,
+
         COUNT(*) FILTER (
           WHERE birth_date IS NULL
         )::integer AS age_unknown
+
       FROM users
       `
     );
@@ -111,14 +157,25 @@ exports.getRating = async (req, res) => {
         r.developer_reply_at,
         r.created_at,
         r.updated_at,
-        COALESCE(NULLIF(TRIM(u.username), ''), 'مستخدم') AS username,
+
+        COALESCE(
+          NULLIF(TRIM(u.username), ''),
+          'مستخدم'
+        ) AS username,
+
         u.profile_image
+
       FROM app_ratings r
+
       INNER JOIN users u
         ON u.id = r.user_id
-      WHERE r.comment IS NOT NULL
+
+      WHERE r.rating IS NOT NULL
+        AND r.comment IS NOT NULL
         AND LENGTH(TRIM(r.comment)) > 0
+
       ORDER BY r.created_at DESC
+
       LIMIT 50
       `
     );
@@ -127,11 +184,15 @@ exports.getRating = async (req, res) => {
     const stats = statsResult.rows[0];
 
     const developerEmail =
-      String(process.env.DEVELOPER_EMAIL || "").trim().toLowerCase();
+      String(process.env.DEVELOPER_EMAIL || "")
+        .trim()
+        .toLowerCase();
 
     const isDeveloper =
       !!developerEmail &&
-      String(req.user?.email || "").trim().toLowerCase() === developerEmail;
+      String(req.user?.email || "")
+        .trim()
+        .toLowerCase() === developerEmail;
 
     return res.json({
       success: true,
@@ -142,53 +203,87 @@ exports.getRating = async (req, res) => {
 
       comment: userRating?.comment ?? "",
 
-      rated: userRating?.rating !== null &&
-             userRating?.rating !== undefined,
+      rated:
+        userRating?.rating !== null &&
+        userRating?.rating !== undefined,
 
-      reviewed: !!userRating?.comment,
+      reviewed:
+        userRating?.rating !== null &&
+        userRating?.rating !== undefined &&
+        !!userRating?.comment,
 
-      developerReply: userRating?.developer_reply ?? null,
+      developerReply:
+        userRating?.developer_reply ?? null,
 
-      developerReplyAt: userRating?.developer_reply_at ?? null,
+      developerReplyAt:
+        userRating?.developer_reply_at ?? null,
 
-      createdAt: userRating?.created_at ?? null,
+      createdAt:
+        userRating?.created_at ?? null,
 
-      updatedAt: userRating?.updated_at ?? null,
+      updatedAt:
+        userRating?.updated_at ?? null,
 
       stats: {
-        averageRating: Number(stats.average_rating || 0),
+        averageRating:
+          Number(stats.average_rating || 0),
 
         ageGroups: {
-          "13-17": Number(ageStats.age_13_17 || 0),
-          "18-24": Number(ageStats.age_18_24 || 0),
-          "25-34": Number(ageStats.age_25_34 || 0),
-          "35-44": Number(ageStats.age_35_44 || 0),
-          "45+": Number(ageStats.age_45_plus || 0),
-          unknown: Number(ageStats.age_unknown || 0)
+          "13-17":
+            Number(ageStats.age_13_17 || 0),
+
+          "18-24":
+            Number(ageStats.age_18_24 || 0),
+
+          "25-34":
+            Number(ageStats.age_25_34 || 0),
+
+          "35-44":
+            Number(ageStats.age_35_44 || 0),
+
+          "45+":
+            Number(ageStats.age_45_plus || 0),
+
+          unknown:
+            Number(ageStats.age_unknown || 0)
         },
-        totalRatings: Number(stats.total_ratings || 0),
-        totalReviews: Number(stats.total_reviews || 0),
+
+        totalRatings:
+          Number(stats.total_ratings || 0),
+
+        totalReviews:
+          Number(stats.total_reviews || 0),
 
         distribution: {
-          5: Number(stats.five_star || 0),
-          4: Number(stats.four_star || 0),
-          3: Number(stats.three_star || 0),
-          2: Number(stats.two_star || 0),
-          1: Number(stats.one_star || 0)
+          5:
+            Number(stats.five_star || 0),
+
+          4:
+            Number(stats.four_star || 0),
+
+          3:
+            Number(stats.three_star || 0),
+
+          2:
+            Number(stats.two_star || 0),
+
+          1:
+            Number(stats.one_star || 0)
         }
       },
 
-      reviews: reviewsResult.rows.map(row => ({
-        id: row.id,
-        username: row.username,
-        profileImage: row.profile_image,
-        rating: row.rating,
-        comment: row.comment,
-        developerReply: row.developer_reply,
-        developerReplyAt: row.developer_reply_at,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at
-      }))
+      reviews:
+        reviewsResult.rows.map(row => ({
+          id: row.id,
+          username: row.username,
+          profileImage: row.profile_image,
+          rating: row.rating,
+          comment: row.comment,
+          developerReply: row.developer_reply,
+          developerReplyAt: row.developer_reply_at,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at
+        }))
     });
 
   } catch (err) {
@@ -204,7 +299,7 @@ exports.getRating = async (req, res) => {
 
 // ==========================================
 // POST /api/rating
-// إنشاء أو تحديث تقييم / تعليق
+// إنشاء أو تحديث تقييم
 // ==========================================
 exports.saveRating = async (req, res) => {
   try {
@@ -217,10 +312,10 @@ exports.saveRating = async (req, res) => {
 
     const rating = validateRating(req.body.rating);
 
-    if (rating === undefined) {
+    if (rating === null || rating === undefined) {
       return res.status(400).json({
         success: false,
-        message: "التقييم يجب أن يكون رقمًا صحيحًا بين 1 و5"
+        message: "اختر تقييمًا من 1 إلى 5 نجوم"
       });
     }
 
@@ -241,12 +336,15 @@ exports.saveRating = async (req, res) => {
         comment
       )
       VALUES ($1, $2, $3)
+
       ON CONFLICT (user_id)
+
       DO UPDATE SET
         rating = EXCLUDED.rating,
         comment = EXCLUDED.comment,
         created_at = NOW(),
         updated_at = NOW()
+
       RETURNING
         id,
         rating,
@@ -265,7 +363,7 @@ exports.saveRating = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "تم حفظ مشاركتك بنجاح ⭐",
+      message: "تم حفظ تقييمك بنجاح ⭐",
       data: result.rows[0]
     });
 
@@ -274,20 +372,163 @@ exports.saveRating = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "فشل حفظ التقييم أو التعليق"
+      message: "فشل حفظ التقييم"
     });
   }
 };
 
+
+// ==========================================
+// GET /api/rating/comments
+// التعليقات المستقلة بدون تقييم
+// ==========================================
+exports.getComments = async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
+
+    const result = await db.query(
+      `
+      SELECT
+        c.id,
+        c.comment,
+        c.created_at,
+        c.updated_at,
+
+        COALESCE(
+          NULLIF(TRIM(u.username), ''),
+          'مستخدم'
+        ) AS username,
+
+        u.profile_image
+
+      FROM app_comments c
+
+      INNER JOIN users u
+        ON u.id = c.user_id
+
+      ORDER BY c.created_at DESC
+
+      LIMIT 50
+      `
+    );
+
+    return res.json({
+      success: true,
+
+      comments: result.rows.map(row => ({
+        id: row.id,
+        username: row.username,
+        profileImage: row.profile_image,
+        comment: row.comment,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }))
+    });
+
+  } catch (err) {
+    console.error("❌ GET COMMENTS ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "فشل جلب التعليقات"
+    });
+  }
+};
+
+
+// ==========================================
+// POST /api/rating/comments
+// إنشاء تعليق مستقل بدون تقييم
+// ==========================================
+exports.saveComment = async (req, res) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
+
+    const comment = normalizeComment(req.body.comment);
+
+    if (!comment) {
+      return res.status(400).json({
+        success: false,
+        message: "التعليق مطلوب"
+      });
+    }
+
+    if (comment.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: "التعليق يجب ألا يتجاوز 500 حرف"
+      });
+    }
+
+    const result = await db.query(
+      `
+      INSERT INTO app_comments (
+        user_id,
+        comment
+      )
+      VALUES ($1, $2)
+
+      RETURNING
+        id,
+        user_id,
+        comment,
+        created_at,
+        updated_at
+      `,
+      [
+        req.user.id,
+        comment
+      ]
+    );
+
+    return res.json({
+      success: true,
+      message: "تم نشر تعليقك بنجاح.",
+      data: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("❌ SAVE COMMENT ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "فشل حفظ التعليق"
+    });
+  }
+};
+
+
+// ==========================================
+// POST /api/rating/reply
+// رد المطوّر على مراجعة تقييم
+// ==========================================
 exports.replyToReview = async (req, res) => {
   try {
     const developerEmail =
-      String(process.env.DEVELOPER_EMAIL || "").trim().toLowerCase();
+      String(process.env.DEVELOPER_EMAIL || "")
+        .trim()
+        .toLowerCase();
 
     const userEmail =
-      String(req.user?.email || "").trim().toLowerCase();
+      String(req.user?.email || "")
+        .trim()
+        .toLowerCase();
 
-    if (!developerEmail || !userEmail || userEmail !== developerEmail) {
+    if (
+      !developerEmail ||
+      !userEmail ||
+      userEmail !== developerEmail
+    ) {
       return res.status(403).json({
         success: false,
         message: "غير مصرح"
@@ -295,9 +536,14 @@ exports.replyToReview = async (req, res) => {
     }
 
     const reviewId = Number(req.body.reviewId);
-    const reply = String(req.body.reply || "").trim();
 
-    if (!Number.isInteger(reviewId) || reviewId <= 0) {
+    const reply =
+      String(req.body.reply || "").trim();
+
+    if (
+      !Number.isInteger(reviewId) ||
+      reviewId <= 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "معرف المراجعة غير صالح"
@@ -321,16 +567,22 @@ exports.replyToReview = async (req, res) => {
     const result = await db.query(
       `
       UPDATE app_ratings
+
       SET
         developer_reply = $1,
         developer_reply_at = NOW()
+
       WHERE id = $2
+
       RETURNING
         id,
         developer_reply,
         developer_reply_at
       `,
-      [reply, reviewId]
+      [
+        reply,
+        reviewId
+      ]
     );
 
     if (!result.rows.length) {
