@@ -717,12 +717,7 @@ headers:{
 function showStars(value){
 
 stars.forEach(star=>{
-const rating=Number(star.dataset.rating);
-
-star.classList.toggle(
-"active",
-value!==null && rating<=value
-);
+star.classList.remove("active");
 });
 }
 
