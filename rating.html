@@ -732,7 +732,7 @@ star.addEventListener("click",async()=>{
 
 const clickedRating=Number(star.dataset.rating);
 
-if(selectedRating===clickedRating){
+if(selectedRating!==null && selectedRating===clickedRating){
 
 selectedRating=null;
 showStars(null);
