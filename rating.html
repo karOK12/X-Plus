@@ -717,7 +717,12 @@ headers:{
 function showStars(value){
 
 stars.forEach(star=>{
-star.classList.remove("active");
+const rating=Number(star.dataset.rating);
+
+star.classList.toggle(
+"active",
+value!==null && rating===value
+);
 });
 }
 
@@ -1074,16 +1079,16 @@ isDeveloper = data.isDeveloper === true;
 
 if(data.rating){
 
-selectedRating=Number(data.rating);
+selectedRating=null;
 
-showStars(selectedRating);
+showStars(null);
 
 if(topRatingStar){
-topRatingStar.classList.add("active");
+topRatingStar.classList.remove("active");
 }
 
 ratingText.textContent=
-`${selectedRating} من 5 ⭐`;
+"اختر عدد النجوم لتقييم X Plus";
 
 }
 
