@@ -716,13 +716,19 @@ headers:{
 function showStars(value){
 
 stars.forEach(star=>{
-const rating=Number(star.dataset.rating);
-
-star.classList.toggle(
-"active",
-value!==null && rating<=value
-);
+star.classList.remove("active");
 });
+
+if(value!==null){
+const star=document.querySelector(
+`.star[data-rating="${value}"]`
+);
+
+if(star){
+star.classList.add("active");
+}
+}
+
 }
 
 stars.forEach(star=>{
@@ -731,16 +737,26 @@ star.addEventListener("click",async()=>{
 
 const clickedRating=Number(star.dataset.rating);
 
-if(selectedRating!==null && selectedRating===clickedRating){
+if(star.classList.contains("active")){
+
+star.classList.remove("active");
 
 selectedRating=null;
-showStars(null);
+
+stars.forEach(otherStar=>{
+if(otherStar.classList.contains("active")){
+selectedRating=Number(otherStar.dataset.rating);
+}
+});
+
+if(selectedRating===null){
 
 if(topRatingStar){
 topRatingStar.classList.remove("active");
 }
 
-ratingText.textContent="اختر عدد النجوم لتقييم X Plus";
+ratingText.textContent=
+"اختر عدد النجوم لتقييم X Plus";
 
 message.textContent="⏳ جاري إلغاء التقييم...";
 
@@ -772,18 +788,29 @@ error.message||"تعذر إلغاء التقييم.";
 
 }
 
-return;
+}else{
+
+ratingText.textContent=
+`${selectedRating} من 5 ⭐`;
+
 }
 
+return;
+
+}
+
+star.classList.add("active");
+
 selectedRating=clickedRating;
-showStars(selectedRating);
 
 const topRatingStar=document.querySelector(".top-rating-star");
+
 if(topRatingStar){
 topRatingStar.classList.add("active");
 }
 
-ratingText.textContent=`${selectedRating} من 5 ⭐`;
+ratingText.textContent=
+`${selectedRating} من 5 ⭐`;
 
 commentOnlyArea.style.display="none";
 commentOnly.value="";
