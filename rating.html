@@ -351,14 +351,14 @@ word-break:break-word;
 }
 
 .review-actions{
-width:52px;
+width:auto;
 flex:none;
 direction:rtl;
 display:flex;
 flex-direction:column;
-align-items:center;
-gap:8px;
-padding-top:1px;
+align-items:flex-start;
+gap:4px;
+padding-top:6px;
 position:relative;
 }
 
@@ -1218,6 +1218,32 @@ class="review"
 data-review-id="${escapeHtml(id)}"
 >
 
+<div class="review-main">
+
+<div class="review-user">
+
+${renderAvatar(item)}
+
+<div class="review-username">
+${escapeHtml(username)}
+</div>
+
+</div>
+
+<div class="review-meta">
+
+${renderStars(item.rating)}
+
+<span class="review-date">
+${escapeHtml(date)}
+</span>
+
+</div>
+
+<div class="review-comment">
+${escapeHtml(text)}
+</div>
+
 <div class="review-actions">
 
 <button
@@ -1266,32 +1292,6 @@ data-report-reason="غير مرغوب فيه"
 
 </div>
 
-</div>
-
-<div class="review-main">
-
-<div class="review-user">
-
-${renderAvatar(item)}
-
-<div class="review-username">
-${escapeHtml(username)}
-</div>
-
-</div>
-
-<div class="review-meta">
-
-${renderStars(item.rating)}
-
-<span class="review-date">
-${escapeHtml(date)}
-</span>
-
-</div>
-
-<div class="review-comment">
-${escapeHtml(text)}
 </div>
 
 ${reply?`
