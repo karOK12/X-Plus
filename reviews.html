@@ -140,94 +140,6 @@ color:#fff;
 border-color:rgba(255,255,255,.2);
 }
 
-
-.review-card{
-display:flex;
-align-items:flex-start;
-justify-content:space-between;
-gap:12px;
-width:100%;
-}
-
-.review-main{
-flex:1;
-min-width:0;
-}
-
-.review-side{
-width:62px;
-min-width:62px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:8px;
-}
-
-.more-button{
-border:0;
-background:transparent;
-color:#9fb0c3;
-font-size:25px;
-line-height:25px;
-padding:0;
-cursor:pointer;
-font-family:Arial,sans-serif;
-}
-
-.more-button:hover{
-color:#fff;
-}
-
-.review-side .review-actions{
-display:flex;
-align-items:center;
-gap:4px;
-direction:rtl;
-}
-
-.review-side .review-action{
-min-width:28px;
-height:27px;
-padding:0 6px;
-font-size:11px;
-}
-
-.report-menu{
-display:none;
-position:absolute;
-z-index:30;
-top:28px;
-right:0;
-background:#101d2c;
-border:1px solid rgba(255,255,255,.12);
-border-radius:8px;
-padding:5px;
-box-shadow:0 8px 25px rgba(0,0,0,.35);
-}
-
-.report-menu.show{
-display:block;
-}
-
-.report-option{
-display:block;
-width:150px;
-border:0;
-background:transparent;
-color:#d9e3ed;
-padding:8px 10px;
-border-radius:6px;
-font-family:inherit;
-font-size:12px;
-text-align:right;
-cursor:pointer;
-}
-
-.report-option:hover{
-background:#17283b;
-color:#fff;
-}
-
 .empty{
 text-align:center;
 color:#8fa1b5;
@@ -278,7 +190,23 @@ font-size:15px;
 }
 
 .stars{
-font-size:14px;
+display:flex;
+justify-content:center;
+direction:ltr;
+gap:3px;
+margin:17px 0 5px;
+}
+
+#selectedStars{
+font-size:45px !important;
+line-height:1;
+letter-spacing:3px;
+color:#566578;
+cursor:pointer;
+}
+
+#selectedStars .selected-star{
+color:#ffd43b;
 }
 
 .comment{
@@ -363,9 +291,10 @@ if(isWritingReview){
 writeReview.style.display="block";
 reviewList.style.display="none";
 
-selectedStars.textContent=
-"★".repeat(selectedRating)+
-"☆".repeat(5-selectedRating);
+selectedStars.innerHTML=
+Array.from({length:5},(_,i)=>
+`<span class="${i < selectedRating ? "selected-star" : ""}">★</span>`
+).join("");
 
 }
 
@@ -559,11 +488,8 @@ const username=getUsername(review);
 const reviewId=review.id || review._id || "";
 
 return `
+
 <article class="review">
-
-<div class="review-card">
-
-<div class="review-main">
 
 <div class="review-head">
 
@@ -611,50 +537,6 @@ ${formatDate(getReviewDate(review))}
 ${escapeHtml(review.comment || "")}
 </div>
 
-</div>
-
-</div>
-
-<div class="review-side">
-
-<div style="position:relative;">
-
-<button
-class="more-button"
-type="button"
-title="خيارات المراجعة"
-data-menu-id="${escapeHtml(reviewId)}"
->
-⋮
-</button>
-
-<div
-class="report-menu"
-data-report-menu="${escapeHtml(reviewId)}"
->
-
-<button
-class="report-option"
-type="button"
-data-review-id="${escapeHtml(reviewId)}"
-data-report-reason="محتوى غير ملائم"
->
-محتوى غير ملائم
-</button>
-
-<button
-class="report-option"
-type="button"
-data-review-id="${escapeHtml(reviewId)}"
-data-report-reason="غير مرغوب فيه"
->
-غير مرغوب فيه
-</button>
-
-</div>
-
-</div>
-
 <div class="review-actions">
 
 <button
@@ -679,9 +561,8 @@ data-vote="yes"
 
 </div>
 
-</div>
-
 </article>
+
 `;
 
 }).join("");
@@ -697,54 +578,12 @@ container.innerHTML=
 
 }
 
+
 document.addEventListener("click",function(e){
-
-const moreButton=e.target.closest(".more-button");
-
-if(moreButton){
-
-const id=moreButton.dataset.menuId;
-const menu=document.querySelector(
-`[data-report-menu="${CSS.escape(id)}"]`
-);
-
-document.querySelectorAll(".report-menu.show").forEach(item=>{
-if(item!==menu){
-item.classList.remove("show");
-}
-});
-
-if(menu){
-menu.classList.toggle("show");
-}
-
-return;
-}
-
-const reportButton=e.target.closest(".report-option");
-
-if(reportButton){
-
-const reason=reportButton.dataset.reportReason;
-const reviewId=reportButton.dataset.reviewId;
-
-document.querySelectorAll(".report-menu.show").forEach(item=>{
-item.classList.remove("show");
-});
-
-alert(`تم اختيار الإبلاغ عن المراجعة بسبب: ${reason}`);
-
-console.log("Report review:",{
-reviewId,
-reason
-});
-
-return;
-}
 
 const button=e.target.closest(".review-action");
 
-if(button){
+if(!button)return;
 
 const row=button.parentElement;
 
@@ -753,17 +592,6 @@ btn.classList.remove("active");
 });
 
 button.classList.add("active");
-
-return;
-}
-
-if(!e.target.closest(".report-menu")){
-
-document.querySelectorAll(".report-menu.show").forEach(item=>{
-item.classList.remove("show");
-});
-
-}
 
 });
 
