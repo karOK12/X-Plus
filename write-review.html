@@ -443,7 +443,8 @@ review.user.created_at
 
 async function publishSelectedReview(){
 
-if(!isWritingReview){
+if(!selectedRating){
+writeMessage.textContent="⚠️ اختر عدد النجوم أولًا.";
 return;
 }
 
