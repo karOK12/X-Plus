@@ -734,11 +734,7 @@ const reviewStat=document.getElementById("reviewStat");
 const shareRatingBtn=document.getElementById("shareRatingBtn");
 
 shareRatingBtn.addEventListener("click",()=>{
-if(!selectedRating){
-message.textContent="⚠️ اختر عدد النجوم أولاً.";
-return;
-}
-window.location.href=`reviews.html?rating=${selectedRating}`;
+window.location.href="reviews.html";
 });
 
 function resetRatingSelection(){
@@ -820,6 +816,9 @@ star.classList.add("active");
 stars.forEach(star=>{
 
 star.addEventListener("click",()=>{
+
+window.location.href="reviews.html";
+return;
 
 const clickedRating=Number(star.dataset.rating);
 

@@ -272,7 +272,7 @@ style="border:0;border-radius:10px;background:#1677ff;color:#fff;padding:10px 22
 const API_URL="/api";
 
 const params=new URLSearchParams(window.location.search);
-const selectedRating=Number(params.get("rating"));
+let selectedRating=Number(params.get("rating"));
 
 const writeReview=document.getElementById("writeReview");
 const reviewList=document.getElementById("reviewList");
@@ -281,10 +281,7 @@ const reviewComment=document.getElementById("reviewComment");
 const publishReview=document.getElementById("publishReview");
 const writeMessage=document.getElementById("writeMessage");
 
-const isWritingReview=
-Number.isInteger(selectedRating) &&
-selectedRating >= 1 &&
-selectedRating <= 5;
+const isWritingReview=true;
 
 if(isWritingReview){
 
@@ -293,8 +290,23 @@ reviewList.style.display="none";
 
 selectedStars.innerHTML=
 Array.from({length:5},(_,i)=>
-`<span class="${i < selectedRating ? "selected-star" : ""}">★</span>`
+`<span class="${selectedRating >= 1 && i < selectedRating ? "selected-star" : ""}" data-rating="${i+1}">★</span>`
 ).join("");
+
+const reviewStars=selectedStars.querySelectorAll("span");
+
+reviewStars.forEach(star=>{
+star.addEventListener("click",()=>{
+selectedRating=Number(star.dataset.rating);
+
+reviewStars.forEach(item=>{
+item.classList.toggle(
+"selected-star",
+Number(item.dataset.rating) <= selectedRating
+);
+});
+});
+});
 
 }
 
