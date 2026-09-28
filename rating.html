@@ -817,10 +817,22 @@ stars.forEach(star=>{
 
 star.addEventListener("click",()=>{
 
+const clickedRating=Number(star.dataset.rating);
+
+stars.forEach(otherStar=>{
+otherStar.classList.toggle(
+"active",
+Number(otherStar.dataset.rating) <= clickedRating
+);
+});
+
+setTimeout(()=>{
 window.location.href="reviews.html";
+},180);
+
 return;
 
-const clickedRating=Number(star.dataset.rating);
+const oldClickedRating=Number(star.dataset.rating);
 
 if(star.classList.contains("active")){
 
