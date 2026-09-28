@@ -820,10 +820,7 @@ star.addEventListener("click",()=>{
 const clickedRating=Number(star.dataset.rating);
 
 stars.forEach(otherStar=>{
-otherStar.classList.toggle(
-"active",
-Number(otherStar.dataset.rating) <= clickedRating
-);
+otherStar.classList.add("active");
 });
 
 setTimeout(()=>{
