@@ -21,6 +21,72 @@ max-width:720px;
 margin:auto;
 }
 
+.write-page{
+background:#0b1726;
+border-radius:16px;
+padding:22px;
+margin-top:25px;
+box-sizing:border-box;
+}
+
+.write-page h1{
+margin:0 0 18px;
+font-size:22px;
+}
+
+#selectedStars{
+display:flex;
+justify-content:center;
+direction:ltr;
+gap:3px;
+margin:17px 0 20px;
+font-size:45px;
+line-height:1;
+letter-spacing:3px;
+color:#566578;
+cursor:pointer;
+}
+
+#selectedStars span{
+color:#566578;
+transition:color .15s,transform .15s;
+}
+
+#selectedStars span:hover{
+transform:scale(1.05);
+}
+
+#selectedStars .selected-star{
+color:#ffd43b;
+}
+
+#reviewComment{
+width:100%;
+min-height:140px;
+box-sizing:border-box;
+background:#0d1a29;
+color:#fff;
+border:1px solid rgba(255,255,255,.12);
+border-radius:12px;
+padding:14px;
+font-family:inherit;
+font-size:15px;
+resize:vertical;
+outline:none;
+}
+
+#publishReview{
+border:0;
+border-radius:10px;
+background:#1677ff;
+color:#fff;
+padding:10px 22px;
+font-family:inherit;
+font-size:15px;
+font-weight:800;
+cursor:pointer;
+}
+
 h1{
 text-align:center;
 margin-bottom:20px;
@@ -189,30 +255,6 @@ min-width:42px;
 .username{
 font-size:15px;
 }
-
-.stars{
-display:flex;
-justify-content:center;
-direction:ltr;
-gap:3px;
-margin:17px 0 5px;
-}
-
-#selectedStars{
-font-size:45px !important;
-line-height:1;
-letter-spacing:3px;
-color:#566578;
-cursor:pointer;
-}
-
-#selectedStars .selected-star{
-color:#ffd43b;
-}
-
-.comment{
-padding-right:52px;
-}
 }
 </style>
 
@@ -225,7 +267,7 @@ padding-right:52px;
 <span class="back-icon">‹</span>
 </a>
 
-<div id="writeReview" style="display:none;">
+<div id="writeReview" class="write-page">
 
 <h1 style="margin-bottom:10px;">كتابة مراجعة</h1>
 
