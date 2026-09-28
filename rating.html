@@ -550,6 +550,31 @@ color:#2563eb;
 }
 #reviewStat{position:relative !important;top:-1.5px !important;transform:none !important;margin-top:0 !important;}
 </style>
+
+<style>
+.rating-filter{
+border:0;
+background:#172235;
+color:#9fb0c3;
+border-radius:20px;
+padding:7px 15px;
+font-size:14px;
+font-weight:700;
+cursor:pointer;
+white-space:nowrap;
+transition:.2s;
+}
+
+.rating-filter.active{
+background:#ffd43b;
+color:#111827;
+}
+
+.rating-filter:hover{
+transform:scale(1.04);
+}
+</style>
+
 </head>
 
 <body>
@@ -664,11 +689,36 @@ style="margin-top:8px;"
 
 </section>
 
-<section class="card" id="commentsSection">
-<h2>المراجعات</h2>
+<section id="reviewsSection" style="margin-top:18px;">
+
+<h2 style="margin:0 0 14px;text-align:center;">
+التقييمات والمراجعات
+</h2>
+
+<div
+id="ratingFilter"
+style="
+display:flex;
+justify-content:center;
+gap:8px;
+direction:ltr;
+overflow-x:auto;
+padding:4px 2px 10px;
+scrollbar-width:thin;
+"
+>
+<button type="button" class="rating-filter active" data-rating="all">الكل</button>
+<button type="button" class="rating-filter" data-rating="1">1</button>
+<button type="button" class="rating-filter" data-rating="2">2</button>
+<button type="button" class="rating-filter" data-rating="3">3</button>
+<button type="button" class="rating-filter" data-rating="4">4</button>
+<button type="button" class="rating-filter" data-rating="5">5</button>
+</div>
+
 <div id="comments">
 <div class="empty">جاري تحميل التعليقات...</div>
 </div>
+
 </section>
 
 
@@ -977,6 +1027,35 @@ barElement.style.width=`${percentage}%`;
 
 }
 
+
+let selectedReviewFilter="all";
+
+function setupRatingFilters(){
+
+const filters=document.querySelectorAll(".rating-filter");
+
+filters.forEach(filter=>{
+
+filter.addEventListener("click",()=>{
+
+selectedReviewFilter=filter.dataset.rating || "all";
+
+filters.forEach(item=>{
+item.classList.toggle(
+"active",
+item===filter
+);
+});
+
+setupRatingFilters();
+loadComments();
+
+});
+
+});
+
+}
+
 async function loadComments(){
 
 const commentsContainer=document.getElementById("comments");
@@ -997,14 +1076,22 @@ data.message||"تعذر تحميل التعليقات"
 
 }
 
-const items=Array.isArray(data.reviews)
+const allItems=Array.isArray(data.reviews)
 ?data.reviews
 :[];
+
+const items=selectedReviewFilter==="all"
+?allItems
+:allItems.filter(item=>
+Number(item.rating)===Number(selectedReviewFilter)
+);
 
 if(!items.length){
 
 commentsContainer.innerHTML=
-`<div class="empty">لا توجد تعليقات بعد. كن أول من يشارك رأيه.</div>`;
+`<div class="empty">${selectedReviewFilter==="all"
+?"لا توجد تعليقات بعد. كن أول من يشارك رأيه."
+:`لا توجد مراجعات بتقييم ${selectedReviewFilter} نجوم.`}</div>`;
 
 return;
 
