@@ -725,6 +725,14 @@ exports.verifyOTP = async (req, res) => {
     }
 
 
+    // إيقاف المحاولات بعد 5 رموز خاطئة
+    if (Number(otpData.attempts || 0) >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: "تجاوزت الحد الأقصى لمحاولات التحقق. أعد إرسال الرمز بعد انتهاء المهلة."
+      });
+    }
+
     // -------------------------
     // التحقق من الرمز
     // -------------------------
@@ -799,34 +807,18 @@ exports.verifyOTP = async (req, res) => {
         email: existingUser.email
       });
 
-      // تحديث كلمة المرور التي أدخلها المستخدم أثناء التسجيل
-      const updatedUser = await User.updatePassword(
-        cleanEmail,
-        data.password
-      );
-
-      if (!updatedUser) {
-        throw new Error("فشل تحديث كلمة مرور الحساب");
-      }
-
-      console.log("✅ PASSWORD UPDATED:", {
-        id: updatedUser.id,
-        email: updatedUser.email
-      });
-
+      // لا تغيّر كلمة مرور حساب موجود عبر مسار التسجيل
       await Otp.delete(cleanEmail);
 
       return res.status(200).json({
         success: true,
         accountExists: true,
-        passwordUpdated: true,
-        message: "تم التحقق وتحديث كلمة المرور، يرجى تسجيل الدخول",
+        passwordUpdated: false,
+        message: "هذا البريد مسجل مسبقاً. يرجى تسجيل الدخول.",
         email: cleanEmail
       });
     }
 
-
-    // -------------------------
     // إنشاء المستخدم الجديد
     // -------------------------
 
@@ -931,7 +923,7 @@ exports.verifyOTP = async (req, res) => {
 
 exports.sendOTP = async (req, res) => {
 
-  console.log("🔥 SEND OTP REQUEST RECEIVED:", req.body);
+  console.log("SEND OTP REQUEST RECEIVED");
 
   try {
 
@@ -974,6 +966,21 @@ exports.sendOTP = async (req, res) => {
         success: false,
         message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
       });
+    }
+
+    // منع تكرار إرسال الرمز خلال 60 ثانية
+    const previousOtp = await Otp.findByEmail(cleanEmail);
+    if (previousOtp && previousOtp.created_at) {
+      const elapsedSeconds =
+        (Date.now() - new Date(previousOtp.created_at).getTime()) / 1000;
+
+      if (Number.isFinite(elapsedSeconds) && elapsedSeconds < 60) {
+        return res.status(429).json({
+          success: false,
+          message: "انتظر قبل طلب رمز جديد",
+          retryAfterSeconds: Math.ceil(60 - elapsedSeconds)
+        });
+      }
     }
 
     // مهم:
@@ -1082,6 +1089,20 @@ exports.resendOTP = async (req, res) => {
 
     }
 
+
+    // منع إعادة الإرسال قبل مرور 60 ثانية
+    if (otpData.created_at) {
+      const elapsedSeconds =
+        (Date.now() - new Date(otpData.created_at).getTime()) / 1000;
+
+      if (Number.isFinite(elapsedSeconds) && elapsedSeconds < 60) {
+        return res.status(429).json({
+          success: false,
+          message: "انتظر قبل إعادة إرسال الرمز",
+          retryAfterSeconds: Math.ceil(60 - elapsedSeconds)
+        });
+      }
+    }
 
     // -------------------------
     // بيانات المستخدم

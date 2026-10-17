@@ -1,0 +1,15 @@
+'use strict';
+
+const express = require('express');
+const router = express.Router();
+const auth = require('../middleware/auth');
+const controller = require('../controllers/offerwallController');
+
+// رابط الجدار للمستخدم المسجل فقط.
+router.get('/url', auth, controller.wallUrl);
+
+// استقبال Offerwall.GG من دون JWT؛ التحقق يتم بتوقيع HMAC.
+router.get('/postback', controller.postback);
+router.post('/postback', controller.postback);
+
+module.exports = router;

@@ -13,6 +13,7 @@ const profileRoutes = require("./server/routes/profile");
 const walletRoutes = require("./server/routes/wallet");
 const ratingRoutes = require("./server/routes/rating");
 const installRoutes = require("./server/routes/install");
+const offerwallRoutes = require("./server/routes/offerwall");
 const miningRoutes = require("./server/routes/mining");
 const uploadRoutes = require("./api/index");
 
@@ -484,7 +485,7 @@ app.post(
 
             }
 
-            const reward = 10;
+            const reward = 5;
 
             const updated = await client.query(
                 `
@@ -658,6 +659,8 @@ app.use(
 
 
 // ══════════════════════════════════════════════════════
+app.use("/api/offerwall", offerwallRoutes);
+
 // 404 API — آخر Route
 // ══════════════════════════════════════════════════════
 

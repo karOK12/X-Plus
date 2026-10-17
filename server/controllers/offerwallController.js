@@ -1,0 +1,424 @@
+'use strict';
+
+const crypto = require('crypto');
+const pool = require('../config/database');
+
+const PUBLIC_KEY =
+  process.env.OFFERWALL_PUBLIC_KEY ||
+  'f8932b3d30f3c1a0a0f43f34fe6bd5e3';
+
+let schemaPromise;
+
+async function ensureSchema() {
+  if (!schemaPromise) {
+    schemaPromise = pool.query(`
+      CREATE TABLE IF NOT EXISTS offerwall_conversions (
+        transaction_id TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        currency_amount TEXT NOT NULL,
+        credited_points BIGINT NOT NULL DEFAULT 0,
+        state TEXT NOT NULL
+          CHECK (state IN ('credited', 'reversed', 'reversed_pending')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        reversed_at TIMESTAMPTZ
+      );
+
+      CREATE INDEX IF NOT EXISTS offerwall_conversions_user_idx
+        ON offerwall_conversions (user_id, created_at DESC);
+    `).catch(error => {
+      schemaPromise = null;
+      throw error;
+    });
+  }
+
+  return schemaPromise;
+}
+
+function scalar(value) {
+  return typeof value === 'string' ? value : '';
+}
+
+function scaledAmount(amount) {
+  if (
+    typeof amount !== 'string' ||
+    amount.length > 30 ||
+    !/^-?\d+(?:\.\d{1,4})?$/.test(amount)
+  ) {
+    return null;
+  }
+
+  const negative = amount.startsWith('-');
+  const absolute = negative ? amount.slice(1) : amount;
+  const parts = absolute.split('.');
+  const whole = BigInt(parts[0]);
+  const fraction = BigInt(((parts[1] || '') + '0000').slice(0, 4));
+  const scaled = whole * 10000n + fraction;
+
+  return negative ? -scaled : scaled;
+}
+
+function parsePoints(amount, isReversal) {
+  const scaled = scaledAmount(amount);
+  if (scaled === null || (isReversal !== (scaled < 0n))) return null;
+  if (amount === '-0' || scaled === 0n && amount.startsWith('-')) return null;
+
+  const absolute = amount.startsWith('-') ? amount.slice(1) : amount;
+  const whole = BigInt(absolute.split('.')[0]);
+
+  if (whole > BigInt(Number.MAX_SAFE_INTEGER)) return null;
+  return Number(whole);
+}
+
+function validSignature(userId, transactionId, amount, supplied, secret) {
+  if (!/^[a-f0-9]{64}$/i.test(supplied)) return false;
+
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(`${userId}:${transactionId}:${amount}`, 'utf8')
+    .digest();
+
+  const actual = Buffer.from(supplied, 'hex');
+
+  return actual.length === expected.length &&
+    crypto.timingSafeEqual(actual, expected);
+}
+
+
+// جلب عروض Offerwall.GG للمستخدم المسجل.
+exports.listOffers = async (req, res) => {
+  try {
+    const apiKey = process.env.OFFERWALL_SECRET_KEY;
+    const userId = String(req.user?.id ?? '');
+
+    if (!apiKey) {
+      return res.status(503).json({
+        success: false,
+        message: 'إعداد مفتاح API للعروض غير مكتمل'
+      });
+    }
+
+    if (!/^[1-9]\d{0,9}$/.test(userId)) {
+      return res.status(401).json({
+        success: false,
+        message: 'هوية المستخدم غير صالحة'
+      });
+    }
+
+    const endpoint = new URL('https://offerwall.gg/api/v1/offers');
+    endpoint.searchParams.set('appId', PUBLIC_KEY);
+    endpoint.searchParams.set('userId', userId);
+    endpoint.searchParams.set('limit', '50');
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'X-Api-Key': apiKey,
+        'Accept': 'application/json'
+      },
+      signal: AbortSignal.timeout(12000)
+    });
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok || !payload?.success ||
+        !Array.isArray(payload?.data?.offers)) {
+      console.error('OFFERWALL OFFERS API ERROR:', response.status);
+      return res.status(502).json({
+        success: false,
+        message: 'تعذر جلب العروض من Offerwall.GG'
+      });
+    }
+
+    const offers = payload.data.offers
+      .filter(offer => {
+        try {
+          const click = new URL(offer.clickUrl);
+          return click.protocol === 'https:' &&
+            click.hostname === 'offerwall.gg' &&
+            click.pathname.startsWith(`/wall/${PUBLIC_KEY}/click/`) &&
+            click.searchParams.get('userId') === userId;
+        } catch (_) {
+          return false;
+        }
+      })
+      .map(offer => ({
+        id: offer.id,
+        name: String(offer.name || ''),
+        requirements: String(offer.requirements || ''),
+        reward: offer.reward,
+        rewardFormatted: String(offer.rewardFormatted || ''),
+        rewardIsVariable: Boolean(offer.rewardIsVariable),
+        clickUrl: offer.clickUrl
+      }));
+
+    return res.json({
+      success: true,
+      data: {
+        offers,
+        pagination: payload.data.pagination || null,
+        currency: payload.data.currency || null
+      }
+    });
+  } catch (error) {
+    console.error('OFFERWALL OFFERS ERROR:', error.message);
+    return res.status(502).json({
+      success: false,
+      message: 'تعذر الاتصال بخدمة العروض'
+    });
+  }
+};
+
+exports.wallUrl = async (req, res) => {
+  try {
+    const secret = process.env.OFFERWALL_SECRET_KEY;
+    const userId = String(req.user?.id ?? '');
+
+    if (!secret) {
+      return res.status(503).json({
+        success: false,
+        message: 'إعداد العروض غير مكتمل'
+      });
+    }
+
+    if (!/^[1-9]\d{0,9}$/.test(userId)) {
+      return res.status(401).json({
+        success: false,
+        message: 'هوية المستخدم غير صالحة'
+      });
+    }
+
+    await ensureSchema();
+
+    const wallet = await pool.query(
+      'SELECT user_id FROM xp_wallets WHERE user_id = $1 LIMIT 1',
+      [Number(userId)]
+    );
+
+    if (!wallet.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'محفظة XP غير موجودة'
+      });
+    }
+
+    // توقيع رابط الدخول حسب توثيق Offerwall.GG.
+    // يتطلب تفعيل Require signature وتعطيل Expiring links.
+    const canonical =
+      `appId=${PUBLIC_KEY}&userId=${encodeURIComponent(userId)}`;
+
+    const signature = crypto
+      .createHmac('sha256', secret)
+      .update(canonical, 'utf8')
+      .digest('hex');
+
+    const url = new URL(`https://offerwall.gg/wall/${PUBLIC_KEY}`);
+    url.searchParams.set('userId', userId);
+    url.searchParams.set('signature', signature);
+
+    return res.json({ success: true, url: url.toString() });
+  } catch (error) {
+    console.error('OFFERWALL URL ERROR:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'تعذر تجهيز صفحة العروض'
+    });
+  }
+};
+
+exports.postback = async (req, res) => {
+  const data = req.method === 'GET' ? req.query : req.body;
+
+  const userId = scalar(data?.userId);
+  const transactionId = scalar(data?.transactionId);
+  const amount = scalar(data?.currencyAmount);
+  const status = scalar(data?.status);
+  const test = scalar(data?.test);
+  const signature = scalar(data?.signature);
+  const secret = process.env.OFFERWALL_SECRET_KEY;
+
+  if (!secret) {
+    console.error('OFFERWALL_SECRET_KEY is not configured');
+    return res.status(503).send('NOT CONFIGURED');
+  }
+
+  if (
+    !/^[1-9]\d{0,9}$/.test(userId) ||
+    !/^[a-zA-Z0-9_-]{1,128}$/.test(transactionId) ||
+    !['credited', 'reversed'].includes(status)
+  ) {
+    return res.status(400).send('INVALID REQUEST');
+  }
+
+  const isReversal = status === 'reversed';
+  const points = parsePoints(amount, isReversal);
+
+  if (
+    points === null ||
+    !validSignature(userId, transactionId, amount, signature, secret)
+  ) {
+    return res.status(403).send('INVALID SIGNATURE OR AMOUNT');
+  }
+
+  // طلب الاختبار يختبر التوقيع فقط ولا يغيّر الرصيد.
+  if (test === '1') return res.status(200).send('OK');
+
+  if (test !== '0' && test !== '') {
+    return res.status(400).send('INVALID TEST FLAG');
+  }
+
+  let client;
+
+  try {
+    await ensureSchema();
+    client = await pool.connect();
+    await client.query('BEGIN');
+
+    let existing = await client.query(
+      `SELECT transaction_id, user_id, state, currency_amount, credited_points
+       FROM offerwall_conversions
+       WHERE transaction_id = $1
+       FOR UPDATE`,
+      [transactionId]
+    );
+
+    let created = false;
+
+    if (!existing.rows.length) {
+      if (isReversal) {
+        await client.query(
+          `INSERT INTO offerwall_conversions
+             (transaction_id, user_id, currency_amount, credited_points, state)
+           VALUES ($1, $2, $3, 0, 'reversed_pending')
+           ON CONFLICT (transaction_id) DO NOTHING`,
+          [transactionId, Number(userId), amount]
+        );
+      } else {
+        const inserted = await client.query(
+          `INSERT INTO offerwall_conversions
+             (transaction_id, user_id, currency_amount, credited_points, state)
+           VALUES ($1, $2, $3, $4, 'credited')
+           ON CONFLICT (transaction_id) DO NOTHING`,
+          [transactionId, Number(userId), amount, points]
+        );
+        created = inserted.rowCount === 1;
+      }
+
+      existing = await client.query(
+        `SELECT transaction_id, user_id, state, currency_amount, credited_points
+         FROM offerwall_conversions
+         WHERE transaction_id = $1
+         FOR UPDATE`,
+        [transactionId]
+      );
+    }
+
+    const conversion = existing.rows[0];
+
+    if (!conversion || Number(conversion.user_id) !== Number(userId)) {
+      await client.query('ROLLBACK');
+      return res.status(409).send('TRANSACTION CONFLICT');
+    }
+
+    // معالجة المكافأة والإلغاء مع منع التكرار.
+    if (isReversal) {
+      if (conversion.state === 'credited') {
+        const originalAmount = String(conversion.currency_amount);
+        const originalPoints = Number(conversion.credited_points);
+
+        const originalScaled = scaledAmount(originalAmount);
+        const reversalScaled = scaledAmount(amount);
+
+        if (
+          !Number.isSafeInteger(originalPoints) ||
+          originalPoints < 0 ||
+          originalScaled === null ||
+          reversalScaled === null ||
+          reversalScaled !== -originalScaled
+        ) {
+          await client.query('ROLLBACK');
+          return res.status(409).send('REVERSAL AMOUNT MISMATCH');
+        }
+
+        const wallet = await client.query(
+          `SELECT points FROM xp_wallets
+           WHERE user_id = $1 FOR UPDATE`,
+          [Number(userId)]
+        );
+
+        if (!wallet.rows.length) {
+          throw new Error('XP wallet missing during reversal');
+        }
+
+        if (originalPoints > 0) {
+          await client.query(
+            `UPDATE xp_wallets
+             SET points = points - $1
+             WHERE user_id = $2`,
+            [originalPoints, Number(userId)]
+          );
+
+          await client.query(
+            `INSERT INTO wallet_transactions
+              (user_id, type, title, sub, amount, unit, sign, status, reference, note)
+             VALUES
+              ($1, 'earn', 'إلغاء مكافأة عرض', 'عكس مكافأة Offerwall',
+               $2, 'points', -1, 'completed', $3, 'Offerwall reversal')`,
+            [Number(userId), originalPoints, transactionId]
+          );
+        }
+
+        await client.query(
+          `UPDATE offerwall_conversions
+           SET state = 'reversed',
+               currency_amount = $2,
+               reversed_at = NOW()
+           WHERE transaction_id = $1`,
+          [transactionId, amount]
+        );
+      }
+      // reversed وreversed_pending لا يسببان خصماً إضافياً.
+    } else if (created && conversion.state === 'credited') {
+      const wallet = await client.query(
+        `SELECT points FROM xp_wallets
+         WHERE user_id = $1 FOR UPDATE`,
+        [Number(userId)]
+      );
+
+      if (!wallet.rows.length) {
+        throw new Error('XP wallet missing during credit');
+      }
+
+      if (points > 0) {
+        await client.query(
+          `UPDATE xp_wallets
+           SET points = points + $1
+           WHERE user_id = $2`,
+          [points, Number(userId)]
+        );
+
+        await client.query(
+          `INSERT INTO wallet_transactions
+            (user_id, type, title, sub, amount, unit, sign, status, reference, note)
+           VALUES
+            ($1, 'earn', 'مكافأة عرض', 'إكمال عرض Offerwall',
+             $2, 'points', 1, 'completed', $3, 'Offerwall credit')`,
+          [Number(userId), points, transactionId]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+    return res.status(200).send('OK');
+  } catch (error) {
+    if (client) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (_) {}
+    }
+
+    console.error('OFFERWALL POSTBACK ERROR:', error.message);
+    return res.status(500).send('RETRY');
+  } finally {
+    if (client) client.release();
+  }
+};
