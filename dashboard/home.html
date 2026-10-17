@@ -893,7 +893,7 @@
           throw new Error(data.message || 'فشل تحميل حالة التعدين');
         }
 
-        if (data.isMining && data.miningStartTime) {
+        if (false && data.isMining && data.miningStartTime) {
           startTime = Number(data.miningStartTime);
           isMining = true;
           sessionDone = false;
