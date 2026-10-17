@@ -927,6 +927,16 @@
         } else {
           isMining = false;
           startTime = 0;
+          balanceScaled = 0;
+          balanceEl.textContent = '0.00000000';
+          if (balanceInterval) {
+            clearInterval(balanceInterval);
+            balanceInterval = null;
+          }
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
           profitInfoEl.textContent = '⏱️ جاهز للبدء';
           startBtn.disabled = false;
           startBtn.innerText = "⛏️ ابدأ التعدين الآن";
