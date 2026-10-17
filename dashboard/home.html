@@ -872,6 +872,8 @@
 
         profitInfoEl.textContent = '⏱️ جاهز للبدء';
 
+        await loadMiningStatus();
+
       } catch (e) {
 
         console.error("فشل تحميل بيانات المستخدم:", e);
