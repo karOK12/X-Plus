@@ -1,41 +1,79 @@
 const db = require("../config/database");
 
+
+async function insertXpWallet(client, user) {
+  const crypto = require('crypto');
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    let code = '';
+    for (let i = 0; i < 3; i++) {
+      code += letters[crypto.randomInt(letters.length)];
+    }
+
+    const digits = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+    const walletUid = `XP-${code}-${digits}`;
+
+    const result = await client.query(
+      `
+      INSERT INTO xp_wallets (
+        uid, user_id, name, balance, points, rate,
+        daily_pts, total_converted, power, mining_start_time
+      )
+      VALUES ($1, $2, $3, 0, 0, 100, 320, 0, 150.50, NULL)
+      ON CONFLICT (uid) DO NOTHING
+      `,
+      [walletUid, user.id, user.username]
+    );
+
+    if (result.rowCount === 1) {
+      return;
+    }
+  }
+
+  throw new Error('تعذر إنشاء معرّف فريد لمحفظة XP');
+}
+
 const User = {
 
   // ===============================
   // إنشاء مستخدم جديد
   // ===============================
   async create(username, email, password) {
+    const client = await db.connect();
 
-    const result = await db.query(
-      `
-      INSERT INTO users (
-        username,
-        email,
-        password,
-        balance,
-        points,
-        power,
-        mining_start_time
-      )
-      VALUES ($1, $2, $3, 0, 0, 150.50, NULL)
-      RETURNING
-        id,
-        username,
-        email,
-        balance,
-        points,
-        power,
-        mining_start_time
-      `,
-      [
-        username.trim(),
-        email.trim().toLowerCase(),
-        password
-      ]
-    );
+    try {
+      await client.query('BEGIN');
 
-    return result.rows[0];
+      const result = await client.query(
+        `
+        INSERT INTO users (
+          username, email, password, balance, points, power,
+          mining_start_time
+        )
+        VALUES ($1, $2, $3, 0, 0, 150.50, NULL)
+        RETURNING
+          id, username, email, balance, points, power,
+          mining_start_time
+        `,
+        [username.trim(), email.trim().toLowerCase(), password]
+      );
+
+      const user = result.rows[0];
+      await insertXpWallet(client, user);
+      await client.query('COMMIT');
+
+      return user;
+    } catch (error) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('فشل التراجع عن معاملة إنشاء المستخدم:', rollbackError.message);
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
 
@@ -59,21 +97,62 @@ const User = {
 
 
   // ===============================
-  // ربط حساب Google بمستخدم موجود
+  // ربط Google والتأكد من وجود محفظة XP
   // ===============================
   async linkGoogleId(userId, googleId) {
+    const client = await db.connect();
 
-    const result = await db.query(
-      `
-      UPDATE users
-      SET google_id = $1
-      WHERE id = $2
-      RETURNING *
-      `,
-      [googleId, userId]
-    );
+    try {
+      await client.query('BEGIN');
 
-    return result.rows[0] || null;
+      // قفل سجل المستخدم لمنع طلبات الربط المتزامنة من إنشاء محافظ مكررة.
+      const userResult = await client.query(
+        'SELECT * FROM users WHERE id = $1 FOR UPDATE',
+        [userId]
+      );
+
+      const user = userResult.rows[0];
+
+      if (!user) {
+        await client.query('COMMIT');
+        return null;
+      }
+
+      // لا تنشئ محفظة إذا كانت موجودة بالفعل.
+      const walletResult = await client.query(
+        'SELECT id FROM xp_wallets WHERE user_id = $1 LIMIT 1',
+        [userId]
+      );
+
+      if (walletResult.rows.length === 0) {
+        await insertXpWallet(client, user);
+      }
+
+      const result = await client.query(
+        `
+        UPDATE users
+        SET google_id = $1
+        WHERE id = $2
+        RETURNING *
+        `,
+        [googleId, userId]
+      );
+
+      await client.query('COMMIT');
+      return result.rows[0] || null;
+    } catch (error) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error(
+          'فشل التراجع عن معاملة ربط Google:',
+          rollbackError.message
+        );
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
 
@@ -81,39 +160,40 @@ const User = {
   // إنشاء مستخدم بواسطة Google
   // ===============================
   async createGoogle(username, email, googleId) {
+    const client = await db.connect();
 
-    const result = await db.query(
-      `
-      INSERT INTO users (
-        username,
-        email,
-        password,
-        google_id,
-        balance,
-        points,
-        power,
-        mining_start_time,
-        registration_completed
-      )
-      VALUES ($1, $2, NULL, $3, 0, 0, 150.50, NULL, true)
-      RETURNING
-        id,
-        username,
-        email,
-        balance,
-        points,
-        power,
-        mining_start_time,
-        registration_completed
-      `,
-      [
-        username.trim(),
-        email.trim().toLowerCase(),
-        googleId
-      ]
-    );
+    try {
+      await client.query('BEGIN');
 
-    return result.rows[0];
+      const result = await client.query(
+        `
+        INSERT INTO users (
+          username, email, password, google_id, balance, points,
+          power, mining_start_time, registration_completed
+        )
+        VALUES ($1, $2, NULL, $3, 0, 0, 150.50, NULL, true)
+        RETURNING
+          id, username, email, balance, points, power,
+          mining_start_time, registration_completed
+        `,
+        [username.trim(), email.trim().toLowerCase(), googleId]
+      );
+
+      const user = result.rows[0];
+      await insertXpWallet(client, user);
+      await client.query('COMMIT');
+
+      return user;
+    } catch (error) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('فشل التراجع عن معاملة إنشاء المستخدم:', rollbackError.message);
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
 
