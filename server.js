@@ -14,6 +14,7 @@ const walletRoutes = require("./server/routes/wallet");
 const ratingRoutes = require("./server/routes/rating");
 const installRoutes = require("./server/routes/install");
 const offerwallRoutes = require("./server/routes/offerwall");
+const notificationsRoutes = require("./server/routes/notifications");
 const miningRoutes = require("./server/routes/mining");
 const uploadRoutes = require("./api/index");
 
@@ -660,6 +661,8 @@ app.use(
 
 // ══════════════════════════════════════════════════════
 app.use("/api/offerwall", offerwallRoutes);
+
+app.use("/api/notifications", notificationsRoutes);
 
 // 404 API — آخر Route
 // ══════════════════════════════════════════════════════

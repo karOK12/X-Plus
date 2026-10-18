@@ -35,6 +35,22 @@ main{flex:1;overflow-y:auto;padding:6px 16px 104px;scrollbar-width:none}main::-w
 .sumrows{background:var(--card);border-radius:13px;padding:6px 16px;margin-top:16px}.sumrows div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.8rem}.sumrows div:last-child{border:none}.sumrows span{color:var(--muted)}.sumrows b{font-family:'Changa';direction:ltr;font-size:.85rem}
 .ok-ic{width:76px;height:76px;border-radius:50%;background:rgba(14,203,129,.13);display:grid;place-items:center;margin:8px auto 14px}.ok-ic svg{width:44px;height:44px}.ok-ic circle{fill:none;stroke:var(--green);stroke-width:2.5;stroke-dasharray:160;stroke-dashoffset:160;animation:draw .7s ease forwards}.ok-ic path{fill:none;stroke:var(--green);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:draw .5s .5s ease forwards}@keyframes draw{to{stroke-dashoffset:0}}
 #toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center;width:max-content;max-width:92vw}.toast{background:var(--card);border:1px solid rgba(252,213,53,.4);color:var(--text);padding:11px 20px;border-radius:11px;font-size:.78rem;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.5);animation:tin .3s;display:flex;gap:8px;align-items:center}.toast.err{border-color:rgba(246,70,93,.5)}@keyframes tin{from{opacity:0;transform:translateY(12px) scale(.95)}}
+.notification-bell{position:relative}
+.notification-badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--red);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;border:2px solid var(--bg)}
+.notification-badge[hidden]{display:none}
+#notificationsSheet .panel{max-height:82dvh;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.notification-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#notificationsSheet .notification-head h3{text-align:right}
+.notification-head .btn-ghost{padding:7px 10px;white-space:nowrap;font-size:.68rem}
+.notification-list{overflow-y:auto;min-height:100px;max-height:55dvh;overscroll-behavior:contain}
+.notification-item{display:flex;align-items:flex-start;gap:10px;padding:13px 2px;border-bottom:1px solid var(--line)}
+.notification-item.unread{background:rgba(252,213,53,.045)}
+.notification-copy{flex:1;min-width:0}
+.notification-copy b{display:block;font-size:.82rem;overflow-wrap:anywhere}
+.notification-copy p{font-size:.74rem;line-height:1.7;color:var(--muted);margin-top:4px;white-space:pre-wrap;overflow-wrap:anywhere}
+.notification-copy small{display:block;font-size:.64rem;color:var(--muted2);margin-top:5px}
+.notification-item .btn-ghost{flex-shrink:0;padding:6px 8px;font-size:.63rem}
+.notification-read{font-size:.65rem;color:var(--green);white-space:nowrap;padding-top:5px}
 footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;line-height:1.9}.empty{text-align:center;color:var(--muted);padding:26px;font-size:.78rem}
 .form-group{margin-bottom:14px}
 .form-label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px;font-weight:700}
@@ -64,7 +80,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
   <header>
     <h1><span class="brand-dot"></span>محفظة X Plus</h1>
     <div class="hdr-x">
-      <button class="icb" onclick="toast('لا إشعارات جديدة')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+      <button class="icb notification-bell" onclick="openNotifications()" aria-label="الإشعارات" aria-haspopup="dialog"><span id="notificationBadge" class="notification-badge" hidden>0</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
       <button class="icb" onclick="go('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
   </header>
@@ -150,7 +166,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
         <div class="form-group">
           <label class="form-label">عنوان الإيداع</label>
           <div class="deposit-addr" id="depositAddr">
-            0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb
+            جارٍ تحميل عنوان الإيداع...
             <button class="copy-btn" onclick="copyDepositAddr()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
@@ -189,7 +205,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
           <div class="network-grid" id="wdNetworks">
             <div class="net-btn active" data-net="ERC20"><b>ERC20</b>رسوم $5</div>
             <div class="net-btn" data-net="TRC20"><b>TRC20</b>رسوم $1</div>
-            <div class="net-btn" data-net="BEP20"><b>BEP20</b>رسوم $0.5</div>
+            <div class="net-btn" data-net="BEP20"><b>BEP20</b>رسوم $0.8</div>
           </div>
         </div>
         <div class="form-group">
@@ -198,8 +214,8 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
         </div>
         <div class="form-group">
           <label class="form-label">المبلغ ($)</label>
-          <input type="number" class="form-input" id="wdAmount" placeholder="50.00" min="10" step="0.01" oninput="updateWithdrawSummary()">
-          <div class="form-hint">المتاح: <b class="num" id="wdAvail">$0.00</b> · الحد الأدنى: $10</div>
+          <input type="number" class="form-input" id="wdAmount" placeholder="50.00" min="50" step="0.01" oninput="updateWithdrawSummary()">
+          <div class="form-hint">المتاح: <b class="num" id="wdAvail">$0.00</b> · الحد الأدنى: <b id="wdMinLabel">$50</b></div>
         </div>
         <div class="info-strip" id="wdSummary">
           <div><span>المبلغ</span><b class="num" id="wdSumAmt">$0.00</b></div>
@@ -311,6 +327,22 @@ type="button">
     <button class="btn-y big" onclick="okSheet.classList.remove('show')">رائع 👍</button>
   </div>
 </div>
+<div class="sheet" id="notificationsSheet" role="dialog" aria-modal="true"
+     aria-labelledby="notificationsTitle"
+     onclick="if(event.target===this) closeNotifications()">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="notification-head">
+      <h3 id="notificationsTitle">الإشعارات</h3>
+      <button class="btn-ghost" onclick="markAllNotificationsRead()">تعليم الكل كمقروء</button>
+    </div>
+    <p id="notificationStatus" class="psub">إشعارات حسابك</p>
+    <div id="notificationList" class="notification-list" aria-live="polite">
+      <div class="empty">اضغط على الجرس لعرض الإشعارات</div>
+    </div>
+    <button class="btn-ghost" onclick="closeNotifications()">إغلاق</button>
+  </div>
+</div>
 <div id="toasts"></div>
 
 <script>
@@ -335,7 +367,8 @@ let S = null, hidden = false;
 
 let selectedDepNet = 'ERC20';
 let selectedWdNet = 'ERC20';
-const NETWORK_FEES = { ERC20: 5, TRC20: 1, BEP20: 0.5 };
+const NETWORK_FEES = { ERC20: 5, TRC20: 1, BEP20: 0.8 };
+const WITHDRAW_MIN = { ERC20: 50, TRC20: 10, BEP20: 10 };
 
 function toast(m, err) {
   const t = document.createElement('div');
@@ -449,6 +482,7 @@ async function init() {
     S = await loadState();
     $('dbErr').style.display = 'none';
     renderAll();
+    loadDepositInfo(selectedDepNet).catch(() => {});
     toast('تم الاتصال بالمحفظة ✓');
   } catch (e) {
     // ❌ عرض الخطأ فقط، بدون تحويل لأي صفحة
@@ -596,27 +630,73 @@ async function doConvert() {
 
 /* ═══════════ الإيداع ═══════════ */
 
+let depositAddressLoaded = false;
+let depositMin = null;
+
 async function loadDepositInfo(network = selectedDepNet) {
-  const data = await (
-    await apiFetch(`${API_URL}/wallet/deposit?network=${encodeURIComponent(network)}`)
-  ).json();
+  const addr = $('depositAddr');
+  const err = $('depErr');
+  const copyBtn = addr.querySelector('.copy-btn');
 
-  if (data.address) {
-    $('depositAddr').childNodes[0].textContent = data.address;
-  }
+  depositAddressLoaded = false;
+  depositMin = null;
+  addr.childNodes[0].textContent = 'جارٍ تحميل عنوان الإيداع...';
+  if (copyBtn) copyBtn.disabled = true;
+  err.style.display = 'none';
 
-  const warns = document.querySelectorAll('#v-deposit .warn-box b');
+  try {
+    const response = await apiFetch(
+      `${API_URL}/wallet/deposit?network=${encodeURIComponent(network)}`
+    );
+    const data = await response.json();
 
-  if (data.min != null && warns[0]) {
-    warns[0].textContent = '$' + data.min;
-  }
+    if (network !== selectedDepNet) return;
 
-  if (data.confirmations_required != null && warns[1]) {
-    warns[1].textContent = data.confirmations_required + ' تأكيد';
-  }
+    if (!data || data.ok !== true) {
+      throw new Error(
+        data?.error || data?.message || 'تعذر الحصول على معلومات الإيداع من الخادم.'
+      );
+    }
 
-  if (data.time && warns[2]) {
-    warns[2].textContent = data.time;
+    const address = typeof data.address === 'string'
+      ? data.address.trim()
+      : '';
+    const min = Number(data.min);
+
+    if (!address) {
+      throw new Error('لا يوجد عنوان إيداع مُعدّ لهذه الشبكة. يرجى مراجعة الإدارة.');
+    }
+
+    if (!Number.isFinite(min) || min <= 0) {
+      throw new Error('الحد الأدنى للإيداع غير صالح. يرجى مراجعة الإدارة.');
+    }
+
+    addr.childNodes[0].textContent = address;
+    depositMin = min;
+
+    const warns = document.querySelectorAll('#v-deposit .warn-box b');
+    if (warns[0]) warns[0].textContent = '$' + depositMin;
+    $('depAmount').min = String(depositMin);
+
+    if (data.confirmations_required != null && warns[1]) {
+      warns[1].textContent = data.confirmations_required + ' تأكيد';
+    }
+    if (data.time && warns[2]) {
+      warns[2].textContent = data.time;
+    }
+
+    depositAddressLoaded = true;
+    if (copyBtn) copyBtn.disabled = false;
+  } catch (e) {
+    if (network !== selectedDepNet) return;
+
+    depositAddressLoaded = false;
+    depositMin = null;
+    addr.childNodes[0].textContent = 'تعذر تحميل عنوان الإيداع';
+    if (copyBtn) copyBtn.disabled = true;
+    err.textContent = '⚠️ ' + (e.message || 'تعذر تحميل معلومات الإيداع.');
+    err.style.display = 'block';
+    throw e;
   }
 }
 
@@ -641,9 +721,25 @@ document.addEventListener('click', e => {
   }
 });
 
-function copyDepositAddr() {
-  navigator.clipboard.writeText($('depositAddr').textContent.trim())
-    .then(() => toast('تم نسخ العنوان ✓'));
+async function copyDepositAddr() {
+  if (!depositAddressLoaded) {
+    toast('لا يوجد عنوان إيداع مؤكد للنسخ', 1);
+    return;
+  }
+
+  const address = $('depositAddr').childNodes[0].textContent.trim();
+  if (!address || address === 'تعذر تحميل عنوان الإيداع' ||
+      address === 'جارٍ تحميل عنوان الإيداع...') {
+    toast('عنوان الإيداع غير متاح', 1);
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(address);
+    toast('تم نسخ العنوان ✓');
+  } catch {
+    toast('تعذر النسخ تلقائياً. تحقق من صلاحية الحافظة.', 1);
+  }
 }
 
 async function submitDeposit() {
@@ -651,7 +747,14 @@ async function submitDeposit() {
   const txHash = $('depTxHash').value.trim();
   const err = $('depErr');
   err.style.display = 'block';
-  if (!amount || amount < 10) { err.textContent = '⚠️ الحد الأدنى $10'; return; }
+  if (!depositAddressLoaded || !Number.isFinite(depositMin) || depositMin <= 0) {
+    err.textContent = '⚠️ انتظر تحميل عنوان الإيداع والحد الأدنى الصحيح للشبكة.';
+    return;
+  }
+  if (!Number.isFinite(amount) || amount < depositMin) {
+    err.textContent = '⚠️ الحد الأدنى للإيداع عبر ' + selectedDepNet + ' هو $' + depositMin;
+    return;
+  }
   if (!txHash || txHash.length < 10) { err.textContent = '⚠️ أدخل TX Hash صحيح'; return; }
   err.style.display = 'none';
   busy($('depBtn'), true, 'جارٍ الإرسال…');
@@ -673,13 +776,15 @@ async function submitDeposit() {
 
 /* ═══════════ السحب ═══════════ */
 function updateWithdrawSummary() {
-  if (!S) return;
   const amt = parseFloat($('wdAmount').value) || 0;
-  const fee = NETWORK_FEES[selectedWdNet] || 0;
-  const net = Math.max(0, amt - fee);
+  const fee = NETWORK_FEES[selectedWdNet];
+  const min = WITHDRAW_MIN[selectedWdNet];
+
+  $('wdAmount').min = String(min);
+  $('wdMinLabel').textContent = '$' + fmt(min);
   $('wdSumAmt').textContent = '$' + fmt(amt);
   $('wdSumFee').textContent = '$' + fmt(fee);
-  $('wdSumNet').textContent = '$' + fmt(net);
+  $('wdSumNet').textContent = '$' + fmt(Math.max(0, amt - fee));
 }
 
 async function submitWithdraw() {
@@ -687,9 +792,18 @@ async function submitWithdraw() {
   const address = $('wdAddress').value.trim();
   const err = $('wdErr');
   err.style.display = 'block';
-  if (!amount || amount < 10) { err.textContent = '⚠️ الحد الأدنى $10'; return; }
+  if (!Number.isFinite(amount) || amount < WITHDRAW_MIN[selectedWdNet]) {
+    err.textContent = '⚠️ الحد الأدنى للسحب عبر ' + selectedWdNet + ' هو $' + WITHDRAW_MIN[selectedWdNet];
+    return;
+  }
   if (!S || amount > S.balance) { err.textContent = '⚠️ رصيدك غير كافٍ'; return; }
-  if (!/^0x[a-fA-F0-9]{40}$/.test(address)) { err.textContent = '⚠️ عنوان غير صالح'; return; }
+  const validAddress = selectedWdNet === 'TRC20'
+    ? /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address)
+    : /^0x[a-fA-F0-9]{40}$/.test(address);
+  if (!validAddress) {
+    err.textContent = '⚠️ عنوان غير صالح لشبكة ' + selectedWdNet;
+    return;
+  }
   err.style.display = 'none';
   if (!confirm(`سحب $${fmt(amount)} إلى:\n${address}\nالشبكة: ${selectedWdNet}`)) return;
   busy($('wdBtn'), true, 'جارٍ الإرسال…');
@@ -750,7 +864,115 @@ function renderHistory(f) {
   $('hList').innerHTML = list.map(row).join('') || '<div class="empty">لا توجد عمليات</div>';
 }
 
+
+function escapeNotificationText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+}
+
+async function refreshNotificationCount() {
+  try {
+    const response = await apiFetch(`${API_URL}/notifications/unread-count`);
+    const data = await response.json();
+    const badge = $('notificationBadge');
+    const count = Math.max(0, Number(data.count) || 0);
+    badge.textContent = count > 99 ? '99+' : String(count);
+    badge.hidden = count === 0;
+  } catch (_) {
+    // لا نؤثر على وظائف المحفظة إذا تعذر تحميل العداد
+    const badge = $('notificationBadge');
+    if (badge) badge.hidden = true;
+  }
+}
+
+function closeNotifications() {
+  $('notificationsSheet').classList.remove('show');
+}
+
+async function openNotifications() {
+  const sheet = $('notificationsSheet');
+  const list = $('notificationList');
+  const status = $('notificationStatus');
+
+  sheet.classList.add('show');
+  list.innerHTML = '<div class="empty">جارٍ تحميل الإشعارات…</div>';
+  status.textContent = 'إشعارات حسابك';
+
+  try {
+    const response = await apiFetch(`${API_URL}/notifications`);
+    const data = await response.json();
+    const notifications = Array.isArray(data.notifications)
+      ? data.notifications.filter(n =>
+          Number.isSafeInteger(Number(n.id)) && Number(n.id) > 0
+        )
+      : [];
+
+    status.textContent = `عدد الإشعارات: ${notifications.length}`;
+
+    if (!notifications.length) {
+      list.innerHTML = '<div class="empty">لا توجد إشعارات حالياً</div>';
+      await refreshNotificationCount();
+      return;
+    }
+
+    list.innerHTML = notifications.map(n => {
+      const id = Number(n.id);
+      const unread = !n.is_read;
+      const [day, time] = dateLabel(n.created_at || '');
+      const date = `${day} · ${time}`;
+
+      return `<article class="notification-item${unread ? ' unread' : ''}">
+        <div class="notification-copy">
+          <b>${escapeNotificationText(n.title || 'إشعار')}</b>
+          <p>${escapeNotificationText(n.message || '')}</p>
+          <small>${escapeNotificationText(date)}</small>
+        </div>
+        ${unread
+          ? `<button class="btn-ghost" onclick="markNotificationRead(${id})">تعليم كمقروء</button>`
+          : '<span class="notification-read">مقروء</span>'}
+      </article>`;
+    }).join('');
+
+    await refreshNotificationCount();
+  } catch (error) {
+    list.innerHTML = '<div class="empty">تعذر تحميل الإشعارات. تحقق من تسجيل الدخول وحاول مجدداً.</div>';
+    toast(error.message || 'تعذر تحميل الإشعارات', 1);
+  }
+}
+
+async function markNotificationRead(id) {
+  try {
+    await apiFetch(`${API_URL}/notifications/${id}/read`, {
+      method: 'PATCH'
+    });
+    await refreshNotificationCount();
+    await openNotifications();
+  } catch (error) {
+    toast(error.message || 'تعذر تحديث الإشعار', 1);
+  }
+}
+
+async function markAllNotificationsRead() {
+  try {
+    await apiFetch(`${API_URL}/notifications/read-all`, {
+      method: 'PATCH'
+    });
+    await refreshNotificationCount();
+    await openNotifications();
+    toast('تم تعليم الإشعارات كمقروءة');
+  } catch (error) {
+    toast(error.message || 'تعذر تحديث الإشعارات', 1);
+  }
+}
+
 init();
+refreshNotificationCount();
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -768,7 +990,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 });
-</script>
 </script>
 </body>
 </html>
