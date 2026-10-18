@@ -444,19 +444,12 @@ async function apiFetch(url, options = {}) {
   }
 
   // ❌ إذا انتهت الجلسة → عرض رسالة فقط، بدون تحويل
-  if (response.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('auth_token');
-    const err = new Error('انتهت صلاحية الجلسة — أغلق هذه الصفحة وسجّل دخولك من جديد');
-    err.code = 'AUTH_EXPIRED';
-    throw err;
-  }
-
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'خطأ في الخادم' }));
-    const err = new Error(errorData.message || `HTTP ${response.status}`);
-    err.code = 'HTTP_ERROR';
+    const errorData = await response.json().catch(() => ({}));
+    const detail = errorData.message || errorData.error || 'لم يرسل الخادم تفاصيل إضافية';
+    const err = new Error(`HTTP ${response.status}: ${detail}`);
     err.status = response.status;
+    err.code = response.status === 401 ? 'AUTH_EXPIRED' : 'HTTP_ERROR';
     throw err;
   }
   
@@ -491,10 +484,13 @@ async function init() {
     let msg = e.message;
     if (e.code === 'NO_TOKEN') {
       msg = 'لا توجد جلسة نشطة<br><small style="color:#fca5a5">أغلق هذه التبويبة وعد إلى الصفحة الرئيسية ثم سجّل دخولك</small>';
-    } else if (e.code === 'AUTH_EXPIRED') {
-      msg = 'انتهت صلاحية الجلسة<br><small style="color:#fca5a5">أغلق هذه التبويبة وعد للصفحة الرئيسية ثم سجّل دخولك من جديد</small>';
+    } else if (e.code === 'AUTH_EXPIRED' || e.code === 'HTTP_ERROR') {
+      msg = 'تعذّر تحميل المحفظة<br><small style="color:#fca5a5"></small>';
+      msg += `<small style="color:#fca5a5">${String(e.message).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</small>`;
     } else if (e.code === 'NETWORK_ERROR') {
-      msg = 'تعذر الاتصال بالخادم<br><small style="color:#fca5a5">تأكد من تشغيل السيرفر والاتصال بالإنترنت</small>';
+      msg = 'تعذر الاتصال بالخادم<br><small style="color:#fca5a5">' +
+        String(e.message).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') +
+        '</small>';
     }
     
     $('dbErrMsg').innerHTML = msg;
