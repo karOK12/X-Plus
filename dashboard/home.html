@@ -472,30 +472,82 @@
     }
 
 
-/* توحيد شكل أيقونات القائمة الجانبية */
-.sidebar-icon,
-.sidebar-profile .sidebar-profile-image {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
+/* أيقونات جانبية بارزة، مع الحفاظ على لون كل SVG */
+.sidebar-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(96, 165, 250, .22);
-  border-radius: 10px;
-  background: #142b46;
-  color: #60a5fa;
+  border: 1px solid var(--icon-border, rgba(148, 163, 184, .3));
+  border-radius: 12px;
+  background: var(--icon-bg, #172b43);
+  color: var(--icon-color, #60a5fa);
   overflow: hidden;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
 }
 
-.sidebar-icon svg,
-.sidebar-profile .sidebar-profile-image svg {
-  width: 20px;
-  height: 20px;
+.sidebar-icon svg {
+  width: 25px;
+  height: 25px;
   display: block;
   flex-shrink: 0;
-  stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 2.3;
+}
+
+a[href="../account-settings.html"] .sidebar-icon {
+  --icon-color: #3b82f6;
+  --icon-bg: rgba(59, 130, 246, .16);
+  --icon-border: rgba(96, 165, 250, .4);
+}
+a[href="tasks.html"] .sidebar-icon {
+  --icon-color: #f59e0b;
+  --icon-bg: rgba(245, 158, 11, .16);
+  --icon-border: rgba(251, 191, 36, .4);
+}
+a[href="referrals.html"] .sidebar-icon {
+  --icon-color: #10b981;
+  --icon-bg: rgba(16, 185, 129, .16);
+  --icon-border: rgba(52, 211, 153, .4);
+}
+a[href="activity.html"] .sidebar-icon {
+  --icon-color: #06b6d4;
+  --icon-bg: rgba(6, 182, 212, .16);
+  --icon-border: rgba(34, 211, 238, .4);
+}
+a[href="achievements.html"] .sidebar-icon {
+  --icon-color: #f97316;
+  --icon-bg: rgba(249, 115, 22, .16);
+  --icon-border: rgba(251, 146, 60, .4);
+}
+a[href="../rating.html"] .sidebar-icon {
+  --icon-color: #eab308;
+  --icon-bg: rgba(234, 179, 8, .16);
+  --icon-border: rgba(250, 204, 21, .4);
+}
+
+
+.sidebar-profile .sidebar-profile-image {
+  --icon-color: #a78bfa;
+  --icon-bg: rgba(139, 92, 246, .16);
+  --icon-border: rgba(167, 139, 250, .4);
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid #e2e8f0;
+  background: #f1f5f9;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, .14);
+  overflow: hidden;
+}
+.sidebar-profile .sidebar-profile-image svg {
+  width: 42px;
+  height: 42px;
+  display: block;
 }
 
 .sidebar-profile {
@@ -506,30 +558,21 @@
   text-decoration: none;
 }
 
-.sidebar-profile .sidebar-profile-image {
-  border-radius: 10px;
-  box-shadow: none;
-}
-
-.sidebar-item:hover .sidebar-icon,
-.sidebar-profile:hover .sidebar-profile-image {
-  background: #1e3a5f;
-  border-color: #3b82f6;
-  color: #93c5fd;
+.sidebar-item:hover .sidebar-icon {
+  background: var(--icon-bg, #1e3a5f);
+  border-color: var(--icon-color, #93c5fd);
+  transform: translateY(-1px);
 }
 
 .sidebar-logout .sidebar-icon {
-  background: #3b1f2b;
-  border-color: rgba(248, 113, 113, .25);
-  color: #f87171;
+  --icon-color: #f87171;
+  --icon-bg: rgba(239, 68, 68, .16);
+  --icon-border: rgba(248, 113, 113, .4);
 }
-
 .sidebar-logout:hover .sidebar-icon {
-  background: #57232d;
+  background: rgba(239, 68, 68, .25);
   border-color: #ef4444;
-  color: #fca5a5;
 }
-
 .sidebar-logout {
   border-color: #273244;
   background: #1f2937;
@@ -539,6 +582,8 @@
   border-color: #3b82f6;
   color: #60a5fa;
 }
+
+
 
 </style>
 </head>
