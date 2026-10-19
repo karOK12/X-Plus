@@ -204,14 +204,16 @@
     .sidebar-icon { width: 26px; text-align: center; font-size: 17px; flex-shrink: 0; }
 
     .sidebar-logout {
-      color: #60a5fa;
+      color: #f8fafc;
       background: #450a0a20;
       border-color: #7f1d1d40;
     }
-    .sidebar-logout:hover {
-      background: #7f1d1d40;
-      border-color: #ef4444;
-      color: #fca5a5;
+    .sidebar-logout:hover,
+    .sidebar-logout:focus-visible,
+    .sidebar-logout:active {
+      background: #2563eb20;
+      border-color: #3b82f6;
+      color: #60a5fa;
     }
 
     .sidebar-overlay {
