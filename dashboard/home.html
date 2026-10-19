@@ -629,6 +629,24 @@ a[href="../rating.html"] .sidebar-icon {
   stroke: currentColor !important;
 }
 
+/* FIX: keep the profile icon perfectly circular */
+.left-sidebar .sidebar-profile .sidebar-profile-image {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  flex: 0 0 46px !important;
+  box-sizing: border-box !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+
+.left-sidebar .sidebar-profile .sidebar-profile-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
 </style>
 </head>
 <body>
