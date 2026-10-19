@@ -1659,32 +1659,78 @@ $("locationSave").onclick = () => {
 $("profileUpload").addEventListener(
   "change",
   function() {
-
-    const file =
-      this.files[0];
-
+    const file = this.files[0];
     if (!file) return;
 
-    const reader =
-      new FileReader();
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
-    reader.onload = () => {
+    if (!allowedTypes.includes(file.type)) {
+      alert("اختر صورة بصيغة JPG أو PNG أو WebP أو GIF.");
+      this.value = "";
+      return;
+    }
 
-      const image =
-        reader.result;
+    if (file.size > 3 * 1024 * 1024) {
+      alert("حجم الصورة يجب ألا يتجاوز 3 ميغابايت.");
+      this.value = "";
+      return;
+    }
 
-      $("profileImage").src =
-        image;
+    const reader = new FileReader();
 
-      localStorage.setItem(
-        "profileImage",
-        image
-      );
+    reader.onload = async () => {
+      const image = reader.result;
+      $("profileImage").src = image;
 
+      try {
+        localStorage.setItem("profileImage", image);
+      } catch (error) {
+        console.warn("تعذر حفظ نسخة محلية من الصورة:", error);
+      }
+
+      const token =
+        localStorage.getItem("token") ||
+        localStorage.getItem("auth_token");
+
+      if (!token) {
+        alert("ظهرت الصورة، لكن لم تُحفظ في الحساب. سجّل الدخول ثم حاول مجددًا.");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/user/profile-image", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ profileImage: image })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "تعذر حفظ الصورة");
+        }
+
+        if (data.profileImage) {
+          $("profileImage").src = data.profileImage;
+          try {
+            localStorage.setItem("profileImage", data.profileImage);
+          } catch (error) {
+            console.warn("تعذر تحديث النسخة المحلية:", error);
+          }
+        }
+
+        alert("تم حفظ الصورة الشخصية في حسابك بنجاح.");
+      } catch (error) {
+        console.error("PROFILE IMAGE SAVE ERROR:", error);
+        alert("ظهرت الصورة، لكن لم يتأكد حفظها في الحساب. تحقق من الاتصال ثم حاول مجددًا.");
+      }
     };
 
+    reader.onerror = () => alert("تعذرت قراءة الصورة. جرّب اختيار صورة أخرى.");
     reader.readAsDataURL(file);
-
   }
 );
 
@@ -1692,6 +1738,8 @@ $("profileUpload").addEventListener(
 /* =========================
    الغلاف
 ========================= */
+
+
 
 let coverDragging = false;
 let startY = 0;
@@ -1980,6 +2028,36 @@ function loadImages() {
 
 loadData();
 
+</script>
+
+
+<script>
+(async function loadSavedProfileImage() {
+  const imageElement = document.getElementById("profileImage");
+  const token =
+    localStorage.getItem("token") ||
+    localStorage.getItem("auth_token");
+
+  if (!imageElement || !token) return;
+
+  try {
+    const response = await fetch("/api/user/profile", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await response.json();
+
+    if (response.ok && data.success && data.user && data.user.profile_image) {
+      imageElement.src = data.user.profile_image;
+      try {
+        localStorage.setItem("profileImage", data.user.profile_image);
+      } catch (error) {
+        console.warn("تعذر تحديث النسخة المحلية للصورة:", error);
+      }
+    }
+  } catch (error) {
+    console.warn("تعذر تحميل الصورة المحفوظة من الحساب:", error);
+  }
+})();
 </script>
 
 </body>

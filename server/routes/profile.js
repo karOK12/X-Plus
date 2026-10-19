@@ -328,4 +328,49 @@ router.put("/user/profile", auth, async (req, res) => {
 });
 
 
+
+// ===============================
+// حفظ الصورة الشخصية فقط
+// ===============================
+router.put("/user/profile-image", auth, async (req, res) => {
+  try {
+    const { profileImage } = req.body || {};
+
+    if (
+      typeof profileImage !== "string" ||
+      !/^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+/=\r\n]+$/i.test(profileImage) ||
+      profileImage.length > 4300000
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "الصورة غير صالحة أو حجمها كبير. اختر صورة بحجم 5 ميغابايت أو أقل."
+      });
+    }
+
+    const result = await pool.query(
+      "UPDATE users SET profile_image = $1 WHERE id = $2 RETURNING profile_image",
+      [profileImage, req.user.id]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "المستخدم غير موجود"
+      });
+    }
+
+    return res.json({
+      success: true,
+      profileImage: result.rows[0].profile_image,
+      message: "تم حفظ الصورة الشخصية بنجاح"
+    });
+  } catch (error) {
+    console.error("SAVE PROFILE IMAGE ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "تعذر حفظ الصورة في الوقت الحالي"
+    });
+  }
+});
+
 module.exports = router;

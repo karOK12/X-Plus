@@ -629,12 +629,12 @@ a[href="../rating.html"] .sidebar-icon {
   stroke: currentColor !important;
 }
 
-/* FIX: keep the profile icon perfectly circular */
+/* Keep the profile image circular and set its size to 54×54 */
 .left-sidebar .sidebar-profile .sidebar-profile-image {
-  width: 46px !important;
-  height: 46px !important;
-  min-width: 46px !important;
-  flex: 0 0 46px !important;
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  flex: 0 0 54px !important;
   box-sizing: border-box !important;
   border-radius: 50% !important;
   overflow: hidden !important;
@@ -1590,19 +1590,59 @@ if (sidebarLogout) {
 
 
 <script>
-(() => {
+(async () => {
   const profileIcon = document.querySelector(".sidebar-profile-image");
-  const savedProfileImage = localStorage.getItem("profileImage");
+  if (!profileIcon) return;
 
-  if (profileIcon && savedProfileImage) {
-    const image = document.createElement("img");
-    image.id = "sidebarProfileImage";
-    image.src = savedProfileImage;
-    image.alt = "صورة الملف الشخصي";
-    image.style.width = "100%";
-    image.style.height = "100%";
-    image.style.objectFit = "cover";
-    profileIcon.replaceChildren(image);
+  function showProfileImage(src) {
+    if (!src) return;
+
+    let image = document.getElementById("sidebarProfileImage");
+    if (!image) {
+      image = document.createElement("img");
+      image.id = "sidebarProfileImage";
+      image.alt = "صورة الملف الشخصي";
+      image.style.width = "100%";
+      image.style.height = "100%";
+      image.style.objectFit = "cover";
+      image.style.borderRadius = "50%";
+      profileIcon.replaceChildren(image);
+    }
+
+    image.src = src;
+  }
+
+  let savedImage = null;
+  try {
+    savedImage = localStorage.getItem("profileImage");
+  } catch (error) {
+    console.warn("تعذرت قراءة الصورة المحلية:", error);
+  }
+
+  if (savedImage) showProfileImage(savedImage);
+
+  const token =
+    localStorage.getItem("token") ||
+    localStorage.getItem("auth_token");
+
+  if (!token) return;
+
+  try {
+    const response = await fetch("/api/user/profile", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await response.json();
+
+    if (response.ok && data.success && data.user && data.user.profile_image) {
+      showProfileImage(data.user.profile_image);
+      try {
+        localStorage.setItem("profileImage", data.user.profile_image);
+      } catch (error) {
+        console.warn("تعذر حفظ النسخة المحلية للصورة:", error);
+      }
+    }
+  } catch (error) {
+    console.warn("تعذر تحميل صورة الحساب للقائمة الجانبية:", error);
   }
 })();
 </script>
