@@ -453,15 +453,16 @@
       width: 76px;
       height: 76px;
       border-radius: 50%;
-      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       border: 3px solid #e2e8f0;
       background: #f1f5f9;
       box-shadow: 0 5px 18px rgba(15, 23, 42, .14);
     }
-    .sidebar-profile-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .sidebar-profile-image svg {
+      width: 42px;
+      height: 42px;
       display: block;
     }
     .sidebar-icon svg {
@@ -469,6 +470,75 @@
       height: 22px;
       display: block;
     }
+
+
+/* توحيد شكل أيقونات القائمة الجانبية */
+.sidebar-icon,
+.sidebar-profile .sidebar-profile-image {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(96, 165, 250, .22);
+  border-radius: 10px;
+  background: #142b46;
+  color: #60a5fa;
+  overflow: hidden;
+}
+
+.sidebar-icon svg,
+.sidebar-profile .sidebar-profile-image svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.sidebar-profile {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 2px 12px 10px;
+  text-decoration: none;
+}
+
+.sidebar-profile .sidebar-profile-image {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.sidebar-item:hover .sidebar-icon,
+.sidebar-profile:hover .sidebar-profile-image {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+
+.sidebar-logout .sidebar-icon {
+  background: #3b1f2b;
+  border-color: rgba(248, 113, 113, .25);
+  color: #f87171;
+}
+
+.sidebar-logout:hover .sidebar-icon {
+  background: #57232d;
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.sidebar-logout {
+  border-color: #273244;
+  background: #1f2937;
+}
+.sidebar-logout:hover {
+  background: #2563eb20;
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
 
 </style>
 </head>
@@ -496,78 +566,58 @@
           </div>
           <div class="sidebar-items">
             <a href="../profile.html" class="sidebar-profile" aria-label="الملف الشخصي">
-              <span class="sidebar-profile-image">
-                <img id="sidebarProfileImage" src="/assets/images/profile.jpg" alt="صورة الملف الشخصي">
+              <span class="sidebar-profile-image" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#8b5cf6" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>
               </span>
             </a>
 
             <a href="../account-settings.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2.6V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8 15a1.7 1.7 0 0 0-1.6-1H6v-2.6h.4A1.7 1.7 0 0 0 8 10a1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5h2.6v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2V14h-.2a1.7 1.7 0 0 0-1.6 1Z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#3b82f6" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m19.4 15 .1.1 1.4 1.4-2.1 2.1-1.5-1.4a8 8 0 0 1-2 .8L15 20h-6l-.3-2a8 8 0 0 1-2-.8l-1.5 1.4-2.1-2.1L4.5 15a8 8 0 0 1-.8-2L2 12.7v-1.4l1.7-.3a8 8 0 0 1 .8-2L3.1 7.5l2.1-2.1 1.5 1.4a8 8 0 0 1 2-.8L9 4h6l.3 2a8 8 0 0 1 2 .8l1.5-1.4 2.1 2.1-1.4 1.5a8 8 0 0 1 .8 2l1.7.3v1.4l-1.7.3a8 8 0 0 1-.9 2Z"/></svg>
               </span>
               <span>إعدادات الحساب</span>
             </a>
 
             <a href="tasks.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="8" width="18" height="4" rx="1"/>
-                  <path d="M5 12v8h14v-8M12 12v8"/>
-                  <path d="M12 8H7.5a2.5 2.5 0 1 1 2.5-2.5C10 7 12 8 12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5C14 7 12 8 12 8Z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#f59e0b" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="m8 11 1.5 1.5L12 10"/><path d="M14 11h2M8 16h2m4 0h2"/></svg>
               </span>
               <span>المهام</span>
             </a>
 
-            <a href="achievements.html" class="sidebar-item">
-              <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
-                  <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/>
-                </svg>
-              </span>
-              <span>الإنجازات</span>
-            </a>
+
 
             <a href="referrals.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="7" r="3"/>
-                  <path d="M3.5 20v-1.5A4.5 4.5 0 0 1 8 14h2a4.5 4.5 0 0 1 4.5 4.5V20"/>
-                  <path d="M16 4.5a3 3 0 0 1 0 5.8M17 14h1a3.5 3.5 0 0 1 3.5 3.5V19"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3"/><path d="M3.5 20v-1.5A4.5 4.5 0 0 1 8 14h2a4.5 4.5 0 0 1 4.5 4.5V20"/><path d="M16 11V5m-3 3h6m-3 6a3.5 3.5 0 0 1 5 3v2"/></svg>
               </span>
               <span>دعوة أصدقاء</span>
             </a>
 
             <a href="activity.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 3v18h18"/>
-                  <path d="m7 16 4-5 3 3 5-7"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#06b6d4" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-5 4 4 5-7"/><circle cx="7" cy="14" r="1"/><circle cx="11" cy="9" r="1"/><circle cx="15" cy="13" r="1"/></svg>
               </span>
               <span>مخطط النشاط البياني</span>
             </a>
 
+            <a href="achievements.html" class="sidebar-item">
+              <span class="sidebar-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#f97316" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a4 4 0 0 0 4 4m9-6h3v2a4 4 0 0 1-4 4"/><path d="m12 6 1 2 2 .3-1.5 1.5.4 2.2-1.9-1-1.9 1 .4-2.2L9 8.3l2-.3 1-2Z"/></svg>
+              </span>
+              <span>الإنجازات</span>
+            </a>
+
             <a href="../rating.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#eab308" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg>
               </span>
               <span>تقييم التطبيق</span>
             </a>
 
             <button class="sidebar-item sidebar-logout" id="sidebarLogout" type="button">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                  <path d="m16 17 5-5-5-5M21 12H9"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ef4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
               </span>
               <span>تسجيل الخروج</span>
             </button>
@@ -1392,66 +1442,6 @@
   66%  { content: '..'; }
   100% { content: '...'; }
 }
-
-
-/* توحيد شكل أيقونات القائمة الجانبية */
-.sidebar-icon,
-.sidebar-profile .sidebar-profile-image {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(96, 165, 250, .22);
-  border-radius: 10px;
-  background: #142b46;
-  color: #60a5fa;
-  overflow: hidden;
-}
-
-.sidebar-icon svg,
-.sidebar-profile .sidebar-profile-image svg {
-  width: 20px;
-  height: 20px;
-  display: block;
-  flex-shrink: 0;
-  stroke: currentColor;
-  stroke-width: 1.8;
-}
-
-.sidebar-profile {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 2px 12px 10px;
-  text-decoration: none;
-}
-
-.sidebar-profile .sidebar-profile-image {
-  border-radius: 10px;
-  box-shadow: none;
-}
-
-.sidebar-item:hover .sidebar-icon,
-.sidebar-profile:hover .sidebar-profile-image {
-  background: #1e3a5f;
-  border-color: #3b82f6;
-  color: #93c5fd;
-}
-
-.sidebar-logout .sidebar-icon {
-  background: #3b1f2b;
-  border-color: rgba(248, 113, 113, .25);
-  color: #f87171;
-}
-
-.sidebar-logout:hover .sidebar-icon {
-  background: #57232d;
-  border-color: #ef4444;
-  color: #fca5a5;
-}
-
 </style>
 
 <div class="logout-loading" id="logoutLoading">
@@ -1490,16 +1480,25 @@ if (sidebarLogout) {
 }
 </script>
 
+
+
 <script>
+(() => {
+  const profileIcon = document.querySelector(".sidebar-profile-image");
+  const savedProfileImage = localStorage.getItem("profileImage");
 
-  (() => {
-    const sidebarImage = document.getElementById("sidebarProfileImage");
-    const savedProfileImage = localStorage.getItem("profileImage");
-    if (sidebarImage && savedProfileImage) {
-      sidebarImage.src = savedProfileImage;
-    }
-  })();
-
+  if (profileIcon && savedProfileImage) {
+    const image = document.createElement("img");
+    image.id = "sidebarProfileImage";
+    image.src = savedProfileImage;
+    image.alt = "صورة الملف الشخصي";
+    image.style.width = "100%";
+    image.style.height = "100%";
+    image.style.objectFit = "cover";
+    profileIcon.replaceChildren(image);
+  }
+})();
 </script>
+
 </body>
 </html>
