@@ -513,10 +513,10 @@
 
             <a href="tasks.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="9"/>
-                  <circle cx="12" cy="12" r="5"/>
-                  <circle cx="12" cy="12" r="1"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="8" width="18" height="4" rx="1"/>
+                  <path d="M5 12v8h14v-8M12 12v8"/>
+                  <path d="M12 8H7.5a2.5 2.5 0 1 1 2.5-2.5C10 7 12 8 12 8Zm0 0h4.5A2.5 2.5 0 1 0 14 5.5C14 7 12 8 12 8Z"/>
                 </svg>
               </span>
               <span>المهام</span>
@@ -526,7 +526,7 @@
               <span class="sidebar-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
-                  <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4M9 2h6"/>
+                  <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/>
                 </svg>
               </span>
               <span>الإنجازات</span>
@@ -534,10 +534,10 @@
 
             <a href="referrals.html" class="sidebar-item">
               <span class="sidebar-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M19 8v6M22 11h-6"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="7" r="3"/>
+                  <path d="M3.5 20v-1.5A4.5 4.5 0 0 1 8 14h2a4.5 4.5 0 0 1 4.5 4.5V20"/>
+                  <path d="M16 4.5a3 3 0 0 1 0 5.8M17 14h1a3.5 3.5 0 0 1 3.5 3.5V19"/>
                 </svg>
               </span>
               <span>دعوة أصدقاء</span>
@@ -1392,6 +1392,66 @@
   66%  { content: '..'; }
   100% { content: '...'; }
 }
+
+
+/* توحيد شكل أيقونات القائمة الجانبية */
+.sidebar-icon,
+.sidebar-profile .sidebar-profile-image {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(96, 165, 250, .22);
+  border-radius: 10px;
+  background: #142b46;
+  color: #60a5fa;
+  overflow: hidden;
+}
+
+.sidebar-icon svg,
+.sidebar-profile .sidebar-profile-image svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.sidebar-profile {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 2px 12px 10px;
+  text-decoration: none;
+}
+
+.sidebar-profile .sidebar-profile-image {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.sidebar-item:hover .sidebar-icon,
+.sidebar-profile:hover .sidebar-profile-image {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+
+.sidebar-logout .sidebar-icon {
+  background: #3b1f2b;
+  border-color: rgba(248, 113, 113, .25);
+  color: #f87171;
+}
+
+.sidebar-logout:hover .sidebar-icon {
+  background: #57232d;
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
 </style>
 
 <div class="logout-loading" id="logoutLoading">
