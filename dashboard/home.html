@@ -986,7 +986,6 @@ a[href="../rating.html"] .sidebar-icon {
     let balanceInterval = null;
     let lastSecond = -1;
     let lastBalanceSecond = -1;
-    let displayBalanceScaled = 0;
 
     function formatScaled(scaled) {
       const isNeg = scaled < 0;
@@ -1075,17 +1074,17 @@ a[href="../rating.html"] .sidebar-icon {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
       const profitPerMs = profitPerMsScaled();
-      displayBalanceScaled = 0;
+      const baseBalanceScaled = balanceScaled;
 
       function tick() {
         if (!isMining) return;
         const now = Date.now();
         const elapsedMs = now - startTime;
-        displayBalanceScaled = profitPerMs * elapsedMs;
+        balanceScaled = baseBalanceScaled + profitPerMs * elapsedMs;
         const sec = Math.floor(elapsedMs / 1000);
         if (sec !== lastBalanceSecond) {
           lastBalanceSecond = sec;
-          balanceEl.textContent = formatScaled(Math.floor(displayBalanceScaled));
+          balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
         }
       }
 
@@ -1137,9 +1136,7 @@ a[href="../rating.html"] .sidebar-icon {
         const serverBalance = Number(data.balance || 0);
 
         balanceScaled = Math.floor(serverBalance * SCALE);
-        balanceEl.textContent = isMining
-          ? formatScaled(balanceScaled)
-          : '0.00000000';
+        balanceEl.textContent = formatScaled(balanceScaled);
 
         pointsEl.textContent = Number(data.points || 0);
 
@@ -1243,8 +1240,6 @@ a[href="../rating.html"] .sidebar-icon {
       startBtn.disabled = true;
       startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
       startTime = Date.now();
-      displayBalanceScaled = 0;
-      balanceEl.textContent = '0.00000000';
       isMining = true;
       sessionDone = false;
       lastSecond = -1;
@@ -1324,7 +1319,7 @@ a[href="../rating.html"] .sidebar-icon {
         if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
         timerEl.textContent = '24:00:00';
-        balanceEl.textContent = formatScaled(Math.floor(displayBalanceScaled));
+        balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
         updateRing(CYCLE_SECONDS);
         profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
         startBtn.disabled = false;
