@@ -390,9 +390,46 @@
       .nav-menu.active { display: flex; }
       .nav-menu li { margin: 10px 0; width: 100%; text-align: center; }
       .hero-content { flex-direction: column !important; text-align: center; }
-      .mining-row { flex-direction: column; align-items: center; }
-      .mining-right { align-items: center; text-align: center; }
-      .balance-container, .power-container, .rate-container, .points-container { align-items: center; }
+      .mining-card-wrapper {
+        min-width: 0 !important;
+        width: 100%;
+        max-width: 100%;
+      }
+      .mining-card {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        padding: 14px;
+      }
+      .mining-row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .mining-circle {
+        width: 120px;
+        height: 120px;
+        flex: 0 0 120px;
+      }
+      .progress-ring {
+        top: -10px;
+        left: -10px;
+        transform: scale(0.85) rotate(-90deg);
+      }
+      .mining-right {
+        flex: 1;
+        min-width: 0;
+        align-items: flex-end;
+        text-align: right;
+        gap: 6px;
+      }
+      .balance { font-size: clamp(14px, 4vw, 22px); overflow-wrap: anywhere; }
+      .balance-container, .power-container, .rate-container, .points-container {
+        align-items: flex-end;
+        min-width: 0;
+      }
       .sidebar-toggle { width: 36px; height: 36px; font-size: 18px; }
       .left-sidebar { width: 270px; }
     }
