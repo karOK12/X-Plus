@@ -1074,17 +1074,18 @@ a[href="../rating.html"] .sidebar-icon {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
       const profitPerMs = profitPerMsScaled();
-      const baseBalanceScaled = balanceScaled;
+      let displayBalanceScaled = 0;
+      balanceEl.textContent = '0.00000000';
 
       function tick() {
         if (!isMining) return;
         const now = Date.now();
         const elapsedMs = now - startTime;
-        balanceScaled = baseBalanceScaled + profitPerMs * elapsedMs;
+        displayBalanceScaled = profitPerMs * elapsedMs;
         const sec = Math.floor(elapsedMs / 1000);
         if (sec !== lastBalanceSecond) {
           lastBalanceSecond = sec;
-          balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+          balanceEl.textContent = formatScaled(Math.floor(displayBalanceScaled));
         }
       }
 
@@ -1136,7 +1137,7 @@ a[href="../rating.html"] .sidebar-icon {
         const serverBalance = Number(data.balance || 0);
 
         balanceScaled = Math.floor(serverBalance * SCALE);
-        balanceEl.textContent = formatScaled(balanceScaled);
+        balanceEl.textContent = '0.00000000';
 
         pointsEl.textContent = Number(data.points || 0);
 
@@ -1319,7 +1320,7 @@ a[href="../rating.html"] .sidebar-icon {
         if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
         timerEl.textContent = '24:00:00';
-        balanceEl.textContent = formatScaled(Math.floor(balanceScaled));
+        balanceEl.textContent = '0.00000000';
         updateRing(CYCLE_SECONDS);
         profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
         startBtn.disabled = false;
