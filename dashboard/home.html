@@ -1074,12 +1074,13 @@ a[href="../rating.html"] .sidebar-icon {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
       const profitPerMs = profitPerMsScaled();
+      const baseBalanceScaled = balanceScaled;
 
       function tick() {
         if (!isMining) return;
         const now = Date.now();
         const elapsedMs = now - startTime;
-        balanceScaled = profitPerMs * elapsedMs;
+        balanceScaled = baseBalanceScaled + profitPerMs * elapsedMs;
         const sec = Math.floor(elapsedMs / 1000);
         if (sec !== lastBalanceSecond) {
           lastBalanceSecond = sec;
