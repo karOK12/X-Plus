@@ -434,51 +434,6 @@
       .left-sidebar { width: 270px; }
     }
 
-    .offerwall-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-    }
-    .offerwall-card {
-      background: #111827;
-      border: 1px solid #273244;
-      border-radius: 16px;
-      padding: 20px;
-      text-align: right;
-      overflow-wrap: anywhere;
-    }
-    .offerwall-card h3 {
-      color: #f8fafc;
-      margin: 0 0 12px;
-      font-size: 18px;
-    }
-    .offerwall-requirements {
-      color: #cbd5e1;
-      line-height: 1.7;
-      margin: 0 0 14px;
-      white-space: pre-wrap;
-    }
-    .offerwall-reward {
-      color: #60a5fa;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-    .offerwall-open, .offerwall-reload {
-      background: #2563eb;
-      color: white;
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 16px;
-      cursor: pointer;
-      font: inherit;
-      font-weight: 700;
-    }
-    .offerwall-status {
-      color: #cbd5e1;
-      text-align: center;
-      padding: 18px;
-      line-height: 1.8;
-    }
 
 
     .sidebar-profile {
@@ -817,28 +772,7 @@ a[href="../rating.html"] .sidebar-icon {
 
   <!-- قسم جديد: إحصائيات الشبكة -->
 
-  <!-- قسم مهام Offerwall.GG -->
-  <section id="offerwallTasks" class="section">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-badge">🎯 اكسب النقاط</div>
-        <h2 class="section-title">المهام والعروض</h2>
-        <p style="color:#94a3b8; margin-top:12px;">
-          أكمل شروط المهمة حتى تُحتسب المكافأة بعد تأكيد مزوّد العروض.
-        </p>
-      </div>
-      <div id="offerwallStatus" class="offerwall-status"
-           role="status" aria-live="polite">جارٍ تحميل العروض...</div>
-      <div id="offerwallList" class="offerwall-grid"></div>
-      <div style="text-align:center; margin-top:22px;">
-        <button type="button" class="offerwall-reload" id="offerwallReload">
-          🔄 تحديث العروض
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <section id="stats" class="section">
+<section id="stats" class="section">
     <div class="container">
       <div class="section-header">
         <div class="section-badge">بيانات حية</div>
@@ -1329,90 +1263,6 @@ a[href="../rating.html"] .sidebar-icon {
     }
 
 
-    // عرض المهام التي يرجعها الخادم؛ الواجهة لا تمنح نقاطاً بنفسها.
-    async function loadOfferwallOffers() {
-      const status = document.getElementById('offerwallStatus');
-      const list = document.getElementById('offerwallList');
-      const reload = document.getElementById('offerwallReload');
-
-      if (!status || !list || !reload) return;
-
-      reload.disabled = true;
-      status.textContent = 'جارٍ تحميل العروض...';
-      list.replaceChildren();
-
-      try {
-        const response = await apiFetch(`${API_URL}/offerwall/offers`);
-        const result = await response.json();
-        const offers = result?.data?.offers;
-
-        if (!result?.success || !Array.isArray(offers)) {
-          throw new Error('استجابة العروض غير صالحة');
-        }
-
-        if (offers.length === 0) {
-          status.textContent = 'ماكو عروض متاحة حالياً. جرّب التحديث لاحقاً.';
-          return;
-        }
-
-        status.textContent = `العروض المتاحة: ${offers.length}`;
-
-        for (const offer of offers) {
-          const card = document.createElement('article');
-          card.className = 'offerwall-card';
-
-          const title = document.createElement('h3');
-          title.textContent = String(offer.name || 'مهمة');
-
-          const requirements = document.createElement('p');
-          requirements.className = 'offerwall-requirements';
-          requirements.textContent = String(
-            offer.requirements || 'راجع شروط المهمة داخل صفحة العرض.'
-          );
-
-          const reward = document.createElement('div');
-          reward.className = 'offerwall-reward';
-          reward.textContent = '🎁 المكافأة: ' + String(
-            offer.rewardFormatted || offer.reward || 'حسب العرض'
-          );
-
-          card.append(title, requirements, reward);
-
-          let safeUrl = null;
-          try {
-            const url = new URL(offer.clickUrl);
-            if (url.protocol === 'https:' &&
-                url.hostname === 'offerwall.gg') {
-              safeUrl = url.href;
-            }
-          } catch (_) {}
-
-          if (safeUrl) {
-            const open = document.createElement('button');
-            open.type = 'button';
-            open.className = 'offerwall-open';
-            open.textContent = 'عرض المهمة';
-            open.addEventListener('click', () => {
-              window.open(safeUrl, '_blank', 'noopener,noreferrer');
-            });
-            card.append(open);
-          }
-
-          list.append(card);
-        }
-      } catch (error) {
-        status.textContent = 'تعذر تحميل العروض. ' +
-          'تحقق من تسجيل الدخول وإعدادات خدمة Offerwall.GG.';
-        console.error('Offerwall load failed:', error.message);
-      } finally {
-        reload.disabled = false;
-      }
-    }
-
-    document.getElementById('offerwallReload')?.addEventListener(
-      'click', loadOfferwallOffers
-    );
-    loadOfferwallOffers();
 
     const termsContent = {
       terms: `<h2>📋 الشروط والأحكام</h2><p>يتم جمع النقاط والإيداعات لتحضير توزيع عملة X Plus الرسمية.</p>`,
