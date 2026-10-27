@@ -1008,15 +1008,16 @@ a[href="../rating.html"] .sidebar-icon {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
       const profitPerMs = profitPerMsScaled();
-      let displayBalanceScaled = 0;
-      balanceEl.textContent = '0.00000000';
+      const baseBalanceScaled = balanceScaled;
+      const displayStartMs = Date.now();
 
       function tick() {
         if (!isMining) return;
         const now = Date.now();
-        const elapsedMs = now - startTime;
-        displayBalanceScaled = profitPerMs * elapsedMs;
-        const sec = Math.floor(elapsedMs / 1000);
+        const elapsedMs = Math.max(0, now - displayStartMs);
+        const displayBalanceScaled =
+          baseBalanceScaled + profitPerMs * elapsedMs;
+        const sec = Math.floor(now / 1000);
         if (sec !== lastBalanceSecond) {
           lastBalanceSecond = sec;
           balanceEl.textContent = formatScaled(Math.floor(displayBalanceScaled));
@@ -1071,7 +1072,7 @@ a[href="../rating.html"] .sidebar-icon {
         const serverBalance = Number(data.balance || 0);
 
         balanceScaled = Math.floor(serverBalance * SCALE);
-        balanceEl.textContent = '0.00000000';
+        balanceEl.textContent = formatScaled(balanceScaled);
 
         pointsEl.textContent = Number(data.points || 0);
 
@@ -1104,7 +1105,7 @@ a[href="../rating.html"] .sidebar-icon {
           throw new Error(data.message || 'فشل تحميل حالة التعدين');
         }
 
-        if (false && data.isMining && data.miningStartTime) {
+        if (data.isMining && data.miningStartTime) {
           startTime = Number(data.miningStartTime);
           isMining = true;
           sessionDone = false;
@@ -1112,6 +1113,10 @@ a[href="../rating.html"] .sidebar-icon {
           lastBalanceSecond = -1;
 
           currentPower = Number(data.power || currentPower || 0);
+          if (data.balance !== undefined && Number.isFinite(Number(data.balance))) {
+            balanceScaled = Math.floor(Number(data.balance) * SCALE);
+            balanceEl.textContent = formatScaled(balanceScaled);
+          }
 
           const elapsedSeconds = Math.max(
             0,
@@ -1123,10 +1128,18 @@ a[href="../rating.html"] .sidebar-icon {
             sessionDone = true;
             timerEl.textContent = '24:00:00';
             updateRing(CYCLE_SECONDS);
-            profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
-            startBtn.disabled = false;
-            startBtn.innerText = '⛏️ بدء دورة جديدة';
-            return;
+            profitInfoEl.textContent = '⏳ بانتظار تثبيت الأرباح وتجديد الدورة...';
+            startBtn.disabled = true;
+            startBtn.innerText = '⏳ جارٍ تجديد الدورة';
+
+            // إعادة فحص الحالة تلقائياً عند بقاء وقت الدورة قديماً.
+            if (!window.miningStatusRetryTimeout) {
+              window.miningStatusRetryTimeout = setTimeout(() => {
+                window.miningStatusRetryTimeout = null;
+                loadMiningStatus();
+              }, 10000);
+            }
+            return false;
           }
 
           startBtn.disabled = true;
@@ -1153,8 +1166,21 @@ a[href="../rating.html"] .sidebar-icon {
           startBtn.innerText = "⛏️ ابدأ التعدين الآن";
         }
 
+        return true;
       } catch (error) {
         console.error("فشل تحميل حالة التعدين:", error);
+
+        profitInfoEl.textContent =
+          '⚠️ تعذّر الاتصال؛ ستتم إعادة التحقق تلقائياً.';
+
+        if (!window.miningStatusRetryTimeout) {
+          window.miningStatusRetryTimeout = setTimeout(() => {
+            window.miningStatusRetryTimeout = null;
+            loadMiningStatus();
+          }, 10000);
+        }
+
+        return false;
       }
     }
 
@@ -1174,21 +1200,54 @@ a[href="../rating.html"] .sidebar-icon {
       if (isMining || timerInterval || balanceInterval) return;
       startBtn.disabled = true;
       startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
-      startTime = Date.now();
-      isMining = true;
+      isMining = false;
       sessionDone = false;
-      lastSecond = -1;
-      lastBalanceSecond = -1;
+      if (balanceInterval) {
+        clearInterval(balanceInterval);
+        balanceInterval = null;
+      }
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
       timerEl.textContent = '00:00:00';
       resetRing();
-      updateTimer();
-      updateRing(0);
-      startLocalCounter();
       
       try {
         const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
         const data = await response.json();
-        if (data.success) {
+        if (data.success && data.miningStartTime) {
+          startTime = Number(data.miningStartTime);
+          if (data.balance !== undefined && Number.isFinite(Number(data.balance))) {
+            balanceScaled = Math.floor(Number(data.balance) * SCALE);
+            balanceEl.textContent = formatScaled(balanceScaled);
+          }
+          currentPower = Number(data.power || currentPower || 0);
+          isMining = true;
+          sessionDone = false;
+          lastSecond = -1;
+          lastBalanceSecond = -1;
+
+          const elapsedSeconds = Math.max(
+            0,
+            Math.floor((Date.now() - startTime) / 1000)
+          );
+
+          if (elapsedSeconds >= CYCLE_SECONDS) {
+            isMining = false;
+            sessionDone = true;
+            timerEl.textContent = '24:00:00';
+            updateRing(CYCLE_SECONDS);
+            profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
+            startBtn.disabled = false;
+            startBtn.innerText = '⛏️ بدء دورة جديدة';
+            return;
+          }
+
+          updateTimer();
+          updateRing(elapsedSeconds);
+          startLocalCounter();
+
           startBtn.innerText = "⛏️ جاري التعدين (متصل)";
           profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
           if (!window._pointsUpdater) {
@@ -1206,7 +1265,17 @@ a[href="../rating.html"] .sidebar-icon {
       } catch (error) {
         console.error("فشل بدء التعدين:", error);
         stopMining();
-        profitInfoEl.textContent = "❌ تأكد من تشغيل server.js";
+
+        const message = String(error && error.message || "");
+        if (message.includes("لم تكتمل") ||
+            message.includes("current cycle")) {
+          profitInfoEl.textContent = "⏳ دورة التعدين الحالية لم تكتمل بعد";
+          startBtn.innerText = "⏳ انتظر اكتمال الدورة";
+        } else {
+          profitInfoEl.textContent = message
+            ? `❌ تعذّر بدء التعدين: ${message}`
+            : "❌ تعذّر الاتصال بالخادم. حاول مرة أخرى.";
+        }
       }
     }
 
