@@ -350,21 +350,20 @@ app.get(
             ) {
 
                 const seconds =
-                    (
-                        Date.now() -
-                        Number(
-                            data.mining_start_time
+                    Math.min(
+                        86400,
+                        Math.max(
+                            0,
+                            (
+                                Date.now() -
+                                Number(data.mining_start_time)
+                            ) / 1000
                         )
-                    ) / 1000;
+                    );
 
 
                 const profit =
-                    (
-                        Number(
-                            data.power || 0
-                        ) *
-                        0.5
-                    ) / 3600;
+                    (Number(data.power || 0) * (2 / 150.50)) / 86400;
 
 
                 balance +=

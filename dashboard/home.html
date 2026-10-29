@@ -930,7 +930,8 @@ a[href="../rating.html"] .sidebar-icon {
     }
 
     function profitPerMsScaled() {
-      return (currentPower * 0.00000024 * SCALE) / 3600000;
+      // القوة 150.50 تنتج 2 X Plus خلال 24 ساعة
+      return (currentPower * (2 / 150.50) * SCALE) / 86400000;
     }
 
     async function apiFetch(url, options = {}) {
@@ -1080,7 +1081,7 @@ a[href="../rating.html"] .sidebar-icon {
         powerEl.textContent = currentPower.toFixed(2);
 
         rateEl.textContent =
-          `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+          `↗️ +${(currentPower * 2 / 150.50 / 24).toFixed(2)}/h`;
 
         profitInfoEl.textContent = '⏱️ جاهز للبدء';
 
@@ -1137,7 +1138,7 @@ a[href="../rating.html"] .sidebar-icon {
               window.miningStatusRetryTimeout = setTimeout(() => {
                 window.miningStatusRetryTimeout = null;
                 loadMiningStatus();
-              }, 10000);
+              }, 1500);
             }
             return false;
           }
@@ -1238,9 +1239,16 @@ a[href="../rating.html"] .sidebar-icon {
             sessionDone = true;
             timerEl.textContent = '24:00:00';
             updateRing(CYCLE_SECONDS);
-            profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
-            startBtn.disabled = false;
-            startBtn.innerText = '⛏️ بدء دورة جديدة';
+            profitInfoEl.textContent = '⏳ جارٍ تحديث الدورة تلقائياً...';
+            startBtn.disabled = true;
+            startBtn.innerText = '⏳ جارٍ تجديد الدورة';
+
+            if (!window.miningStatusRetryTimeout) {
+              window.miningStatusRetryTimeout = setTimeout(() => {
+                window.miningStatusRetryTimeout = null;
+                loadMiningStatus();
+              }, 1500);
+            }
             return;
           }
 
@@ -1308,26 +1316,42 @@ a[href="../rating.html"] .sidebar-icon {
 
     function updateTimer() {
       if (!isMining) return;
-      const now = Date.now();
-      const elapsedMs = now - startTime;
-      const elapsedSeconds = elapsedMs / 1000;
+
+      const elapsedSeconds = Math.max(0, (Date.now() - startTime) / 1000);
       const elapsed = Math.min(elapsedSeconds, CYCLE_SECONDS);
       const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
       const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
       const s = String(Math.floor(elapsed % 60)).padStart(2, '0');
+
       timerEl.textContent = `${h}:${m}:${s}`;
       updateRing(elapsedSeconds);
+
       if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
         sessionDone = true;
         isMining = false;
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
+
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        if (balanceInterval) {
+          clearInterval(balanceInterval);
+          balanceInterval = null;
+        }
+
         timerEl.textContent = '24:00:00';
-        balanceEl.textContent = '0.00000000';
         updateRing(CYCLE_SECONDS);
-        profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
-        startBtn.disabled = false;
-        startBtn.innerText = '⛏️ بدء دورة جديدة';
+        profitInfoEl.textContent = '⏳ جارٍ تثبيت الأرباح والتحقق من الدورة التالية...';
+        startBtn.disabled = true;
+        startBtn.innerText = '⏳ جارٍ تحديث حالة التعدين';
+
+        if (window.miningCycleRefreshTimeout) {
+          clearTimeout(window.miningCycleRefreshTimeout);
+        }
+        window.miningCycleRefreshTimeout = setTimeout(async () => {
+          window.miningCycleRefreshTimeout = null;
+          await loadMiningStatus();
+        }, 1500);
       }
     }
 
