@@ -756,6 +756,7 @@ a[href="../rating.html"] .sidebar-icon {
 
               <div class="mining-right">
                 <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.00000000</div></div>
+                <div class="balance-container"><div class="balance-label">🪙 ربح الدورة الحالية</div><div class="balance" id="cycleProfit">0.00000000</div></div>
                 <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
                 <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
                 <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
@@ -912,6 +913,8 @@ a[href="../rating.html"] .sidebar-icon {
     const RING_CYCLE    = 60;
     const SCALE = 100000000;
     
+    let balanceScaled = 0;
+    let storedBalanceScaled = 0;
     let currentPower = 150.50;
     let isMining = false;
     let sessionDone = false;
@@ -922,12 +925,13 @@ a[href="../rating.html"] .sidebar-icon {
     let lastBalanceSecond = -1;
 
     function formatScaled(scaled) {
-      const isNeg = scaled < 0;
-      const abs = Math.abs(scaled);
-      const intPart = Math.floor(abs / SCALE);
-      const fracPart = (abs % SCALE).toString().padStart(8, '0');
-      return (isNeg ? '-' : '') + intPart + '.' + fracPart;
-    }
+  const value = Number(scaled);
+  const isNeg = value < 0;
+  const abs = Math.floor(Math.abs(Number.isFinite(value) ? value : 0));
+  const intPart = Math.floor(abs / SCALE);
+  const fracPart = String(abs % SCALE).padStart(8, '0');
+  return (isNeg ? '-' : '') + intPart + '.' + fracPart;
+}
 
     function profitPerMsScaled() {
       // القوة 150.50 تنتج 2 X Plus خلال 24 ساعة
@@ -980,6 +984,7 @@ a[href="../rating.html"] .sidebar-icon {
     circle.style.strokeDashoffset = circumference;
 
     const balanceEl = document.getElementById('balance');
+    const cycleProfitEl = document.getElementById('cycleProfit');
     const pointsEl = document.getElementById('points');
     const powerEl = document.getElementById('power');
     const rateEl = document.getElementById('rate');
@@ -1005,28 +1010,42 @@ a[href="../rating.html"] .sidebar-icon {
     }
 
     function startLocalCounter() {
-      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      if (balanceInterval) {
+        clearInterval(balanceInterval);
+        balanceInterval = null;
+      }
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
 
-      const profitPerMs = profitPerMsScaled();
-      const baseBalanceScaled = balanceScaled;
-      const displayStartMs = Date.now();
+      const profitPerSecondScaled =
+        (currentPower * (2 / 150.50) * SCALE) / CYCLE_SECONDS;
+
+      // الرصيد المحفوظ هو الأساس، ونضيف إليه ربح الدورة الحالية.
+      const baseBalanceScaled = storedBalanceScaled;
 
       function tick() {
         if (!isMining) return;
+
         const now = Date.now();
-        const elapsedMs = Math.max(0, now - displayStartMs);
-        const displayBalanceScaled =
-          baseBalanceScaled + profitPerMs * elapsedMs;
-        const sec = Math.floor(now / 1000);
-        if (sec !== lastBalanceSecond) {
-          lastBalanceSecond = sec;
-          balanceEl.textContent = formatScaled(Math.floor(displayBalanceScaled));
-        }
+        const elapsedSeconds = Math.min(
+          CYCLE_SECONDS,
+          Math.max(0, Math.floor((now - startTime) / 1000))
+        );
+
+        const earnedScaled = Math.floor(
+          profitPerSecondScaled * elapsedSeconds
+        );
+
+        balanceScaled = Math.floor(baseBalanceScaled + earnedScaled);
+        balanceEl.textContent = formatScaled(balanceScaled);
+        cycleProfitEl.textContent = formatScaled(earnedScaled);
+        lastBalanceSecond = Math.floor(now / 1000);
       }
 
       tick();
-      balanceInterval = setInterval(tick, 100);
+      balanceInterval = setInterval(tick, 1000);
       timerInterval = setInterval(() => { updateTimer(); }, 100);
     }
 
@@ -1106,19 +1125,29 @@ a[href="../rating.html"] .sidebar-icon {
           throw new Error(data.message || 'فشل تحميل حالة التعدين');
         }
 
+        // لا تستبدل الرصيد أثناء عمل العدّاد المحلي.
+        if (
+          !isMining &&
+          !balanceInterval &&
+          data.balance !== undefined &&
+          Number.isFinite(Number(data.balance))
+        ) {
+          balanceScaled = Math.floor(Number(data.balance) * SCALE);
+          balanceEl.textContent = formatScaled(balanceScaled);
+        }
+
         if (data.isMining && data.miningStartTime) {
-          startTime = Number(data.miningStartTime);
+          startTime = Date.now() - (Number(data.elapsedSeconds || 0) * 1000);
           isMining = true;
+          cycleProfitEl.textContent = '0.00000000';
           sessionDone = false;
           lastSecond = -1;
           lastBalanceSecond = -1;
 
           currentPower = Number(data.power || currentPower || 0);
-          if (data.balance !== undefined && Number.isFinite(Number(data.balance))) {
-            balanceScaled = Math.floor(Number(data.balance) * SCALE);
-            balanceEl.textContent = formatScaled(balanceScaled);
+          if (data.storedBalance !== undefined && Number.isFinite(Number(data.storedBalance))) {
+            storedBalanceScaled = Math.floor(Number(data.storedBalance) * SCALE);
           }
-
           const elapsedSeconds = Math.max(
             0,
             Math.floor((Date.now() - startTime) / 1000)
@@ -1129,9 +1158,9 @@ a[href="../rating.html"] .sidebar-icon {
             sessionDone = true;
             timerEl.textContent = '24:00:00';
             updateRing(CYCLE_SECONDS);
-            profitInfoEl.textContent = '⏳ بانتظار تثبيت الأرباح وتجديد الدورة...';
+            profitInfoEl.textContent = '⏳ اكتملت الدورة؛ جارٍ تثبيت الأرباح...';
             startBtn.disabled = true;
-            startBtn.innerText = '⏳ جارٍ تجديد الدورة';
+            startBtn.innerText = '⏳ جارٍ تثبيت الأرباح';
 
             // إعادة فحص الحالة تلقائياً عند بقاء وقت الدورة قديماً.
             if (!window.miningStatusRetryTimeout) {
@@ -1163,6 +1192,7 @@ a[href="../rating.html"] .sidebar-icon {
             timerInterval = null;
           }
           profitInfoEl.textContent = '⏱️ جاهز للبدء';
+          cycleProfitEl.textContent = '0.00000000';
           startBtn.disabled = false;
           startBtn.innerText = "⛏️ ابدأ التعدين الآن";
         }
@@ -1218,7 +1248,11 @@ a[href="../rating.html"] .sidebar-icon {
         const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
         const data = await response.json();
         if (data.success && data.miningStartTime) {
-          startTime = Number(data.miningStartTime);
+          startTime = Date.now() - (Number(data.elapsedSeconds || 0) * 1000);
+          cycleProfitEl.textContent = '0.00000000';
+          if (data.storedBalance !== undefined && Number.isFinite(Number(data.storedBalance))) {
+            storedBalanceScaled = Math.floor(Number(data.storedBalance) * SCALE);
+          }
           if (data.balance !== undefined && Number.isFinite(Number(data.balance))) {
             balanceScaled = Math.floor(Number(data.balance) * SCALE);
             balanceEl.textContent = formatScaled(balanceScaled);
@@ -1239,9 +1273,9 @@ a[href="../rating.html"] .sidebar-icon {
             sessionDone = true;
             timerEl.textContent = '24:00:00';
             updateRing(CYCLE_SECONDS);
-            profitInfoEl.textContent = '⏳ جارٍ تحديث الدورة تلقائياً...';
+            profitInfoEl.textContent = '⏳ جارٍ تثبيت أرباح الدورة...';
             startBtn.disabled = true;
-            startBtn.innerText = '⏳ جارٍ تجديد الدورة';
+            startBtn.innerText = '⏳ جارٍ تثبيت الأرباح';
 
             if (!window.miningStatusRetryTimeout) {
               window.miningStatusRetryTimeout = setTimeout(() => {
@@ -1341,9 +1375,9 @@ a[href="../rating.html"] .sidebar-icon {
 
         timerEl.textContent = '24:00:00';
         updateRing(CYCLE_SECONDS);
-        profitInfoEl.textContent = '⏳ جارٍ تثبيت الأرباح والتحقق من الدورة التالية...';
+        profitInfoEl.textContent = '⏳ جارٍ تثبيت الأرباح وتجهيز الدورة التالية تلقائياً';
         startBtn.disabled = true;
-        startBtn.innerText = '⏳ جارٍ تحديث حالة التعدين';
+        startBtn.innerText = '⏳ جارٍ تثبيت الأرباح';
 
         if (window.miningCycleRefreshTimeout) {
           clearTimeout(window.miningCycleRefreshTimeout);

@@ -53,6 +53,7 @@ function makeStatus(user) {
   return {
     success: true,
     balance,
+    storedBalance,
     power,
     miningStartTime,
     elapsedSeconds,
