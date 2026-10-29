@@ -74,42 +74,40 @@ exports.startMining = async (req, res) => {
     const userId = req.user.id;
     const now = Date.now();
 
-    const started = await db.query(
+    // تثبيت الدورات المكتملة أولاً، ثم حفظ ربح الجزء المتبقي قبل بدء دورة جديدة.
+    await settleCompletedCycles(userId, now);
+
+    const result = await db.query(
       `
       UPDATE users
-      SET mining_start_time = $1
+      SET
+        balance = (
+          COALESCE(balance, 0)::numeric
+          + CASE
+              WHEN mining_start_time IS NOT NULL THEN
+                (
+                  LEAST(
+                    GREATEST($1::numeric - mining_start_time::numeric, 0),
+                    86400000
+                  ) / 86400000
+                ) * COALESCE(power, 0)::numeric
+                  * (2::numeric / 150.50::numeric)
+              ELSE 0
+            END
+        )::real,
+        mining_start_time = $1
       WHERE id = $2
-        AND mining_start_time IS NULL
       RETURNING id, balance, power, mining_start_time
       `,
       [now, userId]
     );
 
-    // إذا كان التعدين قد بدأ سابقاً، ثبّت الدورات المكتملة دون إعادة ضبط الوقت.
-    if (started.rows.length === 0) {
-      const exists = await db.query(
-        "SELECT id FROM users WHERE id = $1",
-        [userId]
-      );
-
-      if (exists.rows.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "المستخدم غير موجود"
-        });
-      }
-
-      await settleCompletedCycles(userId, Date.now());
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "المستخدم غير موجود"
+      });
     }
-
-    const result = await db.query(
-      `
-      SELECT id, balance, power, mining_start_time
-      FROM users
-      WHERE id = $1
-      `,
-      [userId]
-    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({

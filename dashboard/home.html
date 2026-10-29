@@ -755,8 +755,7 @@ a[href="../rating.html"] .sidebar-icon {
               </div>
 
               <div class="mining-right">
-                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.00000000</div></div>
-                <div class="balance-container"><div class="balance-label">🪙 ربح الدورة الحالية</div><div class="balance" id="cycleProfit">0.00000000</div></div>
+                <div class="balance-container"><div class="balance-label">🪙 ربح الدورة الحالية</div><div class="balance" id="balance">0.00000000</div></div>
                 <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
                 <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
                 <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
@@ -984,7 +983,7 @@ a[href="../rating.html"] .sidebar-icon {
     circle.style.strokeDashoffset = circumference;
 
     const balanceEl = document.getElementById('balance');
-    const cycleProfitEl = document.getElementById('cycleProfit');
+    const cycleProfitEl = balanceEl;
     const pointsEl = document.getElementById('points');
     const powerEl = document.getElementById('power');
     const rateEl = document.getElementById('rate');
@@ -1038,8 +1037,6 @@ a[href="../rating.html"] .sidebar-icon {
           profitPerSecondScaled * elapsedSeconds
         );
 
-        balanceScaled = Math.floor(baseBalanceScaled + earnedScaled);
-        balanceEl.textContent = formatScaled(balanceScaled);
         cycleProfitEl.textContent = formatScaled(earnedScaled);
         lastBalanceSecond = Math.floor(now / 1000);
       }
@@ -1092,7 +1089,6 @@ a[href="../rating.html"] .sidebar-icon {
         const serverBalance = Number(data.balance || 0);
 
         balanceScaled = Math.floor(serverBalance * SCALE);
-        balanceEl.textContent = formatScaled(balanceScaled);
 
         pointsEl.textContent = Number(data.points || 0);
 
@@ -1133,7 +1129,6 @@ a[href="../rating.html"] .sidebar-icon {
           Number.isFinite(Number(data.balance))
         ) {
           balanceScaled = Math.floor(Number(data.balance) * SCALE);
-          balanceEl.textContent = formatScaled(balanceScaled);
         }
 
         if (data.isMining && data.miningStartTime) {
@@ -1255,7 +1250,6 @@ a[href="../rating.html"] .sidebar-icon {
           }
           if (data.balance !== undefined && Number.isFinite(Number(data.balance))) {
             balanceScaled = Math.floor(Number(data.balance) * SCALE);
-            balanceEl.textContent = formatScaled(balanceScaled);
           }
           currentPower = Number(data.power || currentPower || 0);
           isMining = true;
