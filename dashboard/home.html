@@ -1131,66 +1131,34 @@ a[href="../rating.html"] .sidebar-icon {
           balanceScaled = Math.floor(Number(data.balance) * SCALE);
         }
 
-        if (data.isMining && data.miningStartTime) {
-          startTime = Date.now() - (Number(data.elapsedSeconds || 0) * 1000);
-          isMining = true;
-          cycleProfitEl.textContent = '0.00000000';
-          sessionDone = false;
-          lastSecond = -1;
-          lastBalanceSecond = -1;
+        // تحميل الحالة لا يشغّل التعدين تلقائياً؛ التشغيل يدوي فقط.
+        isMining = false;
+        sessionDone = false;
+        startTime = 0;
 
-          currentPower = Number(data.power || currentPower || 0);
-          if (data.storedBalance !== undefined && Number.isFinite(Number(data.storedBalance))) {
-            storedBalanceScaled = Math.floor(Number(data.storedBalance) * SCALE);
-          }
-          const elapsedSeconds = Math.max(
-            0,
-            Math.floor((Date.now() - startTime) / 1000)
-          );
-
-          if (elapsedSeconds >= CYCLE_SECONDS) {
-            isMining = false;
-            sessionDone = true;
-            timerEl.textContent = '24:00:00';
-            updateRing(CYCLE_SECONDS);
-            profitInfoEl.textContent = '⏳ اكتملت الدورة؛ جارٍ تثبيت الأرباح...';
-            startBtn.disabled = true;
-            startBtn.innerText = '⏳ جارٍ تثبيت الأرباح';
-
-            // إعادة فحص الحالة تلقائياً عند بقاء وقت الدورة قديماً.
-            if (!window.miningStatusRetryTimeout) {
-              window.miningStatusRetryTimeout = setTimeout(() => {
-                window.miningStatusRetryTimeout = null;
-                loadMiningStatus();
-              }, 1500);
-            }
-            return false;
-          }
-
-          startBtn.disabled = true;
-          startBtn.innerText = "⛏️ جاري التعدين (متصل)";
-          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
-
-          updateTimer();
-          updateRing(elapsedSeconds);
-          startLocalCounter();
-
-        } else {
-          isMining = false;
-          startTime = 0;
-          if (balanceInterval) {
-            clearInterval(balanceInterval);
-            balanceInterval = null;
-          }
-          if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-          }
-          profitInfoEl.textContent = '⏱️ جاهز للبدء';
-          cycleProfitEl.textContent = '0.00000000';
-          startBtn.disabled = false;
-          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+        if (balanceInterval) {
+          clearInterval(balanceInterval);
+          balanceInterval = null;
         }
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+
+        currentPower = Number(data.power || currentPower || 0);
+        if (
+          data.storedBalance !== undefined &&
+          Number.isFinite(Number(data.storedBalance))
+        ) {
+          storedBalanceScaled = Math.floor(Number(data.storedBalance) * SCALE);
+        }
+
+        cycleProfitEl.textContent = '0.00000000';
+        timerEl.textContent = '00:00:00';
+        resetRing();
+        profitInfoEl.textContent = '⏱️ جاهز للبدء';
+        startBtn.disabled = false;
+        startBtn.innerText = "⛏️ ابدأ التعدين الآن";
 
         return true;
       } catch (error) {
