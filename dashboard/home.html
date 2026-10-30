@@ -1021,16 +1021,12 @@ a[href="../rating.html"] .sidebar-icon {
       const profitPerSecondScaled =
         (currentPower * (2 / 150.50) * SCALE) / CYCLE_SECONDS;
 
-      // الرصيد المحفوظ هو الأساس، ونضيف إليه ربح الدورة الحالية.
-      const baseBalanceScaled = storedBalanceScaled;
-
       function tick() {
         if (!isMining) return;
 
-        const now = Date.now();
         const elapsedSeconds = Math.min(
           CYCLE_SECONDS,
-          Math.max(0, Math.floor((now - startTime) / 1000))
+          Math.max(0, (Date.now() - startTime) / 1000)
         );
 
         const earnedScaled = Math.floor(
@@ -1038,12 +1034,11 @@ a[href="../rating.html"] .sidebar-icon {
         );
 
         cycleProfitEl.textContent = formatScaled(earnedScaled);
-        lastBalanceSecond = Math.floor(now / 1000);
       }
 
       tick();
-      balanceInterval = setInterval(tick, 1000);
-      timerInterval = setInterval(() => { updateTimer(); }, 100);
+      balanceInterval = setInterval(tick, 100);
+      timerInterval = setInterval(updateTimer, 100);
     }
 
     function updateRing(elapsedSeconds) {
@@ -1131,20 +1126,6 @@ a[href="../rating.html"] .sidebar-icon {
           balanceScaled = Math.floor(Number(data.balance) * SCALE);
         }
 
-        // تحميل الحالة لا يشغّل التعدين تلقائياً؛ التشغيل يدوي فقط.
-        isMining = false;
-        sessionDone = false;
-        startTime = 0;
-
-        if (balanceInterval) {
-          clearInterval(balanceInterval);
-          balanceInterval = null;
-        }
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-
         currentPower = Number(data.power || currentPower || 0);
         if (
           data.storedBalance !== undefined &&
@@ -1153,12 +1134,44 @@ a[href="../rating.html"] .sidebar-icon {
           storedBalanceScaled = Math.floor(Number(data.storedBalance) * SCALE);
         }
 
-        cycleProfitEl.textContent = '0.00000000';
-        timerEl.textContent = '00:00:00';
-        resetRing();
-        profitInfoEl.textContent = '⏱️ جاهز للبدء';
-        startBtn.disabled = false;
-        startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+        if (data.isMining && data.miningStartTime) {
+          const elapsedSeconds = Math.max(0, Number(data.elapsedSeconds || 0));
+
+          startTime = Date.now() - elapsedSeconds * 1000;
+          isMining = true;
+          sessionDone = false;
+          lastSecond = -1;
+          lastBalanceSecond = -1;
+
+
+          startBtn.disabled = true;
+          startBtn.innerText = '⛏️ التعدين مستمر';
+          profitInfoEl.textContent = '⛏️ التعدين مستمر؛ يتم احتساب الأرباح تلقائياً';
+
+          updateTimer();
+          updateRing(elapsedSeconds);
+          startLocalCounter();
+        } else {
+          isMining = false;
+          sessionDone = false;
+          startTime = 0;
+
+          if (balanceInterval) {
+            clearInterval(balanceInterval);
+            balanceInterval = null;
+          }
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+
+          cycleProfitEl.textContent = '0.00000000';
+          timerEl.textContent = '00:00:00';
+          resetRing();
+          profitInfoEl.textContent = '⏱️ جاهز للبدء';
+          startBtn.disabled = false;
+          startBtn.innerText = '⛏️ ابدأ التعدين الآن';
+        }
 
         return true;
       } catch (error) {

@@ -339,38 +339,7 @@ app.get(
                 user.rows[0];
 
 
-            let balance =
-                Number(
-                    data.balance || 0
-                );
-
-
-            if (
-                data.mining_start_time
-            ) {
-
-                const seconds =
-                    Math.min(
-                        86400,
-                        Math.max(
-                            0,
-                            (
-                                Date.now() -
-                                Number(data.mining_start_time)
-                            ) / 1000
-                        )
-                    );
-
-
-                const profit =
-                    (Number(data.power || 0) * (2 / 150.50)) / 86400;
-
-
-                balance +=
-                    seconds * profit;
-
-            }
-
+            const balance = Number(data.balance || 0);
 
             const config =
                 await pool.query(

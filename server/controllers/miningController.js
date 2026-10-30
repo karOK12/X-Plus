@@ -74,32 +74,27 @@ exports.startMining = async (req, res) => {
     const userId = req.user.id;
     const now = Date.now();
 
-    // تثبيت الدورات المكتملة أولاً، ثم حفظ ربح الجزء المتبقي قبل بدء دورة جديدة.
+    // تثبيت أي دورات مكتملة دون المساس بوقت الدورة الحالية.
     await settleCompletedCycles(userId, now);
+
+    // يبدأ فقط إذا لم يسبق للمستخدم بدء التعدين.
+    await db.query(
+      `
+      UPDATE users
+      SET mining_start_time = $1
+      WHERE id = $2
+        AND mining_start_time IS NULL
+      `,
+      [now, userId]
+    );
 
     const result = await db.query(
       `
-      UPDATE users
-      SET
-        balance = (
-          COALESCE(balance, 0)::numeric
-          + CASE
-              WHEN mining_start_time IS NOT NULL THEN
-                (
-                  LEAST(
-                    GREATEST($1::numeric - mining_start_time::numeric, 0),
-                    86400000
-                  ) / 86400000
-                ) * COALESCE(power, 0)::numeric
-                  * (2::numeric / 150.50::numeric)
-              ELSE 0
-            END
-        )::real,
-        mining_start_time = $1
-      WHERE id = $2
-      RETURNING id, balance, power, mining_start_time
+      SELECT id, balance, power, mining_start_time
+      FROM users
+      WHERE id = $1
       `,
-      [now, userId]
+      [userId]
     );
 
     if (result.rows.length === 0) {
@@ -109,19 +104,7 @@ exports.startMining = async (req, res) => {
       });
     }
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "المستخدم غير موجود"
-      });
-    }
-
-    const status = makeStatus(result.rows[0]);
-
-    return res.json({
-      ...status,
-      message: "تم تحميل حالة التعدين"
-    });
+    return res.json(makeStatus(result.rows[0]));
   } catch (err) {
     console.error("START MINING ERROR:", err);
     return res.status(500).json({
