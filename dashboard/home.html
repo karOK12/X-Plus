@@ -261,6 +261,11 @@
       border-radius: 24px; z-index: -1; opacity: 0.3; 
     }
     .mining-row { display: flex; justify-content: flex-start; align-items: center; gap: 20px; flex-wrap: wrap; }
+/* الدائرة يمين والإحصائيات يسار */
+.mining-row {
+  flex-direction: row-reverse !important;
+}
+
     .mining-circle { 
       width: 140px; height: 140px; border-radius: 50%; 
       background: radial-gradient(circle, #1e293b, #0f172a); 
@@ -434,51 +439,6 @@
       .left-sidebar { width: 270px; }
     }
 
-    .offerwall-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-    }
-    .offerwall-card {
-      background: #111827;
-      border: 1px solid #273244;
-      border-radius: 16px;
-      padding: 20px;
-      text-align: right;
-      overflow-wrap: anywhere;
-    }
-    .offerwall-card h3 {
-      color: #f8fafc;
-      margin: 0 0 12px;
-      font-size: 18px;
-    }
-    .offerwall-requirements {
-      color: #cbd5e1;
-      line-height: 1.7;
-      margin: 0 0 14px;
-      white-space: pre-wrap;
-    }
-    .offerwall-reward {
-      color: #60a5fa;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-    .offerwall-open, .offerwall-reload {
-      background: #2563eb;
-      color: white;
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 16px;
-      cursor: pointer;
-      font: inherit;
-      font-weight: 700;
-    }
-    .offerwall-status {
-      color: #cbd5e1;
-      text-align: center;
-      padding: 18px;
-      line-height: 1.8;
-    }
 
 
     .sidebar-profile {
@@ -685,6 +645,311 @@ a[href="../rating.html"] .sidebar-icon {
 }
 
 </style>
+  <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+
+<style>
+.offerwall-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:16px;
+}
+.offerwall-card {
+  background:#111827;
+  border:1px solid #273244;
+  border-radius:16px;
+  padding:20px;
+  text-align:right;
+  overflow-wrap:anywhere;
+}
+.offerwall-card h3 {
+  color:#f8fafc;
+  margin:0 0 12px;
+  font-size:18px;
+}
+.offerwall-requirements {
+  color:#cbd5e1;
+  line-height:1.7;
+  margin:0 0 14px;
+  white-space:pre-wrap;
+}
+.offerwall-reward {
+  color:#60a5fa;
+  font-weight:800;
+  margin-bottom:14px;
+}
+.offerwall-open,.offerwall-reload {
+  background:#2563eb;
+  color:white;
+  border:0;
+  border-radius:10px;
+  padding:11px 16px;
+  cursor:pointer;
+  font:inherit;
+  font-weight:700;
+}
+.offerwall-status {
+  color:#cbd5e1;
+  text-align:center;
+  padding:18px;
+  line-height:1.8;
+}
+.offerwall-reload:disabled {
+  opacity:.6;
+  cursor:wait;
+}
+</style>
+
+
+<style id="mining-card-design">
+.mining-card-wrapper {
+  width: 100%;
+  max-width: 520px;
+  min-width: 0 !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.mining-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.mining-row {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mining-circle {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  flex: 0 0 170px;
+  box-sizing: border-box;
+}
+
+.mining-circle .progress-ring {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  top: 15px;
+  left: 15px;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.circle-balance {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  width: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  z-index: 2;
+  text-align: center;
+}
+
+.circle-balance .balance-label {
+  font-size: 11px;
+  color: #aab8d0;
+}
+
+.circle-balance .balance {
+  max-width: 100%;
+  font-size: clamp(10px, 2.5vw, 14px);
+  font-weight: 800;
+  color: #b69aff;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+.circle-progress {
+  position: absolute;
+  top: 91px;
+  left: 0;
+  width: 170px;
+  text-align: center;
+  color: #42a5ff;
+  font-size: 16px;
+  font-weight: 800;
+  z-index: 2;
+}
+
+.mining-circle .timer {
+  position: absolute;
+  top: 117px;
+  left: 0;
+  width: 170px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.mining-circle .sub {
+  display: none;
+}
+
+.mining-right {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 7px;
+}
+
+.mining-right > div,
+.mining-right .adBtn {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.mining-right .balance,
+.mining-right .points,
+.mining-right .power,
+.mining-right .rate {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .mining-card-wrapper {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0 !important;
+  }
+
+  .mining-card {
+    padding: 14px;
+  }
+
+  .mining-row {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mining-card {
+    padding: 12px !important;
+  }
+
+  .mining-row {
+    gap: 6px;
+  }
+
+  .mining-circle {
+    width: 140px;
+    height: 140px;
+    flex: 0 0 140px;
+  }
+
+  .mining-circle .progress-ring {
+    top: 0;
+    left: 0;
+  }
+
+  .circle-balance {
+    top: 37px;
+    left: 0;
+    width: 140px;
+  }
+
+  .circle-balance .balance {
+    font-size: 11px;
+  }
+
+  .circle-progress {
+    top: 78px;
+    width: 140px;
+    font-size: 14px;
+  }
+
+  .mining-circle .timer {
+    top: 103px;
+    width: 140px;
+    font-size: 12px;
+  }
+
+  .mining-right {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .mining-right .balance {
+    font-size: clamp(12px, 3.5vw, 17px);
+  }
+
+  .mining-right .points {
+    font-size: 15px;
+  }
+
+  .mining-right .power,
+  .mining-right .rate {
+    font-size: 12px;
+  }
+
+  .mining-right .balance-label,
+  .mining-right .points-label,
+  .mining-right .power-label,
+  .mining-right .rate-label {
+    font-size: 9px;
+  }
+
+  .profit-info {
+    font-size: 9px;
+  }
+
+  .adBtn {
+    padding: 6px 3px;
+    font-size: 10px;
+  }
+}
+
+/* X PLUS — Mining circle refinement */
+.mining-circle .timer {
+  top: 50% !important;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: clamp(19px, 4vw, 25px);
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #b69aff;
+  z-index: 3;
+}
+
+.cycle-coin {
+  display: inline-block;
+  margin-inline-end: 5px;
+  transform-origin: center;
+  animation: xplusCoinSpin 3s linear infinite;
+}
+
+@keyframes xplusCoinSpin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+.circle-balance,
+.circle-progress {
+  display: none !important;
+}
+
+</style>
+
 </head>
 <body>
 
@@ -796,11 +1061,12 @@ a[href="../rating.html"] .sidebar-icon {
                   <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
                 </svg>
                 <div class="timer" id="timer">00:00:00</div>
-                <div class="sub">MINING</div>
+
               </div>
 
               <div class="mining-right">
-                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="balance">0.00000000</div></div>
+                <div class="balance-container"><div class="balance-label">💰 إجمالي الرصيد التقديري</div><div class="balance" id="balance">0.00000000</div></div>
+                <div class="balance-container"><div class="balance-label"><span class="cycle-coin">🪙</span> أرباح الدورة</div><div class="balance" id="cycleProfit">0.00000000</div></div>
                 <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
                 <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
                 <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
@@ -817,28 +1083,7 @@ a[href="../rating.html"] .sidebar-icon {
 
   <!-- قسم جديد: إحصائيات الشبكة -->
 
-  <!-- قسم مهام Offerwall.GG -->
-  <section id="offerwallTasks" class="section">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-badge">🎯 اكسب النقاط</div>
-        <h2 class="section-title">المهام والعروض</h2>
-        <p style="color:#94a3b8; margin-top:12px;">
-          أكمل شروط المهمة حتى تُحتسب المكافأة بعد تأكيد مزوّد العروض.
-        </p>
-      </div>
-      <div id="offerwallStatus" class="offerwall-status"
-           role="status" aria-live="polite">جارٍ تحميل العروض...</div>
-      <div id="offerwallList" class="offerwall-grid"></div>
-      <div style="text-align:center; margin-top:22px;">
-        <button type="button" class="offerwall-reload" id="offerwallReload">
-          🔄 تحديث العروض
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <section id="stats" class="section">
+<section id="stats" class="section">
     <div class="container">
       <div class="section-header">
         <div class="section-badge">بيانات حية</div>
@@ -986,18 +1231,58 @@ a[href="../rating.html"] .sidebar-icon {
     let balanceInterval = null;
     let lastSecond = -1;
     let lastBalanceSecond = -1;
+    let balanceScaled = 0;
+    let storedBalanceScaled = 0;
+    let miningNeedsActivation = false;
 
     function formatScaled(scaled) {
-      const isNeg = scaled < 0;
-      const abs = Math.abs(scaled);
+      const value = Number(scaled);
+      if (!Number.isFinite(value)) return '0.00000000';
+      const isNeg = value < 0;
+      const abs = Math.floor(Math.abs(value));
       const intPart = Math.floor(abs / SCALE);
-      const fracPart = (abs % SCALE).toString().padStart(8, '0');
-      return (isNeg ? '-' : '') + intPart + '.' + fracPart;
+      const fracPart = String(abs % SCALE).padStart(8, '0');
+      return (isNeg ? '-' : '') + String(intPart) + '.' + fracPart;
+    }
+
+    function formatCycleProfit(elapsedMs) {
+      const safeMs = Math.max(0, Math.min(elapsedMs, CYCLE_SECONDS * 1000));
+      const profit = safeMs * currentPower * (0.000864 / (150.50 * 86400000));
+      return profit.toFixed(8);
+    }
+
+    function applyServerBalance(value) {
+      const amount = Number(value);
+      if (value === undefined || value === null || value === '' ||
+          !Number.isFinite(amount) || amount < 0) return;
+
+      storedBalanceScaled = Math.floor(amount * SCALE);
+      renderMiningBalance();
+    }
+
+    function renderMiningBalance() {
+      let cycleProfitScaled = 0;
+
+      if (isMining && startTime > 0) {
+        const elapsedMs = Math.max(
+          0,
+          Math.min(Date.now() - startTime, CYCLE_SECONDS * 1000)
+        );
+
+        cycleProfitScaled = Math.floor(
+          elapsedMs * currentPower *
+          (0.000864 / (150.50 * 86400000)) * SCALE
+        );
+      }
+
+      balanceScaled = storedBalanceScaled + cycleProfitScaled;
+      balanceEl.textContent = formatScaled(balanceScaled);
     }
 
     function profitPerMsScaled() {
-      return (currentPower * 0.00000024 * SCALE) / 3600000;
+      return (currentPower * (0.000864 / (150.50 * 24)) * SCALE) / 3600000;
     }
+
 
     async function apiFetch(url, options = {}) {
       const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
@@ -1012,7 +1297,13 @@ a[href="../rating.html"] .sidebar-icon {
         throw new Error('انتهت صلاحية الجلسة');
       }
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'خطأ في الخادم' }));
+        const error = await response.clone().json().catch(() => ({ message: 'خطأ في الخادم' }));
+
+        // حالة عدم تفعيل التعدين ليست انقطاعاً عن Neon.
+        if (response.status === 409 && error.needsActivation === true) {
+          return response;
+        }
+
         throw new Error(error.message || `HTTP ${response.status}`);
       }
       return response;
@@ -1045,6 +1336,7 @@ a[href="../rating.html"] .sidebar-icon {
     circle.style.strokeDashoffset = circumference;
 
     const balanceEl = document.getElementById('balance');
+    const cycleProfitEl = document.getElementById('cycleProfit');
     const pointsEl = document.getElementById('points');
     const powerEl = document.getElementById('power');
     const rateEl = document.getElementById('rate');
@@ -1067,38 +1359,71 @@ a[href="../rating.html"] .sidebar-icon {
       startBtn.disabled = false;
       startBtn.innerText = "⛏️ ابدأ التعدين الآن";
       profitInfoEl.textContent = "⏱️ جاهز للبدء";
+      cycleProfitEl.textContent = '0.00000000';
     }
 
     function startLocalCounter() {
-      if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      if (balanceInterval) {
+        clearInterval(balanceInterval);
+        balanceInterval = null;
+      }
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
 
-      const profitPerMs = profitPerMsScaled();
-      let displayBalanceScaled = 0;
-      balanceEl.textContent = '0.00000000';
+      // الوقت للعرض فقط، والرصيد يُحدّث من الخادم.
+      timerInterval = setInterval(updateTimer, 1000);
 
-      function tick() {
-        if (!isMining) return;
-        const now = Date.now();
-        const elapsedMs = now - startTime;
-        displayBalanceScaled = profitPerMs * elapsedMs;
-        const sec = Math.floor(elapsedMs / 1000);
-        if (sec !== lastBalanceSecond) {
-          lastBalanceSecond = sec;
-          balanceEl.textContent = formatScaled(Math.floor(displayBalanceScaled));
+      async function syncServerBalance() {
+        try {
+          const response = await apiFetch(`${API_URL}/mining/status`);
+          const data = await response.json();
+          if (!data.success) return;
+
+          if (!data.isMining || !data.miningStartTime) {
+            applyServerBalance(data.storedBalance);
+            if (timerInterval) clearInterval(timerInterval);
+            if (balanceInterval) clearInterval(balanceInterval);
+            timerInterval = null;
+            balanceInterval = null;
+            isMining = false;
+            sessionDone = true;
+            await loadMiningStatus();
+            return;
+          }
+
+          const serverStartTime = Number(data.miningStartTime);
+          if (Number.isFinite(serverStartTime) && serverStartTime > 0 &&
+              serverStartTime !== startTime) {
+            startTime = serverStartTime;
+            currentPower = Number(data.power || currentPower || 0);
+            isMining = true;
+            sessionDone = false;
+            lastSecond = -1;
+            applyServerBalance(data.storedBalance);
+            updateTimer();
+          } else {
+            applyServerBalance(data.storedBalance);
+          }
+        } catch (error) {
+          console.warn("تعذر تحديث الرصيد من الخادم:", error);
         }
       }
 
-      tick();
-      balanceInterval = setInterval(tick, 100);
-      timerInterval = setInterval(() => { updateTimer(); }, 100);
+      balanceInterval = setInterval(syncServerBalance, 5000);
+      syncServerBalance();
     }
 
     function updateRing(elapsedSeconds) {
       const t = Math.max(0, Math.min(elapsedSeconds, CYCLE_SECONDS));
       const done = elapsedSeconds >= CYCLE_SECONDS;
-      const speedFactor = 0.1;
-      const fill = done ? 1 : ((t * speedFactor) % RING_CYCLE) / RING_CYCLE;
+      // تقدّم الدائرة مرتبط بدورة التعدين الكاملة (24 ساعة).
+      const fill = done ? 1 : t / CYCLE_SECONDS;
+      const progressPercentEl = document.getElementById('progressPercent');
+      if (progressPercentEl) {
+        progressPercentEl.textContent = Math.floor(fill * 100) + '%';
+      }
 
       circle.style.strokeDasharray = RING_CIRC;
       circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
@@ -1109,7 +1434,12 @@ a[href="../rating.html"] .sidebar-icon {
     }
 
     async function initPage() {
+      isMining = false;
+      startTime = 0;
+      timerEl.textContent = '00:00:00';
+      cycleProfitEl.textContent = '0.00000000';
       resetRing();
+      renderMiningBalance();
 
       const token =
         localStorage.getItem('token') ||
@@ -1134,10 +1464,8 @@ a[href="../rating.html"] .sidebar-icon {
           depAddr.innerText = data.depositAddress || 'غير متوفر';
         }
 
-        const serverBalance = Number(data.balance || 0);
-
-        balanceScaled = Math.floor(serverBalance * SCALE);
-        balanceEl.textContent = '0.00000000';
+        // اعرض الرصيد المحفوظ من الخادم، ثم استرجع حالة التعدين.
+        applyServerBalance(data.balance);
 
         pointsEl.textContent = Number(data.points || 0);
 
@@ -1145,10 +1473,11 @@ a[href="../rating.html"] .sidebar-icon {
         powerEl.textContent = currentPower.toFixed(2);
 
         rateEl.textContent =
-          `↗️ +${(currentPower * 0.5).toFixed(2)}/h`;
+          `↗️ +${(currentPower * (0.000864 / (150.50 * 24))).toFixed(6)}/h`;
 
         profitInfoEl.textContent = '⏱️ جاهز للبدء';
 
+        // استرجع الدورة المحفوظة إن كانت موجودة، دون بدء دورة جديدة.
         await loadMiningStatus();
 
       } catch (e) {
@@ -1166,11 +1495,45 @@ a[href="../rating.html"] .sidebar-icon {
         const response = await apiFetch(`${API_URL}/mining/status`);
         const data = await response.json();
 
+        if (data.needsActivation === true) {
+          miningNeedsActivation = true;
+          isMining = false;
+          sessionDone = false;
+          startTime = 0;
+
+          if (window.miningStatusRetryTimeout) {
+            clearTimeout(window.miningStatusRetryTimeout);
+            window.miningStatusRetryTimeout = null;
+          }
+          if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+          }
+          if (balanceInterval) {
+            clearInterval(balanceInterval);
+            balanceInterval = null;
+          }
+
+          timerEl.textContent = '00:00:00';
+          cycleProfitEl.textContent = '0.00000000';
+          profitInfoEl.textContent = '⏳ نظام التعدين الجديد قيد التجهيز وسيتم تفعيله قريباً';
+          startBtn.disabled = true;
+          startBtn.innerText = '⏳ التعدين قيد التجهيز';
+          return false;
+        }
+
         if (!data.success) {
           throw new Error(data.message || 'فشل تحميل حالة التعدين');
         }
 
-        if (false && data.isMining && data.miningStartTime) {
+        miningNeedsActivation = false;
+
+        if (window.miningStatusRetryTimeout) {
+          clearTimeout(window.miningStatusRetryTimeout);
+          window.miningStatusRetryTimeout = null;
+        }
+
+        if (data.isMining && data.miningStartTime) {
           startTime = Number(data.miningStartTime);
           isMining = true;
           sessionDone = false;
@@ -1178,6 +1541,7 @@ a[href="../rating.html"] .sidebar-icon {
           lastBalanceSecond = -1;
 
           currentPower = Number(data.power || currentPower || 0);
+          applyServerBalance(data.storedBalance);
 
           const elapsedSeconds = Math.max(
             0,
@@ -1187,12 +1551,28 @@ a[href="../rating.html"] .sidebar-icon {
           if (elapsedSeconds >= CYCLE_SECONDS) {
             isMining = false;
             sessionDone = true;
-            timerEl.textContent = '24:00:00';
+
+            if (timerInterval) {
+              clearInterval(timerInterval);
+              timerInterval = null;
+            }
+            if (balanceInterval) {
+              clearInterval(balanceInterval);
+              balanceInterval = null;
+            }
+
+            timerEl.textContent = '00:00:00';
             updateRing(CYCLE_SECONDS);
-            profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
-            startBtn.disabled = false;
-            startBtn.innerText = '⛏️ بدء دورة جديدة';
-            return;
+            profitInfoEl.textContent = '⏳ جارٍ تثبيت أرباح الدورة...';
+            startBtn.disabled = true;
+            startBtn.innerText = '⏳ جارٍ تحديث حالة التعدين';
+            if (!window.miningStatusRetryTimeout) {
+              window.miningStatusRetryTimeout = setTimeout(() => {
+                window.miningStatusRetryTimeout = null;
+                loadMiningStatus();
+              }, 3000);
+            }
+            return false;
           }
 
           startBtn.disabled = true;
@@ -1206,6 +1586,13 @@ a[href="../rating.html"] .sidebar-icon {
         } else {
           isMining = false;
           startTime = 0;
+          currentPower = Number(data.power || currentPower || 0);
+          applyServerBalance(data.storedBalance);
+          timerEl.textContent = '00:00:00';
+          cycleProfitEl.textContent = '0.00000000';
+          updateRing(0);
+          renderMiningBalance();
+
           if (balanceInterval) {
             clearInterval(balanceInterval);
             balanceInterval = null;
@@ -1214,13 +1601,42 @@ a[href="../rating.html"] .sidebar-icon {
             clearInterval(timerInterval);
             timerInterval = null;
           }
-          profitInfoEl.textContent = '⏱️ جاهز للبدء';
-          startBtn.disabled = false;
-          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+          cycleProfitEl.textContent = '0.00000000';
+
+          const alreadyUsed = data.miningEverStarted === true;
+          const canStartNewCycle =
+            data.canStartMining === true && !alreadyUsed;
+
+          if (alreadyUsed) {
+            profitInfoEl.textContent = '✅ انتهت دورة التعدين الوحيدة المخصصة لهذا الحساب';
+            startBtn.disabled = true;
+            startBtn.innerText = '✓ تم استخدام فرصة التعدين';
+          } else if (canStartNewCycle) {
+            profitInfoEl.textContent = '⏱️ جاهز للبدء';
+            startBtn.disabled = false;
+            startBtn.innerText = '⛏️ ابدأ التعدين الآن';
+          } else {
+            profitInfoEl.textContent = '⏳ بانتظار تحديث حالة التعدين';
+            startBtn.disabled = true;
+            startBtn.innerText = '⏳ جارٍ تحديث الحالة';
+          }
         }
 
+        return true;
       } catch (error) {
         console.error("فشل تحميل حالة التعدين:", error);
+
+        profitInfoEl.textContent =
+          '⚠️ تعذّر الاتصال؛ ستتم إعادة التحقق تلقائياً.';
+
+        if (!window.miningStatusRetryTimeout) {
+          window.miningStatusRetryTimeout = setTimeout(() => {
+            window.miningStatusRetryTimeout = null;
+            loadMiningStatus();
+          }, 10000);
+        }
+
+        return false;
       }
     }
 
@@ -1237,24 +1653,69 @@ a[href="../rating.html"] .sidebar-icon {
         return;
       }
 
+      if (miningNeedsActivation) {
+        startBtn.disabled = true;
+        startBtn.innerText = '⏳ التعدين قيد التجهيز';
+        profitInfoEl.textContent = '⏳ نظام التعدين الجديد قيد التجهيز وسيتم تفعيله قريباً';
+        return;
+      }
+
       if (isMining || timerInterval || balanceInterval) return;
       startBtn.disabled = true;
       startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
-      startTime = Date.now();
-      isMining = true;
+      isMining = false;
       sessionDone = false;
-      lastSecond = -1;
-      lastBalanceSecond = -1;
+      if (balanceInterval) {
+        clearInterval(balanceInterval);
+        balanceInterval = null;
+      }
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
       timerEl.textContent = '00:00:00';
       resetRing();
-      updateTimer();
-      updateRing(0);
-      startLocalCounter();
       
       try {
         const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
         const data = await response.json();
-        if (data.success) {
+
+        if (data.needsActivation === true) {
+          miningNeedsActivation = true;
+          await loadMiningStatus();
+          return;
+        }
+
+        if (data.success && data.miningStartTime) {
+          startTime = Number(data.miningStartTime);
+          currentPower = Number(data.power || currentPower || 0);
+          isMining = true;
+          sessionDone = false;
+          applyServerBalance(data.storedBalance);
+          lastSecond = -1;
+          lastBalanceSecond = -1;
+
+          const elapsedSeconds = Math.max(
+            0,
+            Math.floor((Date.now() - startTime) / 1000)
+          );
+
+          if (elapsedSeconds >= CYCLE_SECONDS) {
+            isMining = false;
+            sessionDone = true;
+            timerEl.textContent = '00:00:00';
+            updateRing(CYCLE_SECONDS);
+            profitInfoEl.textContent = '⏳ جارٍ تثبيت أرباح الدورة...';
+            startBtn.disabled = true;
+            startBtn.innerText = '⏳ جارٍ تحديث حالة التعدين';
+            await loadMiningStatus();
+            return;
+          }
+
+          updateTimer();
+          updateRing(elapsedSeconds);
+          startLocalCounter();
+
           startBtn.innerText = "⛏️ جاري التعدين (متصل)";
           profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
           if (!window._pointsUpdater) {
@@ -1267,152 +1728,294 @@ a[href="../rating.html"] .sidebar-icon {
             }, 30000);
           }
         } else {
-          stopMining();
+          await loadMiningStatus();
         }
       } catch (error) {
         console.error("فشل بدء التعدين:", error);
-        stopMining();
-        profitInfoEl.textContent = "❌ تأكد من تشغيل server.js";
+        await loadMiningStatus();
+        if (isMining) return;
+
+        const message = String(error && error.message || "");
+        if (message.includes("لم تكتمل") ||
+            message.includes("current cycle")) {
+          profitInfoEl.textContent = "⏳ دورة التعدين الحالية لم تكتمل بعد";
+          startBtn.innerText = "⏳ انتظر اكتمال الدورة";
+        } else {
+          profitInfoEl.textContent = message
+            ? `❌ تعذّر بدء التعدين: ${message}`
+            : "❌ تعذّر الاتصال بالخادم. حاول مرة أخرى.";
+        }
       }
     }
 
     async function watchAd() {
-      adBtn.innerHTML = "⏳ جاري عرض الإعلان...";
+      if (adBtn.disabled) return;
+
+      if (!window.google || !window.google.ima) {
+        alert("مشغّل الإعلان لم يكتمل تحميله. حدّث الصفحة وحاول مجدداً.");
+        return;
+      }
+
       adBtn.disabled = true;
-      setTimeout(async () => {
+      adBtn.textContent = "⏳ جاري تحميل الإعلان...";
+
+      const vastUrl = "https://pleasing-sink.com/d.mvFJzqd/GsN-vyZxGgUC/UeGmv9duCZJUVlvk/PbTzc/1FNEDLUV2TMzz/MRtcN/zZU_0cNYTFYbzpNmw_";
+
+      const overlay = document.createElement("div");
+      Object.assign(overlay.style, {
+        position: "fixed",
+        inset: "0",
+        zIndex: "999999",
+        background: "rgba(0,0,0,.92)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "12px",
+        direction: "rtl"
+      });
+
+      const panel = document.createElement("div");
+      Object.assign(panel.style, {
+        width: "min(900px, 100%)",
+        background: "#111827",
+        color: "#fff",
+        padding: "12px",
+        borderRadius: "14px",
+        boxSizing: "border-box"
+      });
+
+      const heading = document.createElement("div");
+      heading.textContent = "📺 مشاهدة إعلان";
+      heading.style.cssText = "font-size:18px;font-weight:bold;margin-bottom:10px";
+
+      const videoBox = document.createElement("div");
+      Object.assign(videoBox.style, {
+        position: "relative",
+        width: "100%",
+        aspectRatio: "16 / 9",
+        background: "#000",
+        overflow: "hidden"
+      });
+
+      const video = document.createElement("video");
+      video.playsInline = true;
+      video.preload = "auto";
+      video.style.cssText = "width:100%;height:100%;object-fit:contain";
+
+      const adContainer = document.createElement("div");
+      Object.assign(adContainer.style, {
+        position: "absolute",
+        inset: "0",
+        width: "100%",
+        height: "100%"
+      });
+
+      const status = document.createElement("p");
+      status.textContent = "جاري الاتصال بمصدر الإعلان...";
+      status.style.cssText = "font-size:14px;line-height:1.7";
+
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.textContent = "إغلاق الإعلان";
+      closeBtn.style.cssText =
+        "padding:10px 16px;border:0;border-radius:8px;background:#374151;color:white;cursor:pointer";
+
+      videoBox.append(video, adContainer);
+      panel.append(heading, videoBox, status, closeBtn);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+
+      let adsManager = null;
+      let settled = false;
+      let completedCount = 0;
+      let skippedCount = 0;
+      let rewardRequested = false;
+
+      function closePlayer() {
         try {
-          const res = await apiFetch(`${API_URL}/ad/watch`, { method: 'POST' });
-          const data = await res.json();
-          if(data.success) {
-            pointsEl.textContent = data.points;
-            adBtn.innerHTML = "✅ تمت إضافة 5 نقاط!";
-            adBtn.style.background = "rgba(34, 197, 94, 0.2)";
-            adBtn.style.borderColor = "#22c55e";
-            setTimeout(() => {
-              adBtn.innerHTML = "📺 شاهد إعلان (+5 نقاط)";
-              adBtn.disabled = false;
-              adBtn.style.background = "";
-              adBtn.style.borderColor = "";
-            }, 3000);
+          if (adsManager) adsManager.destroy();
+        } catch (_) {}
+
+        if (overlay.isConnected) overlay.remove();
+        adBtn.disabled = false;
+        adBtn.textContent = "📺 شاهد إعلان (+5 نقاط)";
+        adBtn.style.background = "";
+        adBtn.style.borderColor = "";
+      }
+
+      closeBtn.addEventListener("click", closePlayer);
+
+      function showAdError() {
+        if (settled) return;
+        settled = true;
+        status.textContent =
+          "تعذّر تشغيل الإعلان. لم تتم إضافة نقاط. أغلق النافذة وحاول لاحقاً.";
+        try {
+          if (adsManager) adsManager.destroy();
+        } catch (_) {}
+      }
+
+      try {
+        const ima = window.google.ima;
+        const displayContainer =
+          new ima.AdDisplayContainer(adContainer, video);
+        displayContainer.initialize();
+
+        const loader = new ima.AdsLoader(displayContainer);
+
+        loader.addEventListener(
+          ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+          function (event) {
+            if (settled) return;
+
+            try {
+              adsManager = event.getAdsManager(video);
+
+              adsManager.addEventListener(
+                ima.AdEvent.Type.COMPLETE,
+                function () {
+                  completedCount++;
+                }
+              );
+
+              adsManager.addEventListener(
+                ima.AdEvent.Type.SKIPPED,
+                function () {
+                  skippedCount++;
+                }
+              );
+
+              adsManager.addEventListener(
+                ima.AdEvent.Type.ALL_ADS_COMPLETED,
+                async function () {
+                  if (settled) return;
+                  settled = true;
+
+                  if (completedCount < 1 || skippedCount > 0) {
+                    status.textContent =
+                      "لم تكتمل مشاهدة جميع الإعلانات؛ لم تتم إضافة نقاط.";
+                    return;
+                  }
+
+                  if (rewardRequested) return;
+                  rewardRequested = true;
+                  status.textContent = "اكتملت المشاهدة. جاري تسجيل المكافأة...";
+
+                  try {
+                    const response = await apiFetch(
+                      `${API_URL}/ad/watch`,
+                      { method: "POST" }
+                    );
+                    const data = await response.json();
+
+                    if (!data.success) {
+                      throw new Error(data.message || "تعذر تسجيل المكافأة");
+                    }
+
+                    pointsEl.textContent = data.points;
+                    adBtn.textContent = "✅ تمت إضافة 5 نقاط!";
+                    adBtn.style.background = "rgba(34,197,94,.2)";
+                    adBtn.style.borderColor = "#22c55e";
+                    status.textContent = "تم تسجيل مكافأة الإعلان: 5 نقاط.";
+
+                    setTimeout(closePlayer, 1800);
+                  } catch (error) {
+                    console.error("تعذّر تسجيل مكافأة الإعلان:", error);
+                    status.textContent =
+                      "اكتملت المشاهدة لكن تعذّر تأكيد المكافأة من الخادم. لا تعاود الطلب يدوياً.";
+                  }
+                }
+              );
+
+              adsManager.addEventListener(
+                ima.AdErrorEvent.Type.AD_ERROR,
+                showAdError
+              );
+
+              const rect = videoBox.getBoundingClientRect();
+              adsManager.init(
+                Math.max(1, Math.round(rect.width)),
+                Math.max(1, Math.round(rect.height)),
+                ima.ViewMode.NORMAL
+              );
+              adsManager.start();
+              status.textContent = "الإعلان يعمل...";
+            } catch (error) {
+              console.error("خطأ في تشغيل مشغّل الإعلان:", error);
+              showAdError();
+            }
           }
-        } catch(e) { 
-          console.error("فشل مشاهدة الإعلان:", e.message);
-          adBtn.innerHTML = "📺 شاهد إعلان (+5 نقاط)";
-          adBtn.disabled = false;
-        }
-      }, 3000);
+        );
+
+        loader.addEventListener(
+          ima.AdErrorEvent.Type.AD_ERROR,
+          showAdError
+        );
+
+        const request = new ima.AdsRequest();
+        request.adTagUrl = vastUrl;
+        request.linearAdSlotWidth = Math.max(320, videoBox.clientWidth);
+        request.linearAdSlotHeight = Math.max(180, videoBox.clientHeight);
+        request.nonLinearAdSlotWidth = Math.max(320, videoBox.clientWidth);
+        request.nonLinearAdSlotHeight = 150;
+        request.setAdWillAutoPlay(true);
+        request.setAdWillPlayMuted(false);
+        loader.requestAds(request);
+      } catch (error) {
+        console.error("تعذّر تهيئة مشغّل الإعلان:", error);
+        showAdError();
+      }
     }
 
     function updateTimer() {
       if (!isMining) return;
+
       const now = Date.now();
-      const elapsedMs = now - startTime;
-      const elapsedSeconds = elapsedMs / 1000;
-      const elapsed = Math.min(elapsedSeconds, CYCLE_SECONDS);
-      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-      const s = String(Math.floor(elapsed % 60)).padStart(2, '0');
+      const elapsedMs = Math.max(0, now - startTime);
+      const elapsedSeconds = Math.min(
+        elapsedMs / 1000,
+        CYCLE_SECONDS
+      );
+
+      // عرض الوقت المنقضي منذ بداية دورة التعدين.
+      const totalSeconds = Math.floor(elapsedSeconds);
+
+      const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const s = String(totalSeconds % 60).padStart(2, '0');
+
       timerEl.textContent = `${h}:${m}:${s}`;
+
+      // ربح الدورة يُحسب من وقت البداية، ولا يُضاف مرة ثانية إلى الرصيد.
+      cycleProfitEl.textContent = formatCycleProfit(elapsedMs);
+      renderMiningBalance();
+
       updateRing(elapsedSeconds);
+
       if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
         sessionDone = true;
         isMining = false;
-        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
-        timerEl.textContent = '24:00:00';
-        balanceEl.textContent = '0.00000000';
+
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        if (balanceInterval) {
+          clearInterval(balanceInterval);
+          balanceInterval = null;
+        }
+
+        timerEl.textContent = '00:00:00';
+        cycleProfitEl.textContent = formatCycleProfit(CYCLE_SECONDS * 1000);
         updateRing(CYCLE_SECONDS);
-        profitInfoEl.textContent = '🎉 اكتملت دورة الـ 24 ساعة';
-        startBtn.disabled = false;
-        startBtn.innerText = '⛏️ بدء دورة جديدة';
+
+        profitInfoEl.textContent = '⏳ جارٍ تحديث حالة الدورة...';
+        startBtn.disabled = true;
+        startBtn.innerText = '⏳ جارٍ تحديث الحالة';
+
+        loadMiningStatus();
       }
     }
-
-
-    // عرض المهام التي يرجعها الخادم؛ الواجهة لا تمنح نقاطاً بنفسها.
-    async function loadOfferwallOffers() {
-      const status = document.getElementById('offerwallStatus');
-      const list = document.getElementById('offerwallList');
-      const reload = document.getElementById('offerwallReload');
-
-      if (!status || !list || !reload) return;
-
-      reload.disabled = true;
-      status.textContent = 'جارٍ تحميل العروض...';
-      list.replaceChildren();
-
-      try {
-        const response = await apiFetch(`${API_URL}/offerwall/offers`);
-        const result = await response.json();
-        const offers = result?.data?.offers;
-
-        if (!result?.success || !Array.isArray(offers)) {
-          throw new Error('استجابة العروض غير صالحة');
-        }
-
-        if (offers.length === 0) {
-          status.textContent = 'ماكو عروض متاحة حالياً. جرّب التحديث لاحقاً.';
-          return;
-        }
-
-        status.textContent = `العروض المتاحة: ${offers.length}`;
-
-        for (const offer of offers) {
-          const card = document.createElement('article');
-          card.className = 'offerwall-card';
-
-          const title = document.createElement('h3');
-          title.textContent = String(offer.name || 'مهمة');
-
-          const requirements = document.createElement('p');
-          requirements.className = 'offerwall-requirements';
-          requirements.textContent = String(
-            offer.requirements || 'راجع شروط المهمة داخل صفحة العرض.'
-          );
-
-          const reward = document.createElement('div');
-          reward.className = 'offerwall-reward';
-          reward.textContent = '🎁 المكافأة: ' + String(
-            offer.rewardFormatted || offer.reward || 'حسب العرض'
-          );
-
-          card.append(title, requirements, reward);
-
-          let safeUrl = null;
-          try {
-            const url = new URL(offer.clickUrl);
-            if (url.protocol === 'https:' &&
-                url.hostname === 'offerwall.gg') {
-              safeUrl = url.href;
-            }
-          } catch (_) {}
-
-          if (safeUrl) {
-            const open = document.createElement('button');
-            open.type = 'button';
-            open.className = 'offerwall-open';
-            open.textContent = 'عرض المهمة';
-            open.addEventListener('click', () => {
-              window.open(safeUrl, '_blank', 'noopener,noreferrer');
-            });
-            card.append(open);
-          }
-
-          list.append(card);
-        }
-      } catch (error) {
-        status.textContent = 'تعذر تحميل العروض. ' +
-          'تحقق من تسجيل الدخول وإعدادات خدمة Offerwall.GG.';
-        console.error('Offerwall load failed:', error.message);
-      } finally {
-        reload.disabled = false;
-      }
-    }
-
-    document.getElementById('offerwallReload')?.addEventListener(
-      'click', loadOfferwallOffers
-    );
-    loadOfferwallOffers();
 
     const termsContent = {
       terms: `<h2>📋 الشروط والأحكام</h2><p>يتم جمع النقاط والإيداعات لتحضير توزيع عملة X Plus الرسمية.</p>`,
@@ -1588,6 +2191,37 @@ a[href="../rating.html"] .sidebar-icon {
 }
 </style>
 
+
+<section id="offerwallTasks" class="section"
+ style="padding:36px 20px;background:#0b1220;">
+  <div class="container">
+    <div class="section-header"
+         style="text-align:center;margin-bottom:24px;">
+      <div style="color:#93c5fd;margin-bottom:12px;">
+        🎯 اكسب النقاط
+      </div>
+      <h2 class="section-title">المهام والعروض</h2>
+      <p style="color:#94a3b8;margin-top:12px;line-height:1.8;">
+        أكمل شروط المهمة حتى تُحتسب المكافأة بعد تأكيد مزوّد العروض.
+      </p>
+    </div>
+
+    <div id="offerwallStatus" class="offerwall-status"
+         role="status" aria-live="polite">
+      جارٍ تحميل العروض...
+    </div>
+
+    <div id="offerwallList" class="offerwall-grid"></div>
+
+    <div style="text-align:center;margin-top:22px;">
+      <button type="button" class="offerwall-reload"
+              id="offerwallReload">
+        🔄 تحديث العروض
+      </button>
+    </div>
+  </div>
+</section>
+
 <div class="logout-loading" id="logoutLoading">
   <div class="logout-box">
     <div class="logout-spinner"></div>
@@ -1681,6 +2315,127 @@ if (sidebarLogout) {
   } catch (error) {
     console.warn("تعذر تحميل صورة الحساب للقائمة الجانبية:", error);
   }
+})();
+</script>
+
+
+<script>
+(() => {
+  const apiUrl = "/api";
+  const status = document.getElementById("offerwallStatus");
+  const list = document.getElementById("offerwallList");
+  const reload = document.getElementById("offerwallReload");
+
+  if (!status || !list || !reload) return;
+
+  async function loadOfferwallOffers() {
+    reload.disabled = true;
+    status.textContent = "جارٍ تحميل العروض...";
+    list.replaceChildren();
+
+    try {
+      const token =
+        localStorage.getItem("token") ||
+        localStorage.getItem("auth_token");
+
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = "Bearer " + token;
+
+      const response = await fetch(
+        `${apiUrl}/offerwall/offers`,
+        { headers }
+      );
+
+      if (response.status === 401) {
+        window.location.href = "/login.html";
+        throw new Error("انتهت صلاحية الجلسة");
+      }
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.message || `HTTP ${response.status}`);
+      }
+
+      const offers = result?.data?.offers;
+
+      if (!result?.success || !Array.isArray(offers)) {
+        throw new Error("استجابة العروض غير صالحة");
+      }
+
+      if (offers.length === 0) {
+        status.textContent =
+          "ماكو عروض متاحة حالياً. جرّب التحديث لاحقاً.";
+        return;
+      }
+
+      status.textContent = `العروض المتاحة: ${offers.length}`;
+
+      for (const offer of offers) {
+        const card = document.createElement("article");
+        card.className = "offerwall-card";
+
+        const title = document.createElement("h3");
+        title.textContent = String(offer.name || "مهمة");
+
+        const requirements = document.createElement("p");
+        requirements.className = "offerwall-requirements";
+        requirements.textContent = String(
+          offer.requirements ||
+          "راجع شروط المهمة داخل صفحة العرض."
+        );
+
+        const reward = document.createElement("div");
+        reward.className = "offerwall-reward";
+        reward.textContent = "🎁 المكافأة: " + String(
+          offer.rewardFormatted || offer.reward || "حسب العرض"
+        );
+
+        card.append(title, requirements, reward);
+
+        let safeUrl = null;
+
+        try {
+          const url = new URL(offer.clickUrl);
+
+          if (
+            url.protocol === "https:" &&
+            url.hostname === "offerwall.gg"
+          ) {
+            safeUrl = url.href;
+          }
+        } catch (_) {}
+
+        if (safeUrl) {
+          const open = document.createElement("button");
+          open.type = "button";
+          open.className = "offerwall-open";
+          open.textContent = "عرض المهمة";
+
+          open.addEventListener("click", () => {
+            window.open(
+              safeUrl,
+              "_blank",
+              "noopener,noreferrer"
+            );
+          });
+
+          card.append(open);
+        }
+
+        list.append(card);
+      }
+    } catch (error) {
+      status.textContent =
+        "تعذر تحميل العروض. تحقق من تسجيل الدخول وإعدادات خدمة Offerwall.GG.";
+      console.error("Offerwall load failed:", error.message);
+    } finally {
+      reload.disabled = false;
+    }
+  }
+
+  reload.addEventListener("click", loadOfferwallOffers);
+  loadOfferwallOffers();
 })();
 </script>
 
