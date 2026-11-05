@@ -946,8 +946,22 @@ a[href="../rating.html"] .sidebar-icon {
 }
 
 .circle-balance,
-.circle-progress {
+.circle-progress,
+#progressPercent {
   display: none !important;
+}
+
+.total-balance-hidden {
+  display: none !important;
+}
+
+.mining-right .cycle-profit-container {
+  display: flex;
+  flex-direction: row;
+  direction: rtl;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
 </style>
@@ -1067,8 +1081,8 @@ a[href="../rating.html"] .sidebar-icon {
               </div>
 
               <div class="mining-right">
-                <div class="balance-container" style="display:none"><div class="balance-label">إجمالي الرصيد التقديري</div><div class="balance" id="balance">0.00000000</div></div>
-                <div class="balance-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="cycleProfit">0.00000000</div></div>
+                <div class="balance-container total-balance-hidden"><div class="balance-label">إجمالي الرصيد التقديري</div><div class="balance" id="balance">0.00000000</div></div>
+                <div class="balance-container cycle-profit-container"><div class="balance-label">💰 الرصيد</div><div class="balance" id="cycleProfit">0.00000000</div></div>
                 <div class="points-container"><div class="points-label">⭐ نقاط X Plus</div><div class="points" id="points">0</div></div>
                 <div class="power-container"><div class="power-label">⚡ القوة</div><div class="power" id="power">0.00</div></div>
                 <div class="rate-container"><div class="rate-label">📈 المعدل</div><div class="rate" id="rate">↗️ +0.00/h</div></div>
