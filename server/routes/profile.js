@@ -3,7 +3,11 @@ const router = express.Router();
 
 const bcrypt = require("bcryptjs");
 const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY غير موجود في إعدادات الخادم");
+  return new Resend(apiKey);
+}
 
 const pool = require("../config/database");
 const auth = require("../middleware/auth");
@@ -53,7 +57,7 @@ router.post("/otp/send-data", auth, async (req, res) => {
       new Date(Date.now() + 10 * 60 * 1000)
     );
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: "X Plus <no-reply@xplus.fun>",
       to: [user.email],
       subject: "رمز التحقق - X Plus",

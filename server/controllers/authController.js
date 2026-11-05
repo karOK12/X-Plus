@@ -8,7 +8,11 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 
 const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY غير موجود في إعدادات الخادم");
+  return new Resend(apiKey);
+}
 
 
 // =====================================================
@@ -45,7 +49,7 @@ async function sendOTPEmail(email, otp, username) {
     throw new Error("عنوان البريد الإلكتروني يجب أن يحتوي على أحرف إنجليزية فقط");
   }
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResendClient().emails.send({
     from: "X Plus <no-reply@xplus.fun>",
     to: [cleanEmail],
     subject: "رمز التحقق X Plus",
