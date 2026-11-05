@@ -964,6 +964,45 @@ a[href="../rating.html"] .sidebar-icon {
   gap: 8px;
 }
 
+/* X PLUS — White Diamond Mining Counter */
+.mining-circle .mining-diamond {
+  position: absolute;
+  top: 29%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  filter: drop-shadow(0 0 9px rgba(210, 235, 255, .85));
+  animation: diamondGlow 2.5s ease-in-out infinite;
+}
+
+.mining-circle .timer {
+  top: 70% !important;
+  left: 0;
+  width: 100%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: clamp(15px, 3.5vw, 20px);
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(190, 225, 255, .8);
+  z-index: 5;
+}
+
+@keyframes diamondGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(210, 235, 255, .55));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(210, 235, 255, 1));
+  }
+}
+
+
 </style>
 
 </head>
@@ -1076,7 +1115,20 @@ a[href="../rating.html"] .sidebar-icon {
                   <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
                   <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
                 </svg>
-                <div class="timer" id="timer">00:00:00</div>
+                <div class="mining-diamond" aria-label="X Plus Mining">
+  <svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true">
+    <path d="M17 9 L47 9 L59 25 L32 57 L5 25 Z"
+      fill="#ffffff" stroke="#e8f4ff" stroke-width="2"
+      stroke-linejoin="round"/>
+    <path d="M17 9 L25 25 L32 57 L5 25 Z" fill="#dcecff"/>
+    <path d="M47 9 L39 25 L32 57 L59 25 Z" fill="#f5faff"/>
+    <path d="M5 25 H59 M17 9 L25 25 L39 25 L47 9"
+      fill="none" stroke="#a9c9ec" stroke-width="1.5"/>
+    <path d="M25 25 L32 57 L39 25" fill="none"
+      stroke="#b8d5f5" stroke-width="1.5"/>
+  </svg>
+</div>
+<div class="timer" id="timer">00:00:00</div>
 
               </div>
 
@@ -2204,6 +2256,35 @@ a[href="../rating.html"] .sidebar-icon {
   33%  { content: '.'; }
   66%  { content: '..'; }
   100% { content: '...'; }
+}
+/* X PLUS — Ruby inspired icy mining ring */
+.mining-circle {
+  background: radial-gradient(circle at 50% 42%, #263b59 0%, #14243a 58%, #0b1424 100%);
+  box-shadow:
+    0 0 22px rgba(190, 225, 255, .16),
+    inset 0 0 22px rgba(210, 235, 255, .08);
+}
+
+.mining-circle .progress-bg {
+  stroke: rgba(225, 240, 255, .16);
+  stroke-width: 5;
+}
+
+.mining-circle .progress-bar {
+  stroke: #eaf6ff;
+  stroke-width: 5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(210, 238, 255, .9));
+  transition: stroke-dashoffset .2s linear;
+}
+
+.mining-circle .progress-dot {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 5px rgba(220, 242, 255, 1));
+}
+
+.mining-circle .mining-diamond svg {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, .35));
 }
 </style>
 
