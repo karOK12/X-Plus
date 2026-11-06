@@ -1596,10 +1596,41 @@ a[href="../rating.html"] .sidebar-icon {
       circle.style.strokeDasharray = RING_CIRC;
       circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
 
-      const angle = fill * 2 * Math.PI;
-      dot.setAttribute('cx', (RING_CX + RING_R * Math.cos(angle)).toFixed(3));
-      dot.setAttribute('cy', (RING_CY + RING_R * Math.sin(angle)).toFixed(3));
     }
+
+    // حركة نقطة التعدين بأسلوب Bee Network
+    let miningDotAngle = 0;
+    let miningDotLastFrame = 0;
+
+    function animateMiningDot(timestamp) {
+      if (isMining && startTime > 0 && dot) {
+        if (miningDotLastFrame === 0) {
+          miningDotLastFrame = timestamp;
+        }
+
+        const delta = Math.min(timestamp - miningDotLastFrame, 100);
+        miningDotLastFrame = timestamp;
+
+        miningDotAngle += (delta / 8000) * Math.PI * 2;
+        miningDotAngle %= Math.PI * 2;
+
+        dot.setAttribute(
+          'cx',
+          (RING_CX + RING_R * Math.cos(miningDotAngle)).toFixed(3)
+        );
+
+        dot.setAttribute(
+          'cy',
+          (RING_CY + RING_R * Math.sin(miningDotAngle)).toFixed(3)
+        );
+      } else {
+        miningDotLastFrame = 0;
+      }
+
+      requestAnimationFrame(animateMiningDot);
+    }
+
+    requestAnimationFrame(animateMiningDot);
 
     async function initPage() {
       isMining = false;
