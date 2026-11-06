@@ -919,222 +919,193 @@ a[href="../rating.html"] .sidebar-icon {
   }
 }
 
-/* X PLUS — Mining circle refinement */
-.mining-circle .timer {
-  top: 50% !important;
-  left: 0;
-  width: 100%;
-  transform: translateY(-50%);
-  text-align: center;
-  font-size: clamp(19px, 4vw, 25px);
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: #b69aff;
-  z-index: 3;
-}
 
-.cycle-coin {
-  display: inline-block;
-  margin-inline-end: 5px;
-  transform-origin: center;
-  animation: xplusCoinSpin 3s linear infinite;
-}
-
-@keyframes xplusCoinSpin {
-  from { transform: rotateY(0deg); }
-  to { transform: rotateY(360deg); }
-}
-
-.circle-balance,
-.circle-progress,
-#progressPercent {
-  display: none !important;
-}
-
-.total-balance-hidden {
-  display: none !important;
-}
-
-.mining-right .cycle-profit-container {
-  display: flex;
-  flex-direction: row;
-  direction: rtl;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-}
-
-/* X PLUS — White Diamond Mining Counter */
-.mining-circle .mining-diamond {
-  position: absolute;
-  top: 29%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 4;
-  filter: drop-shadow(0 0 9px rgba(210, 235, 255, .85));
-  animation: diamondGlow 2.5s ease-in-out infinite;
-}
-
-.mining-circle .timer {
-  top: 70% !important;
-  left: 0;
-  width: 100%;
-  transform: translateY(-50%);
-  text-align: center;
-  font-size: clamp(15px, 3.5vw, 20px);
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 0 10px rgba(190, 225, 255, .8);
-  z-index: 5;
-}
-
-@keyframes diamondGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 6px rgba(210, 235, 255, .55));
-  }
-  50% {
-    filter: drop-shadow(0 0 15px rgba(210, 235, 255, 1));
-  }
-}
-
-
-
-/* X PLUS — redesigned mining card */
+/* X PLUS — Unified Mining Card */
 .mining-card {
   position: relative;
   overflow: hidden;
+  width: 100%;
   padding: 20px;
-  border: 1px solid rgba(160, 130, 255, .28);
+  border: 1px solid rgba(157,125,255,.3);
   border-radius: 22px;
   background:
-    radial-gradient(circle at 18% 12%, rgba(120, 80, 255, .19), transparent 38%),
-    linear-gradient(145deg, #15172b, #20213b 58%, #17182d);
-  box-shadow: 0 14px 38px rgba(0, 0, 0, .28),
-              inset 0 1px 0 rgba(255,255,255,.07);
+    radial-gradient(ellipse at 50% 0%,rgba(119,83,235,.2),transparent 55%),
+    linear-gradient(145deg,#111426,#20213d 55%,#15172c);
+  box-shadow: 0 16px 40px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.07);
 }
-
 .mining-card-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 18px;
-  text-align: center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  margin-bottom:20px;
+  text-align:center;
 }
-
 .mining-card-title {
-  color: #fff;
-  font-size: 19px;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color:#fff;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:2px;
 }
-
-.mining-card-subtitle {
-  color: #a99bcf;
-  font-size: 11px;
-  font-weight: 600;
-}
+.mining-card-subtitle {color:#aaa3cc;font-size:12px;font-weight:600}
 
 .mining-row {
-  align-items: center;
-  gap: 16px;
+  display:grid;
+  grid-template-columns:140px minmax(0,1fr);
+  align-items:center;
+  gap:16px;
 }
-
 .mining-circle {
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(116, 85, 210, .13), transparent 69%);
+  position:relative;
+  width:140px;
+  height:140px;
+  min-width:140px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 42%,#263b59 0%,#14243a 58%,#0b1424 100%);
+  box-shadow:0 0 22px rgba(190,225,255,.16),inset 0 0 22px rgba(210,235,255,.08);
 }
-
+.mining-circle .progress-ring {
+  position:absolute;
+  inset:0;
+  width:140px;
+  height:140px;
+  overflow:visible;
+  transform:rotate(-90deg);
+}
+.mining-circle .progress-bg {
+  fill:none;
+  stroke:rgba(225,240,255,.16);
+  stroke-width:5;
+}
+.mining-circle .progress-bar {
+  fill:none;
+  stroke:#eaf6ff;
+  stroke-width:5;
+  stroke-linecap:round;
+  filter:drop-shadow(0 0 5px rgba(210,238,255,.9));
+  transition:stroke-dashoffset .2s linear;
+}
+.mining-circle .progress-dot {
+  fill:#fff;
+  filter:drop-shadow(0 0 5px rgba(220,242,255,1));
+}
 .mining-circle .mining-diamond {
-  top: 24% !important;
-  left: 50%;
-  width: 62px;
-  height: 62px;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 4;
-  animation: diamondGlow 2.5s ease-in-out infinite;
+  position:absolute;
+  top:32%;
+  left:50%;
+  width:62px;
+  height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform:translate(-50%,-50%);
+  z-index:4;
 }
-
 .mining-circle .mining-diamond img {
-  display: block;
-  width: 58px;
-  height: 58px;
-  object-fit: contain;
-  animation: xplusCoinSpin 4s linear infinite;
-  filter: drop-shadow(0 0 10px rgba(160, 135, 255, .65));
+  display:block;
+  width:58px;
+  height:58px;
+  object-fit:contain;
+  animation:xplusCoinSpin 4s linear infinite;
+  filter:drop-shadow(0 0 10px rgba(160,135,255,.7));
 }
-
+@keyframes xplusCoinSpin {
+  from {transform:rotateY(0deg)}
+  to {transform:rotateY(360deg)}
+}
 .mining-circle .timer {
-  top: 72% !important;
-  font-size: clamp(15px, 3.5vw, 20px);
-  color: #fff;
-  text-shadow: 0 0 12px rgba(166, 137, 255, .8);
+  position:absolute;
+  top:76% !important;
+  left:0;
+  width:100%;
+  transform:translateY(-50%);
+  text-align:center;
+  color:#fff;
+  font-size:clamp(14px,3.5vw,19px);
+  font-weight:900;
+  letter-spacing:.5px;
+  white-space:nowrap;
+  text-shadow:0 0 10px rgba(167,139,250,.8);
+  z-index:5;
 }
-
+#progressPercent,.circle-progress,.circle-balance,.total-balance-hidden {
+  display:none !important;
+}
+.mining-right {
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  min-width:0;
+  gap:8px;
+}
 .mining-right .cycle-profit-container {
-  width: 100%;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border: 1px solid rgba(166, 137, 255, .25);
-  border-radius: 12px;
-  background: rgba(130, 100, 220, .12);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  width:100%;
+  gap:4px;
+  padding:10px 12px;
+  border:1px solid rgba(167,139,250,.3);
+  border-radius:13px;
+  background:rgba(125,95,220,.14);
 }
-
 .mining-right .cycle-profit-container .balance-label {
-  color: #c9baff;
-  font-size: 11px;
+  color:#c9baff;
+  font-size:11px;
+  font-weight:700;
 }
-
 .mining-right .cycle-profit-container .balance {
-  color: #fff;
-  font-size: clamp(12px, 3vw, 17px);
-  font-weight: 900;
-  direction: ltr;
-  white-space: nowrap;
+  color:#fff;
+  font-size:clamp(13px,3.5vw,18px);
+  font-weight:900;
+  direction:ltr;
+  white-space:nowrap;
 }
-
 .mining-right .points-container,
 .mining-right .power-container,
 .mining-right .rate-container {
-  width: 100%;
+  width:100%;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;
+  background:rgba(255,255,255,.045);
 }
-
-#progressPercent,
-.circle-progress {
-  display: none !important;
+.mining-right .points-label,
+.mining-right .power-label,
+.mining-right .rate-label {color:#aaa7c5;font-size:10px}
+.mining-right .points,
+.mining-right .power,
+.mining-right .rate {color:#fff;font-size:14px;font-weight:800}
+.profit-info {
+  width:100%;
+  margin-top:14px;
+  padding:10px 12px;
+  border:1px solid rgba(167,139,250,.2);
+  border-radius:11px;
+  background:rgba(115,83,220,.1);
+  color:#d4c9ff;
+  font-size:11px;
+  text-align:center;
 }
+.adBtn {width:100%;margin-top:8px;border-radius:11px}
+.mineBtn {width:100%;margin-top:14px;border-radius:13px;font-weight:900}
 
-@media (max-width: 600px) {
-  .mining-card {
-    padding: 14px !important;
-  }
-
-  .mining-card-header {
-    margin-bottom: 14px;
-  }
-
-  .mining-row {
-    gap: 8px;
-  }
-
-  .mining-circle .mining-diamond img {
-    width: 49px;
-    height: 49px;
-  }
-
-  .mining-right .cycle-profit-container {
-    padding: 8px;
-    gap: 4px;
-  }
+@media(max-width:600px) {
+  .mining-card {padding:14px !important;border-radius:18px}
+  .mining-card-header {margin-bottom:15px}
+  .mining-row {grid-template-columns:124px minmax(0,1fr);gap:9px}
+  .mining-circle {width:124px;height:124px;min-width:124px}
+  .mining-circle .progress-ring {width:124px;height:124px}
+  .mining-circle .mining-diamond {width:54px;height:54px}
+  .mining-circle .mining-diamond img {width:49px;height:49px}
+  .mining-circle .timer {font-size:14px}
+  .mining-right {gap:6px}
+  .mining-right .cycle-profit-container {padding:8px}
+  .mining-right .points-container,
+  .mining-right .power-container,
+  .mining-right .rate-container {padding:6px 8px}
+  .profit-info {margin-top:12px}
 }
 
 </style>
@@ -2385,35 +2356,6 @@ a[href="../rating.html"] .sidebar-icon {
   33%  { content: '.'; }
   66%  { content: '..'; }
   100% { content: '...'; }
-}
-/* X PLUS — Ruby inspired icy mining ring */
-.mining-circle {
-  background: radial-gradient(circle at 50% 42%, #263b59 0%, #14243a 58%, #0b1424 100%);
-  box-shadow:
-    0 0 22px rgba(190, 225, 255, .16),
-    inset 0 0 22px rgba(210, 235, 255, .08);
-}
-
-.mining-circle .progress-bg {
-  stroke: rgba(225, 240, 255, .16);
-  stroke-width: 5;
-}
-
-.mining-circle .progress-bar {
-  stroke: #eaf6ff;
-  stroke-width: 5;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 5px rgba(210, 238, 255, .9));
-  transition: stroke-dashoffset .2s linear;
-}
-
-.mining-circle .progress-dot {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 5px rgba(220, 242, 255, 1));
-}
-
-.mining-circle .mining-diamond svg {
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, .35));
 }
 </style>
 
