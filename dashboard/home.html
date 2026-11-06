@@ -1003,6 +1003,140 @@ a[href="../rating.html"] .sidebar-icon {
 }
 
 
+
+/* X PLUS — redesigned mining card */
+.mining-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid rgba(160, 130, 255, .28);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(120, 80, 255, .19), transparent 38%),
+    linear-gradient(145deg, #15172b, #20213b 58%, #17182d);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .28),
+              inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+.mining-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.mining-card-title {
+  color: #fff;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.mining-card-subtitle {
+  color: #a99bcf;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mining-row {
+  align-items: center;
+  gap: 16px;
+}
+
+.mining-circle {
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(116, 85, 210, .13), transparent 69%);
+}
+
+.mining-circle .mining-diamond {
+  top: 24% !important;
+  left: 50%;
+  width: 62px;
+  height: 62px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  animation: diamondGlow 2.5s ease-in-out infinite;
+}
+
+.mining-circle .mining-diamond img {
+  display: block;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  animation: xplusCoinSpin 4s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(160, 135, 255, .65));
+}
+
+.mining-circle .timer {
+  top: 72% !important;
+  font-size: clamp(15px, 3.5vw, 20px);
+  color: #fff;
+  text-shadow: 0 0 12px rgba(166, 137, 255, .8);
+}
+
+.mining-right .cycle-profit-container {
+  width: 100%;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid rgba(166, 137, 255, .25);
+  border-radius: 12px;
+  background: rgba(130, 100, 220, .12);
+}
+
+.mining-right .cycle-profit-container .balance-label {
+  color: #c9baff;
+  font-size: 11px;
+}
+
+.mining-right .cycle-profit-container .balance {
+  color: #fff;
+  font-size: clamp(12px, 3vw, 17px);
+  font-weight: 900;
+  direction: ltr;
+  white-space: nowrap;
+}
+
+.mining-right .points-container,
+.mining-right .power-container,
+.mining-right .rate-container {
+  width: 100%;
+}
+
+#progressPercent,
+.circle-progress {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .mining-card {
+    padding: 14px !important;
+  }
+
+  .mining-card-header {
+    margin-bottom: 14px;
+  }
+
+  .mining-row {
+    gap: 8px;
+  }
+
+  .mining-circle .mining-diamond img {
+    width: 49px;
+    height: 49px;
+  }
+
+  .mining-right .cycle-profit-container {
+    padding: 8px;
+    gap: 4px;
+  }
+}
+
 </style>
 
 </head>
@@ -1108,6 +1242,10 @@ a[href="../rating.html"] .sidebar-icon {
         
         <div style="flex: 1; min-width: 320px;" class="mining-card-wrapper">
           <div class="mining-card">
+            <div class="mining-card-header">
+              <div class="mining-card-title">X PLUS MINING</div>
+              <div class="mining-card-subtitle">التعدين السحابي</div>
+            </div>
             <div class="mining-row">
               <div class="mining-circle">
                 <svg class="progress-ring" width="140" height="140">
@@ -1115,18 +1253,9 @@ a[href="../rating.html"] .sidebar-icon {
                   <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
                   <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
                 </svg>
-                <div class="mining-diamond" aria-label="X Plus Mining">
-  <svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true">
-    <path d="M17 9 L47 9 L59 25 L32 57 L5 25 Z"
-      fill="#ffffff" stroke="#e8f4ff" stroke-width="2"
-      stroke-linejoin="round"/>
-    <path d="M17 9 L25 25 L32 57 L5 25 Z" fill="#dcecff"/>
-    <path d="M47 9 L39 25 L32 57 L59 25 Z" fill="#f5faff"/>
-    <path d="M5 25 H59 M17 9 L25 25 L39 25 L47 9"
-      fill="none" stroke="#a9c9ec" stroke-width="1.5"/>
-    <path d="M25 25 L32 57 L39 25" fill="none"
-      stroke="#b8d5f5" stroke-width="1.5"/>
-  </svg>
+                <div class="mining-diamond" aria-label="X Plus Coin">
+  <img src="https://d.top4top.io/p_3962ra3w11.png"
+       alt="X Plus Coin">
 </div>
 <div class="timer" id="timer">00:00:00</div>
 
