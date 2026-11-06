@@ -1774,8 +1774,8 @@ a[href="../rating.html"] .sidebar-icon {
             return false;
           }
 
-          startBtn.disabled = false;
-          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+          startBtn.disabled = true;
+          startBtn.innerText = "⛏️ التعدين نشط";
           profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
 
           updateTimer();
@@ -1915,7 +1915,8 @@ a[href="../rating.html"] .sidebar-icon {
           updateRing(elapsedSeconds);
           startLocalCounter();
 
-          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
+          startBtn.disabled = true;
+          startBtn.innerText = "⛏️ التعدين نشط";
           profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
           if (!window._pointsUpdater) {
             window._pointsUpdater = setInterval(async () => {
