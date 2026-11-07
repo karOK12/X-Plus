@@ -3974,5 +3974,131 @@ if (sidebarLogout) {
 })();
 </script>
 
+
+<style id="xplus-exact-reference-final">
+/* XPLUS-EXACT-REFERENCE-FINAL */
+.mining-card-wrapper {
+  width:100% !important;
+  max-width:520px !important;
+  min-width:0 !important;
+  margin:0 auto !important;
+}
+.mining-card {
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:12px !important;
+  padding:20px !important;
+  border-radius:26px !important;
+  box-sizing:border-box !important;
+  direction:rtl !important;
+  background:
+    radial-gradient(ellipse at 15% 5%,rgba(50,119,210,.35),transparent 48%),
+    linear-gradient(145deg,#173e73 0%,#124b68 55%,#1b315f 100%) !important;
+}
+.mining-card-header {
+  grid-column:1/-1 !important;
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin:0 0 8px !important;
+}
+.mining-card-title {
+  font-size:25px !important;
+  font-weight:900 !important;
+  letter-spacing:2px !important;
+  color:#fff !important;
+}
+.mining-card-subtitle,
+.mining-caption {
+  display:none !important;
+}
+.mining-row,.mining-right {
+  display:contents !important;
+}
+.mining-circle {
+  grid-column:1/-1 !important;
+  justify-self:center !important;
+  width:230px !important;
+  height:230px !important;
+  margin:5px auto 14px !important;
+}
+.mining-circle .mining-diamond img {
+  width:84px !important;
+  height:84px !important;
+  object-fit:contain !important;
+}
+.mining-circle .timer {
+  top:78% !important;
+  font-size:20px !important;
+}
+.mining-right .cycle-profit-container {
+  grid-column:1/-1 !important;
+  min-height:104px !important;
+  width:100% !important;
+  border-radius:19px !important;
+}
+.mining-right .points-container,
+.mining-right .power-container,
+.mining-right .rate-container {
+  grid-column:span 2 !important;
+  min-width:0 !important;
+  min-height:102px !important;
+  padding:12px 9px !important;
+  border-radius:17px !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:10px !important;
+}
+.mining-right .points-label,
+.mining-right .power-label,
+.mining-right .rate-label {
+  font-size:11px !important;
+}
+.mining-right .points,
+.mining-right .power,
+.mining-right .rate {
+  font-size:14px !important;
+  font-weight:900 !important;
+}
+.mining-right .rate {
+  direction:ltr !important;
+  white-space:nowrap !important;
+}
+.profit-info {
+  grid-column:1/-1 !important;
+  min-height:42px !important;
+  margin:0 !important;
+  border-radius:15px !important;
+}
+.adBtn,#startBtn {
+  grid-column:span 3 !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:52px !important;
+  margin:0 !important;
+  padding:9px 5px !important;
+  border-radius:16px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+}
+.adBtn {
+  background:rgba(255,255,255,.08) !important;
+  color:#fff !important;
+}
+#startBtn {
+  background:linear-gradient(110deg,#2879dc,#079fbd) !important;
+  color:#fff !important;
+}
+@media(max-width:380px) {
+  .mining-card {padding:15px !important;gap:10px !important}
+  .mining-circle {width:210px !important;height:210px !important}
+  .mining-right .cycle-profit-container .balance {font-size:21px !important}
+  .mining-right .points,.mining-right .power,.mining-right .rate {
+    font-size:12px !important;
+  }
+  .adBtn,#startBtn {font-size:11px !important}
+}
+</style>
+
 </body>
 </html>
