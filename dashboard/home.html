@@ -1214,12 +1214,12 @@ a[href="../rating.html"] .sidebar-icon {
         <div style="flex: 1; min-width: 320px;" class="mining-card-wrapper">
           <div class="mining-card">
             <div class="mining-card-header">
-              <div class="mining-card-title">X PLUS MINING</div>
-              <div class="mining-card-subtitle">التعدين السحابي</div>
+              <div class="mining-card-title">X PLUS</div>
+              <div id="miningStatusBadge">● غير نشط</div>
             </div>
             <div class="mining-row">
               <div class="mining-circle">
-                <svg class="progress-ring" width="140" height="140">
+                <svg class="progress-ring" width="190" height="190" viewBox="0 0 140 140">
                   <circle class="progress-bg" cx="70" cy="70" r="62"></circle>
                   <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
                   <circle class="progress-dot" id="progressDot" cx="132" cy="70" r="6"></circle>
@@ -1513,6 +1513,61 @@ a[href="../rating.html"] .sidebar-icon {
     const startBtn = document.getElementById('startBtn');
     const adBtn = document.getElementById('adBtn');
 
+    let miningPresenceVerified = false;
+    let miningPresenceTimeout = null;
+
+    function updateMiningVisualState(active) {
+      const badge = document.getElementById('miningStatusBadge');
+      const status =
+        !!active &&
+        document.visibilityState === 'visible' &&
+        miningPresenceVerified;
+
+      if (badge) {
+        badge.classList.toggle('active', status);
+        badge.classList.toggle('inactive', !status);
+        badge.textContent = status ? '● نشط' : '● غير نشط';
+      }
+    }
+
+    async function verifyMiningPresence() {
+      if (document.visibilityState !== 'visible') return;
+
+      const verified = await loadMiningStatus();
+
+      if (document.visibilityState !== 'visible') return;
+
+      miningPresenceVerified = verified === true;
+      updateMiningVisualState(isMining);
+    }
+
+    function scheduleMiningPresenceCheck() {
+      if (miningPresenceTimeout) {
+        clearTimeout(miningPresenceTimeout);
+        miningPresenceTimeout = null;
+      }
+
+      miningPresenceVerified = false;
+      updateMiningVisualState(false);
+
+      if (document.visibilityState === 'visible') {
+        miningPresenceTimeout = setTimeout(() => {
+          miningPresenceTimeout = null;
+          verifyMiningPresence();
+        }, 2000);
+      }
+    }
+
+    document.addEventListener(
+      'visibilitychange',
+      scheduleMiningPresenceCheck
+    );
+
+    // يبدأ التحقق الأول بعد دخول المستخدم للتطبيق.
+    scheduleMiningPresenceCheck();
+
+
+
     function resetRing() {
       circle.style.strokeDasharray  = RING_CIRC;
       circle.style.strokeDashoffset = RING_CIRC;
@@ -1522,6 +1577,7 @@ a[href="../rating.html"] .sidebar-icon {
 
     function stopMining() {
       isMining = false;
+          updateMiningVisualState(false);
       if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
       if (balanceInterval) { clearInterval(balanceInterval); balanceInterval = null; }
       startBtn.disabled = false;
@@ -1541,7 +1597,7 @@ a[href="../rating.html"] .sidebar-icon {
       }
 
       // الوقت للعرض فقط، والرصيد يُحدّث من الخادم.
-      timerInterval = setInterval(updateTimer, 1000);
+      timerInterval = setInterval(updateTimer, 100);
 
       async function syncServerBalance() {
         try {
@@ -1556,6 +1612,7 @@ a[href="../rating.html"] .sidebar-icon {
             timerInterval = null;
             balanceInterval = null;
             isMining = false;
+          updateMiningVisualState(false);
             sessionDone = true;
             await loadMiningStatus();
             return;
@@ -1567,6 +1624,7 @@ a[href="../rating.html"] .sidebar-icon {
             startTime = serverStartTime;
             currentPower = Number(data.power || currentPower || 0);
             isMining = true;
+          updateMiningVisualState(true);
             sessionDone = false;
             lastSecond = -1;
             applyServerBalance(data.storedBalance);
@@ -1634,6 +1692,7 @@ a[href="../rating.html"] .sidebar-icon {
 
     async function initPage() {
       isMining = false;
+          updateMiningVisualState(false);
       startTime = 0;
       timerEl.textContent = '00:00:00';
       cycleProfitEl.textContent = '0.00000000';
@@ -1697,6 +1756,7 @@ a[href="../rating.html"] .sidebar-icon {
         if (data.needsActivation === true) {
           miningNeedsActivation = true;
           isMining = false;
+          updateMiningVisualState(false);
           sessionDone = false;
           startTime = 0;
 
@@ -1715,9 +1775,9 @@ a[href="../rating.html"] .sidebar-icon {
 
           timerEl.textContent = '00:00:00';
           cycleProfitEl.textContent = '0.00000000';
-          profitInfoEl.textContent = '⏳ نظام التعدين الجديد قيد التجهيز وسيتم تفعيله قريباً';
-          startBtn.disabled = true;
-          startBtn.innerText = '⏳ التعدين قيد التجهيز';
+          profitInfoEl.textContent = '';
+          startBtn.disabled = false;
+          startBtn.innerText = '⛏️ ابدأ التعدين الآن';
           return false;
         }
 
@@ -1735,6 +1795,7 @@ a[href="../rating.html"] .sidebar-icon {
         if (data.isMining && data.miningStartTime) {
           startTime = Number(data.miningStartTime);
           isMining = true;
+          updateMiningVisualState(true);
           sessionDone = false;
           lastSecond = -1;
           lastBalanceSecond = -1;
@@ -1749,6 +1810,7 @@ a[href="../rating.html"] .sidebar-icon {
 
           if (elapsedSeconds >= CYCLE_SECONDS) {
             isMining = false;
+          updateMiningVisualState(false);
             sessionDone = true;
 
             if (timerInterval) {
@@ -1784,6 +1846,7 @@ a[href="../rating.html"] .sidebar-icon {
 
         } else {
           isMining = false;
+          updateMiningVisualState(false);
           startTime = 0;
           currentPower = Number(data.power || currentPower || 0);
           applyServerBalance(data.storedBalance);
@@ -1802,18 +1865,17 @@ a[href="../rating.html"] .sidebar-icon {
           }
           cycleProfitEl.textContent = '0.00000000';
 
+          const canStartNewCycle = data.canStartMining === true;
           const alreadyUsed = data.miningEverStarted === true;
-          const canStartNewCycle =
-            data.canStartMining === true && !alreadyUsed;
 
-          if (alreadyUsed) {
-            profitInfoEl.textContent = '✅ انتهت دورة التعدين الوحيدة المخصصة لهذا الحساب';
-            startBtn.disabled = true;
-            startBtn.innerText = '✓ تم استخدام فرصة التعدين';
-          } else if (canStartNewCycle) {
+          if (canStartNewCycle) {
             profitInfoEl.textContent = '⏱️ جاهز للبدء';
             startBtn.disabled = false;
             startBtn.innerText = '⛏️ ابدأ التعدين الآن';
+          } else if (alreadyUsed) {
+            profitInfoEl.textContent = '✅ انتهت دورة التعدين';
+            startBtn.disabled = true;
+            startBtn.innerText = '✓ انتهت دورة التعدين';
           } else {
             profitInfoEl.textContent = '⏳ بانتظار تحديث حالة التعدين';
             startBtn.disabled = true;
@@ -1824,6 +1886,9 @@ a[href="../rating.html"] .sidebar-icon {
         return true;
       } catch (error) {
         console.error("فشل تحميل حالة التعدين:", error);
+
+        miningPresenceVerified = false;
+        updateMiningVisualState(false);
 
         profitInfoEl.textContent =
           '⚠️ تعذّر الاتصال؛ ستتم إعادة التحقق تلقائياً.';
@@ -1853,9 +1918,9 @@ a[href="../rating.html"] .sidebar-icon {
       }
 
       if (miningNeedsActivation) {
-        startBtn.disabled = true;
-        startBtn.innerText = '⏳ التعدين قيد التجهيز';
-        profitInfoEl.textContent = '⏳ نظام التعدين الجديد قيد التجهيز وسيتم تفعيله قريباً';
+        startBtn.disabled = false;
+        startBtn.innerText = '⛏️ ابدأ التعدين الآن';
+        profitInfoEl.textContent = '';
         return;
       }
 
@@ -1863,6 +1928,7 @@ a[href="../rating.html"] .sidebar-icon {
       startBtn.disabled = true;
       startBtn.innerText = "⏳ جاري الاتصال بـ Neon DB...";
       isMining = false;
+          updateMiningVisualState(false);
       sessionDone = false;
       if (balanceInterval) {
         clearInterval(balanceInterval);
@@ -1889,6 +1955,7 @@ a[href="../rating.html"] .sidebar-icon {
           startTime = Number(data.miningStartTime);
           currentPower = Number(data.power || currentPower || 0);
           isMining = true;
+          updateMiningVisualState(true);
           sessionDone = false;
           applyServerBalance(data.storedBalance);
           lastSecond = -1;
@@ -1901,6 +1968,7 @@ a[href="../rating.html"] .sidebar-icon {
 
           if (elapsedSeconds >= CYCLE_SECONDS) {
             isMining = false;
+          updateMiningVisualState(false);
             sessionDone = true;
             timerEl.textContent = '00:00:00';
             updateRing(CYCLE_SECONDS);
@@ -2195,6 +2263,7 @@ a[href="../rating.html"] .sidebar-icon {
       if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
         sessionDone = true;
         isMining = false;
+          updateMiningVisualState(false);
 
         if (timerInterval) {
           clearInterval(timerInterval);
@@ -2389,6 +2458,218 @@ a[href="../rating.html"] .sidebar-icon {
   66%  { content: '..'; }
   100% { content: '...'; }
 }
+
+
+
+/* X PLUS — Reference Design */
+.mining-card {
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:11px !important;
+  padding:17px !important;
+  border-radius:22px !important;
+  background:linear-gradient(155deg,#17172e,#0b1020 75%) !important;
+  border:1px solid rgba(150,135,255,.23) !important;
+}
+
+.mining-card-header {
+  grid-column:1/-1 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin:0 0 5px !important;
+}
+
+.mining-card-title {
+  color:#fff !important;
+  font-size:21px !important;
+  font-weight:1000 !important;
+  letter-spacing:2px !important;
+}
+
+.mining-card-subtitle {
+  display:none !important;
+}
+
+#miningStatusBadge {
+  padding:7px 10px;
+  border-radius:20px;
+  background:rgba(148,163,184,.13);
+  border:1px solid rgba(148,163,184,.25);
+  color:#aeb8c9;
+  font-size:10px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+#miningStatusBadge.active {
+  color:#4ade80;
+  background:rgba(34,197,94,.13);
+  border-color:rgba(34,197,94,.4);
+}
+
+#miningStatusBadge.inactive {
+  color:#facc15;
+  background:rgba(234,179,8,.13);
+  border-color:rgba(234,179,8,.4);
+}
+
+.mining-row,
+.mining-right {
+  display:contents !important;
+}
+
+.mining-circle {
+  grid-column:1/-1 !important;
+  justify-self:center !important;
+  position:relative !important;
+  width:190px !important;
+  height:190px !important;
+  min-width:190px !important;
+  margin:5px auto 8px !important;
+}
+
+.mining-circle .progress-ring {
+  width:190px !important;
+  height:190px !important;
+}
+
+.mining-circle .mining-diamond {
+  width:78px !important;
+  height:78px !important;
+}
+
+.mining-circle .mining-diamond img {
+  width:72px !important;
+  height:72px !important;
+  object-fit:contain !important;
+  animation:xplusCoinSpin 4s linear infinite !important;
+}
+
+.mining-circle .timer {
+  top:77% !important;
+  font-size:15px !important;
+  font-weight:900 !important;
+}
+
+.cycle-profit-container {
+  grid-column:1/-1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100% !important;
+  padding:13px !important;
+  margin:0 !important;
+  border:1px solid rgba(167,139,250,.35) !important;
+  border-radius:15px !important;
+  background:rgba(125,95,220,.15) !important;
+  gap:5px !important;
+}
+
+.cycle-profit-container .balance-label {
+  color:#c9baff !important;
+  font-size:12px !important;
+}
+
+.cycle-profit-container .balance {
+  color:#fff !important;
+  font-size:21px !important;
+  font-weight:900 !important;
+  direction:ltr !important;
+}
+
+.points-container,
+.power-container,
+.rate-container {
+  grid-column:span 2 !important;
+  width:100% !important;
+  min-width:0 !important;
+  padding:11px 3px !important;
+  margin:0 !important;
+  text-align:center !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  border-radius:12px !important;
+  background:rgba(255,255,255,.045) !important;
+}
+
+.points-label,.power-label,.rate-label {
+  display:block !important;
+  color:#aaa7c5 !important;
+  font-size:10px !important;
+}
+
+.points,.power,.rate {
+  color:#fff !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  overflow-wrap:anywhere !important;
+}
+
+
+.profit-info:empty {
+  display: none !important;
+}
+
+.profit-info {
+  grid-column:1/-1 !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:9px !important;
+  border-radius:11px !important;
+  font-size:10px !important;
+  text-align:center !important;
+}
+
+.adBtn,#startBtn {
+  grid-column:span 3 !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:44px !important;
+  margin:0 !important;
+  padding:11px 4px !important;
+  border-radius:12px !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  white-space:normal !important;
+}
+
+#startBtn.mining-active {
+  background:linear-gradient(135deg,#07966d,#087653) !important;
+  border:1px solid rgba(74,222,128,.5) !important;
+  color:#fff !important;
+  opacity:1 !important;
+  cursor:default !important;
+}
+
+#startBtn:disabled:not(.mining-active) {
+  opacity:.75;
+}
+
+.total-balance-hidden {
+  display:none !important;
+}
+
+@media(max-width:380px) {
+  .mining-card {padding:12px !important;gap:9px !important}
+  .mining-circle {
+    width:176px !important;
+    height:176px !important;
+    min-width:176px !important;
+  }
+  .mining-circle .progress-ring {
+    width:176px !important;
+    height:176px !important;
+  }
+  .mining-circle .mining-diamond img {
+    width:65px !important;
+    height:65px !important;
+  }
+  .cycle-profit-container .balance {font-size:18px !important}
+}
+
+
 </style>
 
 
