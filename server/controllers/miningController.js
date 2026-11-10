@@ -13,7 +13,7 @@ async function settleCompletedCycles(userId, now) {
         + FLOOR(
             ($1::numeric - mining_start_time::numeric) / 86400000
           ) * COALESCE(power, 0)::numeric
-            * (2::numeric / 150.50::numeric)
+            * (0.000864::numeric / 150.50::numeric)
       )::real,
       mining_start_time = mining_start_time
         + (
@@ -47,7 +47,7 @@ function makeStatus(user) {
     );
 
     const cappedSeconds = Math.min(elapsedSeconds, 86400);
-    balance += (cappedSeconds / 86400) * power * (2 / 150.50);
+    balance += (cappedSeconds / 86400) * power * (0.000864 / 150.50);
   }
 
   return {
