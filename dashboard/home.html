@@ -2524,7 +2524,7 @@ a[href="../rating.html"] .sidebar-icon {
         powerEl.textContent = currentPower.toFixed(2);
 
         rateEl.textContent =
-          `↗️ +${(currentPower * (0.000864 / (150.50 * 24))).toFixed(6)}/h`;
+          `↗️ +${(currentPower * (0.000864 / (150.50 * 24))).toFixed(1)}/h`;
 
         profitInfoEl.textContent = '⏱️ جاهز للبدء';
 
@@ -2619,7 +2619,7 @@ a[href="../rating.html"] .sidebar-icon {
             updateRing(CYCLE_SECONDS);
             profitInfoEl.textContent = '⏳ جارٍ تثبيت أرباح الدورة...';
             startBtn.disabled = true;
-            startBtn.innerText = '⏳ جارٍ تحديث حالة التعدين';
+            startBtn.innerText = '⛏️ ابدأ التعدين الآن';
             if (!window.miningStatusRetryTimeout) {
               window.miningStatusRetryTimeout = setTimeout(() => {
                 window.miningStatusRetryTimeout = null;
@@ -2629,9 +2629,9 @@ a[href="../rating.html"] .sidebar-icon {
             return false;
           }
 
-          startBtn.disabled = false;
-          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
-          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
+          startBtn.disabled = true;
+          startBtn.innerText = "⛏️ التعدين نشط الآن";
+          profitInfoEl.textContent = "✅ التعدين مستمر تلقائياً - دورة 24 ساعة";
 
           updateTimer();
           updateRing(elapsedSeconds);
@@ -2767,7 +2767,7 @@ a[href="../rating.html"] .sidebar-icon {
             updateRing(CYCLE_SECONDS);
             profitInfoEl.textContent = '⏳ جارٍ تثبيت أرباح الدورة...';
             startBtn.disabled = true;
-            startBtn.innerText = '⏳ جارٍ تحديث حالة التعدين';
+            startBtn.innerText = '⛏️ ابدأ التعدين الآن';
             await loadMiningStatus();
             return;
           }
@@ -2776,9 +2776,9 @@ a[href="../rating.html"] .sidebar-icon {
           updateRing(elapsedSeconds);
           startLocalCounter();
 
-          startBtn.disabled = false;
-          startBtn.innerText = "⛏️ ابدأ التعدين الآن";
-          profitInfoEl.textContent = "✅ متصل بالخادم - دورة 24 ساعة";
+          startBtn.disabled = true;
+          startBtn.innerText = "⛏️ التعدين نشط الآن";
+          profitInfoEl.textContent = "✅ التعدين مستمر تلقائياً - دورة 24 ساعة";
           if (!window._pointsUpdater) {
             window._pointsUpdater = setInterval(async () => {
               try {
@@ -3073,7 +3073,7 @@ a[href="../rating.html"] .sidebar-icon {
 
         profitInfoEl.textContent = '⏳ جارٍ تحديث حالة الدورة...';
         startBtn.disabled = true;
-        startBtn.innerText = '⏳ جارٍ تحديث الحالة';
+        startBtn.innerText = '⛏️ ابدأ التعدين الآن';
 
         loadMiningStatus();
       }
@@ -4100,5 +4100,174 @@ if (sidebarLogout) {
 }
 </style>
 
-</body>
+
+
+
+
+<style>
+/* XPLUS START BUTTON VISIBILITY ONLY */
+.mining-card #startBtn {
+  display: block !important;
+  visibility: visible !important;
+  grid-column: span 3 !important;
+}
+</style>
+
+
+<style id="xplus-horizontal-card">
+/* Horizontal mining card - display only */
+.mining-card-wrapper {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+.mining-card-header {
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+  text-align: right !important;
+}
+.mining-card-title {
+  font-size: 17px !important;
+  letter-spacing: 1px !important;
+}
+.mining-card-subtitle {
+  font-size: 10px !important;
+}
+.mining-row {
+  display: grid !important;
+  grid-template-columns: 112px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+.mining-circle {
+  width: 112px !important;
+  height: 112px !important;
+  min-width: 112px !important;
+}
+.mining-circle .progress-ring {
+  width: 112px !important;
+  height: 112px !important;
+}
+.mining-circle .timer {
+  font-size: 12px !important;
+}
+.mining-circle .mining-diamond {
+  width: 48px !important;
+  height: 48px !important;
+}
+.mining-circle .mining-diamond img {
+  width: 45px !important;
+  height: 45px !important;
+}
+.mining-right {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+}
+.mining-right .cycle-profit-container,
+.mining-right .profit-info,
+.mining-right .adBtn {
+  grid-column: 1 / -1 !important;
+}
+.mining-right .cycle-profit-container {
+  padding: 7px 9px !important;
+  gap: 2px !important;
+}
+.mining-right .points-container,
+.mining-right .power-container,
+.mining-right .rate-container {
+  min-width: 0 !important;
+  padding: 6px 7px !important;
+}
+.mining-right .points-label,
+.mining-right .power-label,
+.mining-right .rate-label {
+  font-size: 9px !important;
+}
+.mining-right .points,
+.mining-right .power,
+.mining-right .rate {
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.mining-right .cycle-profit-container .balance {
+  font-size: clamp(12px, 3.5vw, 16px) !important;
+}
+.mining-right .profit-info {
+  margin-top: 2px !important;
+  padding: 7px !important;
+}
+.mining-right .adBtn {
+  width: 100% !important;
+  margin: 0 !important;
+}
+.mining-card > #startBtn {
+  width: 100% !important;
+  margin-top: 10px !important;
+}
+@media (max-width: 380px) {
+  .mining-card {
+    padding: 9px !important;
+  }
+  .mining-row {
+    grid-template-columns: 96px minmax(0, 1fr) !important;
+    gap: 7px !important;
+  }
+  .mining-circle {
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+  }
+  .mining-circle .progress-ring {
+    width: 96px !important;
+    height: 96px !important;
+  }
+  .mining-circle .timer {
+    font-size: 10px !important;
+  }
+  .mining-circle .mining-diamond img {
+    width: 39px !important;
+    height: 39px !important;
+  }
+}
+</style>
+
+
+<style id="xplus-premium-v1">
+.mining-card{
+ background:linear-gradient(145deg,#111c32,#080e1c)!important;
+ border:1px solid rgba(0,212,255,.3)!important;
+ border-radius:22px!important;padding:18px!important;
+ box-shadow:0 12px 40px #0008,0 0 22px #00d4ff18!important;
+}
+.mining-card-header{padding-bottom:12px;border-bottom:1px solid #ffffff12}
+.mining-card-title{font-size:20px!important;font-weight:800!important;
+ background:linear-gradient(90deg,#22d3ee,#818cf8);
+ -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.mining-card-subtitle{color:#94a3b8!important}
+#miningStatusBadge{font-size:11px;padding:6px 10px;border-radius:20px;
+ background:#ffffff0d;border:1px solid #ffffff18}
+.mining-circle{filter:drop-shadow(0 0 12px #06b6d433)}
+.mining-circle .timer{font-variant-numeric:tabular-nums}
+.mining-circle .mining-caption{color:#22d3ee;font-weight:800}
+.mining-right .cycle-profit-container{
+ background:linear-gradient(120deg,#0e749033,#2563eb22)!important;
+ border-color:#22d3ee55!important}
+.mining-right .cycle-profit-container .balance{
+ color:#5eead4!important;font-weight:800}
+.points-container,.power-container,.rate-container{
+ background:#ffffff08!important;border-color:#ffffff12!important}
+.adBtn{background:linear-gradient(100deg,#334155,#475569)!important;
+ border:1px solid #64748b55!important}
+.mineBtn{background:linear-gradient(100deg,#0891b2,#059669)!important;
+ box-shadow:0 5px 18px #06b6d433!important}
+.mineBtn:active,.adBtn:active{transform:scale(.98)}
+@media(max-width:380px){.mining-card{padding:10px!important}}
+</style>
+\n</body>
 </html>
