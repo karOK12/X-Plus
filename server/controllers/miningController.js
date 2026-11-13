@@ -50,6 +50,8 @@ function makeStatus(user) {
     balance += (cappedSeconds / 86400) * power * (0.000864 / 150.50);
   }
 
+  const everStarted = user.mining_ever_started === true;
+
   return {
     success: true,
     balance,
@@ -57,7 +59,9 @@ function makeStatus(user) {
     power,
     miningStartTime,
     elapsedSeconds,
-    isMining: miningStartTime !== null
+    isMining: miningStartTime !== null,
+    everStarted,
+    canStart: !everStarted && miningStartTime === null
   };
 }
 
@@ -81,16 +85,18 @@ exports.startMining = async (req, res) => {
     await db.query(
       `
       UPDATE users
-      SET mining_start_time = $1
+      SET mining_start_time = $1,
+          mining_ever_started = TRUE
       WHERE id = $2
         AND mining_start_time IS NULL
+        AND COALESCE(mining_ever_started, FALSE) = FALSE
       `,
       [now, userId]
     );
 
     const result = await db.query(
       `
-      SELECT id, balance, power, mining_start_time
+      SELECT id, balance, power, mining_start_time, mining_ever_started
       FROM users
       WHERE id = $1
       `,
@@ -131,7 +137,7 @@ exports.getMiningStatus = async (req, res) => {
 
     const result = await db.query(
       `
-      SELECT id, balance, power, mining_start_time
+      SELECT id, balance, power, mining_start_time, mining_ever_started
       FROM users
       WHERE id = $1
       `,

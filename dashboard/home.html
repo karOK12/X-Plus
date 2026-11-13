@@ -1193,9 +1193,15 @@ a[href="../rating.html"] .sidebar-icon {
           cycleProfitEl.textContent = '0.00000000';
           timerEl.textContent = '00:00:00';
           resetRing();
-          profitInfoEl.textContent = '⏱️ جاهز للبدء';
-          startBtn.disabled = false;
-          startBtn.innerText = '⛏️ ابدأ التعدين الآن';
+          if (data.canStart === true) {
+            profitInfoEl.textContent = '⏱️ جاهز للبدء';
+            startBtn.disabled = false;
+            startBtn.innerText = '⛏️ ابدأ التعدين الآن';
+          } else {
+            profitInfoEl.textContent = '✅ تم تفعيل التعدين سابقاً';
+            startBtn.disabled = true;
+            startBtn.innerText = '⛏️ التعدين يعمل تلقائياً';
+          }
         }
 
         return true;
