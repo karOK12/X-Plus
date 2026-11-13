@@ -1309,10 +1309,12 @@ a[href="../rating.html"] .sidebar-icon {
           }
         } else {
           await loadMiningStatus();
+          profitInfoEl.textContent = data.message || "❌ تعذّر بدء التعدين. حاول مرة أخرى.";
         }
       } catch (error) {
         console.error("فشل بدء التعدين:", error);
         await loadMiningStatus();
+        profitInfoEl.textContent = "❌ تعذّر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة أخرى.";
       }
     }
 
