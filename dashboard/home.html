@@ -776,7 +776,7 @@ a[href="../rating.html"] .sidebar-icon {
                 <button class="adBtn" id="adBtn" onclick="watchAd()">📺 شاهد إعلان (+5 نقاط)</button>
               </div>
             </div>
-            <button id="startBtn" class="mineBtn" onclick="startMining()" disabled>⏳ جارٍ التحقق من حالة التعدين</button>
+            <button id="startBtn" class="mineBtn" onclick="startMining()" disabled>⛏️ ابدأ التعدين الآن</button>
           </div>
         </div>
       </div>
@@ -1302,22 +1302,11 @@ a[href="../rating.html"] .sidebar-icon {
             }, 30000);
           }
         } else {
-          stopMining();
+          await loadMiningStatus();
         }
       } catch (error) {
         console.error("فشل بدء التعدين:", error);
-        stopMining();
-
-        const message = String(error && error.message || "");
-        if (message.includes("لم تكتمل") ||
-            message.includes("current cycle")) {
-          profitInfoEl.textContent = "⏳ دورة التعدين الحالية لم تكتمل بعد";
-          startBtn.innerText = "⏳ انتظر اكتمال الدورة";
-        } else {
-          profitInfoEl.textContent = message
-            ? `❌ تعذّر بدء التعدين: ${message}`
-            : "❌ تعذّر الاتصال بالخادم. حاول مرة أخرى.";
-        }
+        await loadMiningStatus();
       }
     }
 
