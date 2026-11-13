@@ -184,7 +184,7 @@ exports.logoutMining = async (req, res) => {
             (
               COALESCE(balance, 0)::numeric
               + (
-                  GREATEST(0, $1::numeric - mining_start_time::numeric)
+                  LEAST(86400000::numeric, GREATEST(0, $1::numeric - mining_start_time::numeric))
                   / 86400000
                 )
                 * COALESCE(power, 0)::numeric
