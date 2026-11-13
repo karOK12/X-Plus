@@ -38,13 +38,12 @@ function makeStatus(user) {
     : Number(user.mining_start_time);
 
   let elapsedSeconds = 0;
+  let elapsedMilliseconds = 0;
   let balance = storedBalance;
 
   if (miningStartTime !== null) {
-    elapsedSeconds = Math.max(
-      0,
-      Math.floor((Date.now() - miningStartTime) / 1000)
-    );
+    elapsedMilliseconds = Math.max(0, Date.now() - miningStartTime);
+    elapsedSeconds = Math.floor(elapsedMilliseconds / 1000);
 
     const cappedSeconds = Math.min(elapsedSeconds, 86400);
     balance += (cappedSeconds / 86400) * power * (0.000864 / 150.50);
@@ -59,6 +58,7 @@ function makeStatus(user) {
     power,
     miningStartTime,
     elapsedSeconds,
+    elapsedMilliseconds,
     isMining: miningStartTime !== null,
     everStarted,
     canStart: !everStarted && miningStartTime === null
@@ -158,6 +158,65 @@ exports.getMiningStatus = async (req, res) => {
       success: false,
       message: "فشل جلب حالة التعدين",
       error: err.message
+    });
+  }
+};
+
+
+exports.logoutMining = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "جلسة المستخدم غير صالحة"
+      });
+    }
+
+    const now = Date.now();
+    const userId = req.user.id;
+
+    const result = await db.query(
+      `
+      UPDATE users
+      SET
+        balance = CASE
+          WHEN mining_start_time IS NOT NULL THEN
+            (
+              COALESCE(balance, 0)::numeric
+              + (
+                  GREATEST(0, $1::numeric - mining_start_time::numeric)
+                  / 86400000
+                )
+                * COALESCE(power, 0)::numeric
+                * (0.000864::numeric / 150.50::numeric)
+            )::real
+          ELSE COALESCE(balance, 0)
+        END,
+        mining_start_time = NULL,
+        mining_ever_started = FALSE
+      WHERE id = $2
+      RETURNING id, balance
+      `,
+      [now, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "المستخدم غير موجود"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "تم حفظ الأرباح وإيقاف التعدين",
+      balance: result.rows[0].balance
+    });
+  } catch (err) {
+    console.error("LOGOUT MINING ERROR:", err);
+    return res.status(500).json({
+      success: false,
+      message: "تعذر حفظ الأرباح وإيقاف التعدين"
     });
   }
 };

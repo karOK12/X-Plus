@@ -947,7 +947,7 @@ a[href="../rating.html"] .sidebar-icon {
 
     function profitPerMsScaled() {
       // القوة 150.50 تنتج 2 X Plus خلال 24 ساعة
-      return (currentPower * (2 / 150.50) * SCALE) / 86400000;
+      return (currentPower * (0.000864 / 150.50) * SCALE) / 86400000;
     }
 
     async function apiFetch(url, options = {}) {
@@ -1043,18 +1043,18 @@ a[href="../rating.html"] .sidebar-icon {
       }
 
       const profitPerSecondScaled =
-        (currentPower * (2 / 150.50) * SCALE) / CYCLE_SECONDS;
+        (currentPower * (0.000864 / 150.50) * SCALE) / CYCLE_SECONDS;
 
       function tick() {
         if (!isMining) return;
 
-        const elapsedSeconds = Math.min(
-          CYCLE_SECONDS,
-          Math.max(0, (Date.now() - startTime) / 1000)
+        const elapsedMilliseconds = Math.min(
+          CYCLE_SECONDS * 1000,
+          Math.max(0, Date.now() - startTime)
         );
 
         const earnedScaled = Math.floor(
-          profitPerSecondScaled * elapsedSeconds
+          profitPerSecondScaled * (elapsedMilliseconds / 1000) + 1e-9
         );
 
         cycleProfitEl.textContent = formatScaled(earnedScaled);
@@ -1068,8 +1068,7 @@ a[href="../rating.html"] .sidebar-icon {
     function updateRing(elapsedSeconds) {
       const t = Math.max(0, Math.min(elapsedSeconds, CYCLE_SECONDS));
       const done = elapsedSeconds >= CYCLE_SECONDS;
-      const speedFactor = 0.1;
-      const fill = done ? 1 : ((t * speedFactor) % RING_CYCLE) / RING_CYCLE;
+      const fill = done ? 1 : (t / CYCLE_SECONDS);
 
       circle.style.strokeDasharray = RING_CIRC;
       circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
@@ -1115,7 +1114,7 @@ a[href="../rating.html"] .sidebar-icon {
         powerEl.textContent = currentPower.toFixed(2);
 
         rateEl.textContent =
-          `↗️ +${(currentPower * 2 / 150.50 / 24).toFixed(2)}/h`;
+          `↗️ +${(currentPower * 0.000864 / 150.50 / 24).toFixed(8)}/h`;
 
         profitInfoEl.textContent = '⏱️ جاهز للبدء';
 
@@ -1159,9 +1158,13 @@ a[href="../rating.html"] .sidebar-icon {
         }
 
         if (data.isMining && data.miningStartTime) {
-          const elapsedSeconds = Math.max(0, Number(data.elapsedSeconds || 0));
+          const elapsedMilliseconds = Math.max(
+            0,
+            Number(data.elapsedMilliseconds ?? (Number(data.elapsedSeconds || 0) * 1000))
+          );
+          const elapsedSeconds = elapsedMilliseconds / 1000;
 
-          startTime = Date.now() - elapsedSeconds * 1000;
+          startTime = Date.now() - elapsedMilliseconds;
           isMining = true;
           sessionDone = false;
           lastSecond = -1;
@@ -1198,7 +1201,7 @@ a[href="../rating.html"] .sidebar-icon {
             startBtn.disabled = false;
             startBtn.innerText = '⛏️ ابدأ التعدين الآن';
           } else {
-            profitInfoEl.textContent = '✅ تم تفعيل التعدين سابقاً';
+            profitInfoEl.textContent = '🔒 سبق بدء التعدين لهذا الحساب؛ لا يمكن بدء دورة جديدة من هذا الزر.';
             startBtn.disabled = true;
             startBtn.innerText = '⛏️ ابدأ التعدين الآن';
           }
@@ -1255,7 +1258,11 @@ a[href="../rating.html"] .sidebar-icon {
         const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
         const data = await response.json();
         if (data.success && data.miningStartTime) {
-          startTime = Date.now() - (Number(data.elapsedSeconds || 0) * 1000);
+          const elapsedMilliseconds = Math.max(
+            0,
+            Number(data.elapsedMilliseconds ?? (Number(data.elapsedSeconds || 0) * 1000))
+          );
+          startTime = Date.now() - elapsedMilliseconds;
           cycleProfitEl.textContent = '0.00000000';
           if (data.storedBalance !== undefined && Number.isFinite(Number(data.storedBalance))) {
             storedBalanceScaled = Math.floor(Number(data.storedBalance) * SCALE);
@@ -1577,23 +1584,45 @@ const sidebarLogout = document.getElementById("sidebarLogout");
 const logoutLoading = document.getElementById("logoutLoading");
 
 if (sidebarLogout) {
-  sidebarLogout.addEventListener("click", function(e) {
+  sidebarLogout.addEventListener("click", async function(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (logoutLoading) {
-      logoutLoading.classList.add("active");
+    const token = localStorage.getItem("token") || localStorage.getItem("auth_token");
+
+    if (!token) {
+      alert("لم يتم العثور على رمز الجلسة. يرجى تسجيل الدخول من جديد.");
+      return;
     }
 
+    if (logoutLoading) logoutLoading.classList.add("active");
     sidebarLogout.disabled = true;
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("auth_token");
-    sessionStorage.clear();
+    try {
+      const response = await fetch(`${API_URL}/mining/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
 
-    setTimeout(function() {
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.success !== true) {
+        throw new Error(data.message || "تعذر حفظ الأرباح وإيقاف التعدين");
+      }
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("auth_token");
+      sessionStorage.clear();
+
       window.location.replace("/index.html");
-    }, 900);
+    } catch (error) {
+      if (logoutLoading) logoutLoading.classList.remove("active");
+      sidebarLogout.disabled = false;
+      alert(error.message || "فشل تسجيل الخروج. حاول مرة أخرى.");
+    }
   });
 }
 </script>
