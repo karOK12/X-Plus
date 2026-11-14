@@ -647,19 +647,13 @@ a[href="../rating.html"] .sidebar-icon {
 
 </style>
 <style id="mining-ring-smooth-fix">
-.mining-circle.ring-active .progress-motion {
-  transform-box: view-box;
-  transform-origin: 70px 70px !important;
-  animation: miningRingOrbit 8s linear infinite !important;
+.mining-circle .progress-motion {
+  transform: none !important;
 }
 .mining-circle .progress-bar,
 .mining-circle .progress-dot {
   animation: none !important;
   transition: none !important;
-}
-@keyframes miningRingOrbit {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 </style>
 </head>
@@ -1044,8 +1038,8 @@ a[href="../rating.html"] .sidebar-icon {
 
     function resetRing() {
       setRingActive(false);
-      circle.style.strokeDasharray  = RING_CIRC;
-      circle.style.strokeDashoffset = RING_CIRC;
+      circle.style.strokeDasharray  = `0 ${RING_CIRC}`;
+      circle.style.strokeDashoffset = "0";
       dot.setAttribute('cx', (RING_CX + RING_R).toFixed(3));
       dot.setAttribute('cy', RING_CY);
     }
@@ -1096,12 +1090,27 @@ a[href="../rating.html"] .sidebar-icon {
     }
 
     function updateRing(elapsedSeconds) {
-      const arcLength = RING_CIRC * (2 / 3);
+      const progress = Math.min(
+        1,
+        Math.max(0, Number(elapsedSeconds) / CYCLE_SECONDS || 0)
+      );
+
+      const arcLength = RING_CIRC * progress;
       const gapLength = RING_CIRC - arcLength;
 
       circle.style.strokeDasharray =
         `${arcLength.toFixed(3)} ${gapLength.toFixed(3)}`;
       circle.style.strokeDashoffset = "0";
+
+      const angle = progress * Math.PI * 2;
+      dot.setAttribute(
+        'cx',
+        (RING_CX + RING_R * Math.cos(angle)).toFixed(3)
+      );
+      dot.setAttribute(
+        'cy',
+        (RING_CY + RING_R * Math.sin(angle)).toFixed(3)
+      );
     }
 
     window.RING_START_CACHE_KEY = 'xplus_mining_start_time';
