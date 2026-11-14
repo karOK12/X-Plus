@@ -651,8 +651,14 @@ a[href="../rating.html"] .sidebar-icon {
   transition: stroke-dashoffset .1s linear !important;
 }
 .mining-circle .progress-dot {
-  animation: none !important;
-  transition: cx .1s linear, cy .1s linear !important;
+  animation: miningDotOrbit 8s linear infinite !important;
+  transform-box: view-box;
+  transform-origin: 70px 70px !important;
+  transition: none !important;
+}
+@keyframes miningDotOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>
 </head>
@@ -1088,9 +1094,7 @@ a[href="../rating.html"] .sidebar-icon {
       circle.style.strokeDasharray = RING_CIRC;
       circle.style.strokeDashoffset = (RING_CIRC * (1 - fill)).toFixed(3);
 
-      const angle = fill * 2 * Math.PI;
-      dot.setAttribute('cx', (RING_CX + RING_R * Math.cos(angle)).toFixed(3));
-      dot.setAttribute('cy', (RING_CY + RING_R * Math.sin(angle)).toFixed(3));
+      // حركة النقطة مستقلة عن تقدم دورة التعدين.
     }
 
     window.RING_START_CACHE_KEY = 'xplus_mining_start_time';
