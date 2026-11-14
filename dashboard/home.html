@@ -658,14 +658,6 @@ a[href="../rating.html"] .sidebar-icon {
   animation: none !important;
   transition: cx 0.12s linear, cy 0.12s linear !important;
 }
-.mining-circle .progress-marker {
-  stroke: #fff !important;
-  stroke-width: 3 !important;
-  stroke-linecap: round !important;
-  filter: drop-shadow(0 0 5px #fff);
-  transition: x1 0.12s linear, y1 0.12s linear,
-              x2 0.12s linear, y2 0.12s linear !important;
-}
 </style>
 </head>
 <body>
@@ -783,7 +775,6 @@ a[href="../rating.html"] .sidebar-icon {
                   <circle class="progress-bg" cx="70" cy="70" r="62"></circle>
                   <g class="progress-motion">
                     <circle class="progress-bar" id="progressCircle" cx="70" cy="70" r="62"></circle>
-                    <line class="progress-marker" id="progressMarker" x1="137" y1="74" x2="137" y2="66"></line>
                     <circle class="progress-dot" id="progressDot" cx="39" cy="16" r="6"></circle>
                   </g>
                 </svg>
@@ -1055,18 +1046,6 @@ a[href="../rating.html"] .sidebar-icon {
       dot.setAttribute('cx', (RING_CX + RING_R).toFixed(3));
       dot.setAttribute('cy', RING_CY);
 
-      const marker = document.getElementById('progressMarker');
-      if (marker) {
-        const markerAngle = 0.18;
-        const markerRadius = RING_R + 5;
-        const halfLength = 4;
-        const mx = RING_CX + markerRadius * Math.cos(markerAngle);
-        const my = RING_CY + markerRadius * Math.sin(markerAngle);
-        marker.setAttribute('x1', (mx - halfLength * Math.sin(markerAngle)).toFixed(3));
-        marker.setAttribute('y1', (my + halfLength * Math.cos(markerAngle)).toFixed(3));
-        marker.setAttribute('x2', (mx + halfLength * Math.sin(markerAngle)).toFixed(3));
-        marker.setAttribute('y2', (my - halfLength * Math.cos(markerAngle)).toFixed(3));
-      }
     }
 
     function stopMining() {
@@ -1137,19 +1116,6 @@ a[href="../rating.html"] .sidebar-icon {
         (RING_CY + RING_R * Math.sin(angle)).toFixed(3)
       );
 
-      const marker = document.getElementById('progressMarker');
-      if (marker) {
-        const markerAngle = angle + 0.18;
-        const markerRadius = RING_R + 5;
-        const halfLength = 4;
-        const mx = RING_CX + markerRadius * Math.cos(markerAngle);
-        const my = RING_CY + markerRadius * Math.sin(markerAngle);
-
-        marker.setAttribute('x1', (mx - halfLength * Math.sin(markerAngle)).toFixed(3));
-        marker.setAttribute('y1', (my + halfLength * Math.cos(markerAngle)).toFixed(3));
-        marker.setAttribute('x2', (mx + halfLength * Math.sin(markerAngle)).toFixed(3));
-        marker.setAttribute('y2', (my - halfLength * Math.cos(markerAngle)).toFixed(3));
-      }
     }
 
     window.RING_START_CACHE_KEY = 'xplus_mining_start_time';
