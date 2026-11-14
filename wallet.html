@@ -268,7 +268,8 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
     <section class="view" id="v-account">
       <div class="sec-h" style="margin-top:4px">الحساب</div>
       <div class="me">
-        <div class="ava" id="avaTxt">؟</div>
+        <div class="ava" id="avaTxt" role="button" tabindex="0" title="اختيار صورة شخصية">؟</div>
+        <input type="file" id="avatarPicker" accept="image/*" hidden>
         <div><b id="meName">—</b><small id="meUid">—</small></div>
       </div>
       <div class="card" style="padding:6px 16px">
@@ -532,7 +533,7 @@ function renderAll() {
   cvCalc();
   $('wdAvail').textContent = '$' + fmt(S.balance);
   updateWithdrawSummary();
-  $('avaTxt').innerHTML = '<img src="https://cdn.imagetourls.com/image/19PkT7Ipf.jpg" alt="صورة البروفايل" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">';
+  renderAvatar();
   $('meName').textContent = S.name;
   $('meUid').textContent = S.uid;
   $('accRate').textContent = S.rate + ' = $1';
@@ -965,6 +966,98 @@ async function markAllNotificationsRead() {
     toast(error.message || 'تعذر تحديث الإشعارات', 1);
   }
 }
+
+
+function avatarStorageKey() {
+  return 'xplus_wallet_avatar_' + String(S && S.uid ? S.uid : 'default');
+}
+
+function renderAvatar() {
+  const el = $('avaTxt');
+  if (!el || !S) return;
+
+  const saved = localStorage.getItem(avatarStorageKey());
+
+  if (saved) {
+    const img = document.createElement('img');
+    img.src = saved;
+    img.alt = 'صورة البروفايل';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';
+    el.replaceChildren(img);
+  } else {
+    el.textContent = (S.name || 'م')[0] || '؟';
+  }
+}
+
+(function setupAvatarPicker() {
+  const avatar = $('avaTxt');
+  const picker = $('avatarPicker');
+  if (!avatar || !picker) return;
+
+  avatar.style.cursor = 'pointer';
+  avatar.setAttribute('aria-label', 'اختيار صورة شخصية');
+
+  avatar.addEventListener('click', () => picker.click());
+
+  avatar.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      picker.click();
+    }
+  });
+
+  picker.addEventListener('change', () => {
+    const file = picker.files && picker.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast('اختَر ملف صورة صالح', 1);
+      picker.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const source = new Image();
+
+      source.onload = () => {
+        const scale = Math.min(1, 256 / Math.max(source.width, source.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(source.width * scale));
+        canvas.height = Math.max(1, Math.round(source.height * scale));
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+
+        try {
+          const compressed = canvas.toDataURL('image/jpeg', 0.82);
+          localStorage.setItem(avatarStorageKey(), compressed);
+          renderAvatar();
+          toast('تم حفظ صورة البروفايل ✓');
+        } catch (error) {
+          toast('تعذر حفظ الصورة. جرّب صورة أصغر.', 1);
+        }
+
+        picker.value = '';
+      };
+
+      source.onerror = () => {
+        toast('تعذر قراءة الصورة', 1);
+        picker.value = '';
+      };
+
+      source.src = reader.result;
+    };
+
+    reader.onerror = () => {
+      toast('تعذر فتح الصورة', 1);
+      picker.value = '';
+    };
+
+    reader.readAsDataURL(file);
+  });
+})();
 
 init();
 refreshNotificationCount();
