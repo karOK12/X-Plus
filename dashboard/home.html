@@ -650,10 +650,13 @@ a[href="../rating.html"] .sidebar-icon {
 .mining-circle .progress-motion {
   transform: none !important;
 }
-.mining-circle .progress-bar,
+.mining-circle .progress-bar {
+  animation: none !important;
+  transition: stroke-dasharray 0.12s linear !important;
+}
 .mining-circle .progress-dot {
   animation: none !important;
-  transition: none !important;
+  transition: cx 0.12s linear, cy 0.12s linear !important;
 }
 </style>
 </head>
