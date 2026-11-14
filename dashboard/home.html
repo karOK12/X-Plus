@@ -647,7 +647,7 @@ a[href="../rating.html"] .sidebar-icon {
 
 </style>
 <style id="mining-ring-smooth-fix">
-.mining-circle .progress-motion {
+.mining-circle.ring-active .progress-motion {
   transform-box: view-box;
   transform-origin: 70px 70px !important;
   animation: miningRingOrbit 8s linear infinite !important;
@@ -1040,7 +1040,12 @@ a[href="../rating.html"] .sidebar-icon {
       miningStatusBadge.textContent = active ? '● نشط' : '● غير نشط';
     }
 
+    function setRingActive(active) {
+      document.querySelector('.mining-circle')?.classList.toggle('ring-active', !!active);
+    }
+
     function resetRing() {
+      setRingActive(false);
       circle.style.strokeDasharray  = RING_CIRC;
       circle.style.strokeDashoffset = RING_CIRC;
       dot.setAttribute('cx', (RING_CX + RING_R).toFixed(3));
@@ -1048,6 +1053,7 @@ a[href="../rating.html"] .sidebar-icon {
     }
 
     function stopMining() {
+      setRingActive(false);
       setMiningBadge(false);
       isMining = false;
       if (timerInterval)   { clearInterval(timerInterval);   timerInterval   = null; }
@@ -1200,6 +1206,7 @@ a[href="../rating.html"] .sidebar-icon {
 
           startTime = Date.now() - elapsedMilliseconds;
           isMining = true;
+          setRingActive(true);
           sessionDone = false;
           lastSecond = -1;
           lastBalanceSecond = -1;
@@ -1313,6 +1320,7 @@ a[href="../rating.html"] .sidebar-icon {
           }
           currentPower = Number(data.power || currentPower || 0);
           isMining = true;
+          setRingActive(true);
           sessionDone = false;
           lastSecond = -1;
           lastBalanceSecond = -1;
@@ -1324,6 +1332,7 @@ a[href="../rating.html"] .sidebar-icon {
 
           if (elapsedSeconds >= CYCLE_SECONDS) {
             isMining = false;
+            setRingActive(false);
             sessionDone = true;
             timerEl.textContent = '24:00:00';
             updateRing(CYCLE_SECONDS);
@@ -1408,6 +1417,7 @@ a[href="../rating.html"] .sidebar-icon {
       if (elapsedSeconds >= CYCLE_SECONDS && !sessionDone) {
         sessionDone = true;
         isMining = false;
+        setRingActive(false);
 
         if (timerInterval) {
           clearInterval(timerInterval);
