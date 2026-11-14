@@ -1084,8 +1084,20 @@ a[href="../rating.html"] .sidebar-icon {
       dot.setAttribute('cy', (RING_CY + RING_R * Math.sin(angle)).toFixed(3));
     }
 
+    window.RING_START_CACHE_KEY = 'xplus_mining_start_time';
+    const RING_START_CACHE_KEY = window.RING_START_CACHE_KEY;
+
+    function restoreRingFromCache() {
+      const cachedStart = Number(localStorage.getItem(RING_START_CACHE_KEY));
+      if (Number.isFinite(cachedStart) && cachedStart > 0) {
+        updateRing((Date.now() - cachedStart) / 1000);
+      } else {
+        resetRing();
+      }
+    }
+
     async function initPage() {
-      resetRing();
+      restoreRingFromCache();
 
       const token =
         localStorage.getItem('token') ||
@@ -1163,6 +1175,7 @@ a[href="../rating.html"] .sidebar-icon {
         }
 
         if (data.isMining && data.miningStartTime) {
+          localStorage.setItem(RING_START_CACHE_KEY, String(Number(data.miningStartTime)));
           const elapsedMilliseconds = Math.max(
             0,
             Number(data.elapsedMilliseconds ?? (Number(data.elapsedSeconds || 0) * 1000))
@@ -1188,6 +1201,7 @@ a[href="../rating.html"] .sidebar-icon {
           document.querySelector('.mining-circle')?.classList.add('ring-ready');
           startLocalCounter();
         } else {
+          localStorage.removeItem(RING_START_CACHE_KEY);
           setMiningBadge(false);
           isMining = false;
           sessionDone = false;
@@ -1268,6 +1282,7 @@ a[href="../rating.html"] .sidebar-icon {
         const response = await apiFetch(`${API_URL}/mining/start`, { method: 'POST' });
         const data = await response.json();
         if (data.success && data.miningStartTime) {
+          localStorage.setItem(RING_START_CACHE_KEY, String(Number(data.miningStartTime)));
           const elapsedMilliseconds = Math.max(
             0,
             Number(data.elapsedMilliseconds ?? (Number(data.elapsedSeconds || 0) * 1000))
@@ -1623,6 +1638,7 @@ if (sidebarLogout) {
         throw new Error(data.message || "تعذر حفظ الأرباح وإيقاف التعدين");
       }
 
+      localStorage.removeItem(window.RING_START_CACHE_KEY);
       localStorage.removeItem("token");
       localStorage.removeItem("auth_token");
       sessionStorage.clear();
