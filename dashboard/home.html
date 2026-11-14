@@ -1057,10 +1057,15 @@ a[href="../rating.html"] .sidebar-icon {
 
       const marker = document.getElementById('progressMarker');
       if (marker) {
-        marker.setAttribute('x1', RING_CX + RING_R + 5);
-        marker.setAttribute('y1', RING_CY + 4);
-        marker.setAttribute('x2', RING_CX + RING_R + 5);
-        marker.setAttribute('y2', RING_CY - 4);
+        const markerAngle = 0.18;
+        const markerRadius = RING_R + 5;
+        const halfLength = 4;
+        const mx = RING_CX + markerRadius * Math.cos(markerAngle);
+        const my = RING_CY + markerRadius * Math.sin(markerAngle);
+        marker.setAttribute('x1', (mx - halfLength * Math.sin(markerAngle)).toFixed(3));
+        marker.setAttribute('y1', (my + halfLength * Math.cos(markerAngle)).toFixed(3));
+        marker.setAttribute('x2', (mx + halfLength * Math.sin(markerAngle)).toFixed(3));
+        marker.setAttribute('y2', (my - halfLength * Math.cos(markerAngle)).toFixed(3));
       }
     }
 
@@ -1134,15 +1139,16 @@ a[href="../rating.html"] .sidebar-icon {
 
       const marker = document.getElementById('progressMarker');
       if (marker) {
+        const markerAngle = angle + 0.18;
         const markerRadius = RING_R + 5;
         const halfLength = 4;
-        const mx = RING_CX + markerRadius * Math.cos(angle);
-        const my = RING_CY + markerRadius * Math.sin(angle);
+        const mx = RING_CX + markerRadius * Math.cos(markerAngle);
+        const my = RING_CY + markerRadius * Math.sin(markerAngle);
 
-        marker.setAttribute('x1', (mx - halfLength * Math.sin(angle)).toFixed(3));
-        marker.setAttribute('y1', (my + halfLength * Math.cos(angle)).toFixed(3));
-        marker.setAttribute('x2', (mx + halfLength * Math.sin(angle)).toFixed(3));
-        marker.setAttribute('y2', (my - halfLength * Math.cos(angle)).toFixed(3));
+        marker.setAttribute('x1', (mx - halfLength * Math.sin(markerAngle)).toFixed(3));
+        marker.setAttribute('y1', (my + halfLength * Math.cos(markerAngle)).toFixed(3));
+        marker.setAttribute('x2', (mx + halfLength * Math.sin(markerAngle)).toFixed(3));
+        marker.setAttribute('y2', (my - halfLength * Math.cos(markerAngle)).toFixed(3));
       }
     }
 
