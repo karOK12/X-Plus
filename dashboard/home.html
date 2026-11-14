@@ -287,6 +287,11 @@
       50%      { filter: drop-shadow(0 0 11px rgba(59, 130, 246, 1)); }
     }
     
+    .mining-circle:not(.ring-ready) .progress-bar,
+    .mining-circle:not(.ring-ready) .progress-dot {
+      opacity: 0 !important;
+    }
+
     .timer { font-size: 20px; font-weight: bold; color: #3b82f6; font-variant-numeric: tabular-nums; direction: ltr; }
     .sub { font-size: 10px; opacity: 0.6; letter-spacing: 1px; color: #94a3b8; }
     
@@ -1180,7 +1185,11 @@ a[href="../rating.html"] .sidebar-icon {
           profitInfoEl.textContent = '✅ متصل بالخادم - دورة 24 ساعة';
 
           updateTimer();
+          circle.style.transition = 'none';
           updateRing(elapsedSeconds);
+          void circle.getBoundingClientRect();
+          circle.style.removeProperty('transition');
+          document.querySelector('.mining-circle')?.classList.add('ring-ready');
           startLocalCounter();
         } else {
           setMiningBadge(false);
@@ -1200,6 +1209,7 @@ a[href="../rating.html"] .sidebar-icon {
           cycleProfitEl.textContent = '0.00000000';
           timerEl.textContent = '00:00:00';
           resetRing();
+          document.querySelector('.mining-circle')?.classList.add('ring-ready');
           if (data.canStart === true) {
             profitInfoEl.textContent = '⏱️ جاهز للبدء';
             startBtn.disabled = false;
