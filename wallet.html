@@ -30,7 +30,7 @@ main{flex:1;overflow-y:auto;padding:6px 16px 104px;scrollbar-width:none}main::-w
 .info-strip{display:flex;flex-direction:column;gap:9px;background:var(--card);border-radius:13px;padding:14px 16px;margin-top:12px;font-size:.76rem}.info-strip div{display:flex;justify-content:space-between;align-items:center}.info-strip span{color:var(--muted)}.info-strip b{font-weight:700;font-size:.76rem}.info-strip b.num{direction:ltr;color:var(--yellow)}
 .err{font-size:.73rem;color:var(--red);margin-top:9px;display:none;font-weight:700}
 .tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{padding:7px 16px;border-radius:99px;border:1px solid var(--line);background:none;color:var(--muted);font-size:.73rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:.2s}.tab:hover{color:var(--text)}.tab.on{background:rgba(252,213,53,.12);border-color:rgba(252,213,53,.4);color:var(--yellow)}
-.me{display:flex;align-items:center;gap:13px;padding:4px 2px 16px}.ava{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FCD535,#D9A914);display:grid;place-items:center;font-family:'Changa';font-weight:800;font-size:1.2rem;color:#181A20;flex-shrink:0}.me b{font-size:.98rem;display:block}.me small{color:var(--muted);font-size:.68rem}.mrow{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:.83rem;font-weight:700}.mrow:last-child{border:none}.mrow .mi{width:34px;height:34px;border-radius:10px;background:var(--card);display:grid;place-items:center;color:var(--yellow)}.mrow .mi svg{width:16px;height:16px}.mrow small{color:var(--muted);font-size:.66rem;display:block;font-weight:400}.mrow .end{margin-inline-start:auto;color:var(--muted)}
+.me{display:flex;align-items:center;gap:13px;padding:4px 2px 16px}.ava{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FCD535,#D9A914);display:grid;place-items:center;font-family:'Changa';font-weight:800;font-size:1.2rem;color:#181A20;flex-shrink:0;position:relative;overflow:hidden;cursor:pointer}.ava img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}.ava::after{content:'';position:absolute;right:0;bottom:0;width:19px;height:19px;border-radius:50%;background-color:var(--yellow);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23181A20' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h-4L8 7H4v13h16V7h-4z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:11px;border:2px solid var(--card);pointer-events:none}.ava:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}.me b{font-size:.98rem;display:block}.me small{color:var(--muted);font-size:.68rem}.mrow{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:.83rem;font-weight:700}.mrow:last-child{border:none}.mrow .mi{width:34px;height:34px;border-radius:10px;background:var(--card);display:grid;place-items:center;color:var(--yellow)}.mrow .mi svg{width:16px;height:16px}.mrow small{color:var(--muted);font-size:.66rem;display:block;font-weight:400}.mrow .end{margin-inline-start:auto;color:var(--muted)}
 .sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}.sheet.show{display:flex}.panel{width:100%;max-width:480px;background:var(--bg2);border-radius:24px 24px 0 0;padding:16px 22px calc(26px + env(safe-area-inset-bottom));animation:up .35s cubic-bezier(.2,.8,.3,1.1);border-top:1px solid var(--line)}@keyframes up{from{transform:translateY(100%)}}.grab{width:42px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 16px}.panel h3{text-align:center;font-size:1.02rem}.panel .psub{text-align:center;color:var(--muted);font-size:.72rem;margin:5px 0 0}
 .sumrows{background:var(--card);border-radius:13px;padding:6px 16px;margin-top:16px}.sumrows div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.8rem}.sumrows div:last-child{border:none}.sumrows span{color:var(--muted)}.sumrows b{font-family:'Changa';direction:ltr;font-size:.85rem}
 .ok-ic{width:76px;height:76px;border-radius:50%;background:rgba(14,203,129,.13);display:grid;place-items:center;margin:8px auto 14px}.ok-ic svg{width:44px;height:44px}.ok-ic circle{fill:none;stroke:var(--green);stroke-width:2.5;stroke-dasharray:160;stroke-dashoffset:160;animation:draw .7s ease forwards}.ok-ic path{fill:none;stroke:var(--green);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:draw .5s .5s ease forwards}@keyframes draw{to{stroke-dashoffset:0}}
@@ -268,9 +268,13 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
     <section class="view" id="v-account">
       <div class="sec-h" style="margin-top:4px">الحساب</div>
       <div class="me">
-        <div class="ava" id="avaTxt">؟</div>
+        <div class="ava" id="avaTxt" role="button" tabindex="0" title="اختيار صورة شخصية">؟</div>
+    <input type="file" id="avatarPicker" accept="image/*" hidden>
         <div><b id="meName">—</b><small id="meUid">—</small></div>
       </div>
+      <a href="/account-settings.html" class="btn-ghost" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;margin:0 0 14px;text-decoration:none;box-sizing:border-box">
+        ⚙️ إعدادات الحساب
+      </a>
       <div class="card" style="padding:6px 16px">
         <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>
           <div>سعر التحويل<small>مُحدد من الإدارة</small></div><span class="end num" id="accRate">—</span></div>
@@ -532,7 +536,7 @@ function renderAll() {
   cvCalc();
   $('wdAvail').textContent = '$' + fmt(S.balance);
   updateWithdrawSummary();
-  $('avaTxt').textContent = (S.name || 'م')[0];
+  renderAvatar();
   $('meName').textContent = S.name;
   $('meUid').textContent = S.uid;
   $('accRate').textContent = S.rate + ' = $1';
@@ -965,6 +969,89 @@ async function markAllNotificationsRead() {
     toast(error.message || 'تعذر تحديث الإشعارات', 1);
   }
 }
+
+
+function renderAvatar() {
+  const avatar = $('avaTxt');
+  if (!avatar || !S) return;
+  if (S.profileImage) {
+    avatar.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = S.profileImage;
+    img.alt = 'الصورة الشخصية';
+    avatar.appendChild(img);
+  } else {
+    avatar.textContent = (S.name || 'م')[0];
+  }
+}
+
+function setupAvatarPicker() {
+  const avatar = $('avaTxt');
+  const picker = $('avatarPicker');
+  if (!avatar || !picker || avatar.dataset.pickerReady) return;
+  avatar.dataset.pickerReady = '1';
+  const openPicker = () => picker.click();
+  avatar.addEventListener('click', openPicker);
+  avatar.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openPicker();
+    }
+  });
+  picker.addEventListener('change', async () => {
+    const file = picker.files && picker.files[0];
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)) {
+      toast('اختر صورة بصيغة JPG أو PNG أو WEBP أو GIF', 1);
+      picker.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast('حجم الصورة أكبر من 5 ميغابايت', 1);
+      picker.value = '';
+      return;
+    }
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('تعذر قراءة الصورة'));
+        reader.readAsDataURL(file);
+      });
+      const compressed = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, 256 / Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return reject(new Error('تعذر معالجة الصورة'));
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = () => reject(new Error('ملف الصورة غير صالح'));
+        img.src = dataUrl;
+      });
+      toast('جارٍ حفظ الصورة…');
+      const response = await apiFetch(`${API_URL}/user/profile-image`, {
+        method: 'PUT',
+        body: JSON.stringify({ profileImage: compressed })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || result.error || 'تعذر حفظ الصورة');
+      S.profileImage = result.profileImage || compressed;
+      renderAvatar();
+      toast('تم حفظ الصورة الشخصية بنجاح ✓');
+    } catch (error) {
+      toast(error.message || 'تعذر حفظ الصورة', 1);
+    } finally {
+      picker.value = '';
+    }
+  });
+}
+
+setupAvatarPicker();
 
 init();
 refreshNotificationCount();

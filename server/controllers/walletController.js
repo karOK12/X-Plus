@@ -1563,6 +1563,11 @@ exports.state = async (req, res) => {
       });
     }
 
+    const profile = await pool.query(
+      'SELECT profile_image FROM users WHERE id = $1 LIMIT 1',
+      [userId]
+    );
+
     const history = await pool.query(`
       SELECT
         type,
@@ -1601,6 +1606,7 @@ exports.state = async (req, res) => {
         uid: w.uid,
         user_id: w.user_id,
         name: w.name,
+        profileImage: profile.rows[0]?.profile_image || null,
         balance: Number(w.balance || 0),
         points: Number(w.points || 0),
         rate: Number(w.rate || 100),
