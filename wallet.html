@@ -546,6 +546,9 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
         <input type="file" id="avatarPicker" accept="image/*" hidden>
         <div><b id="meName">—</b><small id="meUid">—</small></div>
       </div>
+      <a href="/account-settings.html" class="btn-ghost" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;margin:0 0 14px;text-decoration:none;box-sizing:border-box">
+        ⚙️ إعدادات الحساب
+      </a>
       <div class="card" style="padding:6px 16px">
         <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>
           <div>سعر التحويل<small>مُحدد من الإدارة</small></div><span class="end num" id="accRate">—</span></div>
@@ -561,186 +564,17 @@ type="button">
 تسجيل الخروج
 </button>
       <footer>X Plus © 2026</footer>
-    </section
+    </section>
 
 <section class="view" id="v-settings">
-<div class="settings-container">
-
+  <div class="settings-container">
     <div class="header">
       <button class="back" onclick="go('account')" aria-label="رجوع">→</button>
-      <h1>⚙️ إعدادات الحساب</h1>
+      <h1>إعدادات الحساب</h1>
     </div>
-
-    <!-- 1. كلمة المرور -->
-    <section class="settings-card">
-      <h2>🔐 كلمة المرور</h2>
-
-      <div class="field">
-        <label for="currentPassword">كلمة المرور الحالية</label>
-        <div class="password-wrap">
-          <input
-            id="currentPassword"
-            type="password"
-            autocomplete="current-password"
-          >
-          <button type="button" class="password-toggle" data-target="currentPassword" aria-label="إظهار كلمة المرور">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
-              <circle cx="12" cy="12" r="2.5"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="newPassword">كلمة المرور الجديدة</label>
-        <div class="password-wrap">
-          <input
-            id="newPassword"
-            type="password"
-            autocomplete="new-password"
-          >
-          <button type="button" class="password-toggle" data-target="newPassword" aria-label="إظهار كلمة المرور">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
-              <circle cx="12" cy="12" r="2.5"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="confirmPassword">تأكيد كلمة المرور الجديدة</label>
-        <div class="password-wrap">
-          <input
-            id="confirmPassword"
-            type="password"
-            autocomplete="new-password"
-          >
-          <button type="button" class="password-toggle" data-target="confirmPassword" aria-label="إظهار كلمة المرور">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
-              <circle cx="12" cy="12" r="2.5"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <button class="save" id="passwordBtn">
-        حفظ كلمة المرور
-      </button>
-
-      <div class="status" id="passwordStatus"></div>
-
-      <div class="notice">
-        لا يتم عرض كلمة المرور أو حفظها كنص مكشوف داخل الصفحة.
-      </div>
-    </section>
-
-    <!-- 2. البريد الإلكتروني -->
-    <section class="settings-card">
-      <h2>📧 البريد الإلكتروني</h2>
-
-      <div class="field">
-        <label for="email">البريد الإلكتروني الجديد</label>
-        <input
-          id="email"
-          type="email"
-          autocomplete="email"
-          placeholder="example@email.com"
-        >
-      </div>
-
-      <button class="save" type="button" id="emailBtn">
-        تحديث البريد الإلكتروني
-      </button>
-
-      <div class="status" id="emailStatus"></div>
-    </section>
-
-    <!-- 3. رقم الهاتف -->
-    <section class="settings-card">
-      <h2>📱 رقم الهاتف</h2>
-
-      <div class="field">
-        <label for="phone">رقم الهاتف</label>
-        <input
-          id="phone"
-          type="tel"
-          autocomplete="tel"
-          placeholder="أدخل رقم الهاتف"
-        >
-      </div>
-
-      <button class="save" type="button" id="phoneBtn">
-        تحديث رقم الهاتف
-      </button>
-
-      <div class="status" id="phoneStatus"></div>
-    </section>
-
-    <!-- 4. الأمان وتسجيل الدخول -->
-    <section class="settings-card">
-      <h2>🛡️ الأمان وتسجيل الدخول</h2>
-
-      <a href="#" class="settings-action">
-        <span class="settings-action-icon">🔑</span>
-        <span>
-          <strong>جلسات تسجيل الدخول</strong>
-          <small>مراجعة الأجهزة والجلسات المسجلة</small>
-        </span>
-      </a>
-
-      <a href="#" class="settings-action">
-        <span class="settings-action-icon">🚪</span>
-        <span>
-          <strong>تسجيل الخروج من الأجهزة</strong>
-          <small>إدارة جلسات الدخول الأخرى</small>
-        </span>
-      </a>
-
-      <a href="#" class="settings-action">
-        <span class="settings-action-icon">🔒</span>
-        <span>
-          <strong>إعدادات الأمان</strong>
-          <small>إدارة وسائل حماية الحساب</small>
-        </span>
-      </a>
-    </section>
-
-    <!-- 5. التخزين المحلي -->
-    <section class="settings-card">
-      <h2>💾 التخزين المحلي</h2>
-
-      <p class="notice">
-        هذا القسم مخصص لمعاينة البيانات المخزنة محلياً وإدارتها
-        بشكل واضح وآمن.
-      </p>
-    </section>
-
-    <!-- 6. حذف الحساب -->
-    <section class="settings-card">
-      <h2>🗑️ حذف الحساب</h2>
-
-      <p class="notice">
-        حذف الحساب إجراء نهائي وقد يؤدي إلى حذف بيانات الحساب.
-      </p>
-
-      <button
-        class="save"
-        type="button"
-        id="deleteAccountBtn"
-        style="background:#dc2626;"
-      >
-        حذف الحساب نهائياً
-      </button>
-
-      <div class="status" id="deleteStatus"></div>
-    </section>
-
   </div>
 </section>
->
+
   </main>
 
   <nav class="bnav">
@@ -1009,14 +843,38 @@ function go(v) {
   if (v === 'history') renderHistory(hF);
 }
 /* ═══════════ تسجيل الخروج ═══════════ */
-window.doLogout = function () {
+window.doLogout = async function () {
+  const logoutButton = document.getElementById('logoutBtn');
+  const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
+
+  if (!token) {
+    toast('لا توجد جلسة نشطة لتسجيل الخروج', 1);
+    return;
+  }
+
+  if (logoutButton) logoutButton.disabled = true;
+
   try {
+    const response = await fetch(`${API_URL}/mining/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || data.success !== true) {
+      throw new Error(data.message || 'تعذر حفظ الأرباح وإيقاف التعدين');
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('auth_token');
-
     window.location.replace('/');
-  } catch (e) {
-    console.error('Logout error:', e);
+  } catch (error) {
+    console.error('Logout error:', error);
+    toast(error.message || 'فشل تسجيل الخروج. حاول مرة أخرى.', 1);
+    if (logoutButton) logoutButton.disabled = false;
   }
 };
 
@@ -1430,10 +1288,11 @@ function renderAvatar() {
   if (!el || !S) return;
 
   const saved = localStorage.getItem(avatarStorageKey());
+  const image = S.profileImage || saved;
 
-  if (saved) {
+  if (image) {
     const img = document.createElement('img');
-    img.src = saved;
+    img.src = image;
     img.alt = 'صورة البروفايل';
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';
     el.replaceChildren(img);
@@ -1474,7 +1333,7 @@ function renderAvatar() {
     reader.onload = () => {
       const source = new Image();
 
-      source.onload = () => {
+      source.onload = async () => {
         const scale = Math.min(1, 256 / Math.max(source.width, source.height));
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(source.width * scale));
@@ -1485,11 +1344,26 @@ function renderAvatar() {
 
         try {
           const compressed = canvas.toDataURL('image/jpeg', 0.82);
-          localStorage.setItem(avatarStorageKey(), compressed);
+
+          const response = await apiFetch(`${API_URL}/user/profile-image`, {
+            method: 'PUT',
+            body: JSON.stringify({ profileImage: compressed })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.success || !result.profileImage) {
+            throw new Error(result.message || 'تعذر حفظ الصورة');
+          }
+
+          S.profileImage = result.profileImage;
+          localStorage.setItem(avatarStorageKey(), result.profileImage);
+
           renderAvatar();
-          toast('تم حفظ صورة البروفايل ✓');
+          toast('تم حفظ صورة البروفايل في حسابك ✓');
         } catch (error) {
-          toast('تعذر حفظ الصورة. جرّب صورة أصغر.', 1);
+          console.error('AVATAR SAVE ERROR:', error);
+          toast(error.message || 'تعذر حفظ الصورة بالخادم', 1);
         }
 
         picker.value = '';
@@ -1519,188 +1393,18 @@ refreshNotificationCount();
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const logout = document.getElementById('logoutBtn');
-
   if (logout) {
     logout.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
-
-      localStorage.removeItem('token');
-      localStorage.removeItem('auth_token');
-
-      window.location.replace('/');
+      window.doLogout();
     });
   }
 });
 </script>
 
-<script>
-(() => {
-const passwordBtn = document.getElementById('passwordBtn');
-    const passwordStatus = document.getElementById('passwordStatus');
-
-    passwordBtn.addEventListener('click', async () => {
-      const current =
-        document.getElementById('currentPassword').value;
-
-      const next =
-        document.getElementById('newPassword').value;
-
-      const confirm =
-        document.getElementById('confirmPassword').value;
-
-      passwordStatus.style.display = 'block';
-      passwordStatus.className = 'status';
-
-      if (!current || !next || !confirm) {
-        passwordStatus.textContent =
-          '⚠️ املأ جميع الحقول.';
-        passwordStatus.classList.add('error');
-        return;
-      }
-
-      if (next !== confirm) {
-        passwordStatus.textContent =
-          '⚠️ تأكيد كلمة المرور غير مطابق.';
-        passwordStatus.classList.add('error');
-        return;
-      }
-
-      if (next.length < 8) {
-        passwordStatus.textContent =
-          '⚠️ كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل.';
-        passwordStatus.classList.add('error');
-        return;
-      }
-
-      const token =
-        localStorage.getItem('token') ||
-        localStorage.getItem('auth_token');
-
-      if (!token) {
-        passwordStatus.textContent =
-          '⚠️ يجب تسجيل الدخول أولاً.';
-        passwordStatus.classList.add('error');
-        return;
-      }
-
-      passwordBtn.disabled = true;
-      passwordBtn.textContent = 'جاري الحفظ...';
-
-      try {
-        const response = await fetch('/api/auth/change-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            currentPassword: current,
-            newPassword: next
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-          passwordStatus.textContent =
-            `⚠️ ${data.message || 'تعذر تغيير كلمة المرور.'}`;
-          passwordStatus.classList.add('error');
-          return;
-        }
-
-        passwordStatus.textContent =
-          '✅ تم تغيير كلمة المرور بنجاح.';
-        passwordStatus.classList.add('success');
-
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-
-      } catch (error) {
-        console.error('CHANGE PASSWORD:', error);
-
-        passwordStatus.textContent =
-          '❌ تعذر الاتصال بالخادم.';
-        passwordStatus.classList.add('error');
-
-      } finally {
-        passwordBtn.disabled = false;
-        passwordBtn.textContent = 'حفظ كلمة المرور';
-      }
-    });
-
-    document.getElementById('emailBtn').addEventListener('click', () => {
-      const status = document.getElementById('emailStatus');
-      const email = document.getElementById('email').value.trim();
-
-      status.style.display = 'block';
-      status.className = 'status';
-
-      if (!email) {
-        status.textContent = '⚠️ أدخل البريد الإلكتروني.';
-        status.classList.add('error');
-        return;
-      }
-
-      status.textContent =
-        'ℹ️ البريد جاهز للربط بالخادم.';
-      status.classList.add('success');
-    });
 
 
-    document.getElementById('phoneBtn').addEventListener('click', () => {
-      const status = document.getElementById('phoneStatus');
-      const phone = document.getElementById('phone').value.trim();
-
-      status.style.display = 'block';
-      status.className = 'status';
-
-      if (!phone) {
-        status.textContent = '⚠️ أدخل رقم الهاتف.';
-        status.classList.add('error');
-        return;
-      }
-
-      status.textContent =
-        'ℹ️ رقم الهاتف جاهز للربط بالخادم.';
-      status.classList.add('success');
-    });
-
-
-    document.getElementById('deleteAccountBtn').addEventListener('click', () => {
-      const status = document.getElementById('deleteStatus');
-
-      status.style.display = 'block';
-      status.className = 'status error';
-      status.textContent =
-        '⚠️ حذف الحساب غير مفعّل حالياً لحماية بياناتك.';
-    });
-})();
-</script>
-<script>
-(() => {
-
-document.querySelectorAll('.password-toggle').forEach((button) => {
-  button.addEventListener('click', () => {
-    const targetId = button.getAttribute('data-target');
-    const input = document.getElementById(targetId);
-    if (!input) return;
-
-    const isHidden = input.type === 'password';
-    input.type = isHidden ? 'text' : 'password';
-
-    button.setAttribute(
-      'aria-label',
-      isHidden ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
-    );
-
-    button.classList.toggle('visible', isHidden);
-  });
-});
-
-})();
-</script>
 
 </body>
 </html>
