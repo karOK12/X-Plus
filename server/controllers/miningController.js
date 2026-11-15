@@ -175,6 +175,7 @@ exports.logoutMining = async (req, res) => {
     const now = Date.now();
     const userId = req.user.id;
 
+    // حفظ كامل مدة التعدين حتى لحظة الخروج، ثم إيقاف الدورة ذرياً.
     const result = await db.query(
       `
       UPDATE users
@@ -184,8 +185,8 @@ exports.logoutMining = async (req, res) => {
             (
               COALESCE(balance, 0)::numeric
               + (
-                  LEAST(86400000::numeric, GREATEST(0, $1::numeric - mining_start_time::numeric))
-                  / 86400000
+                  GREATEST(0::numeric, $1::numeric - mining_start_time::numeric)
+                  / 86400000::numeric
                 )
                 * COALESCE(power, 0)::numeric
                 * (0.000864::numeric / 150.50::numeric)
