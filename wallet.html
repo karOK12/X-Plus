@@ -544,11 +544,14 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
       <div class="me">
         <div class="ava" id="avaTxt" role="button" tabindex="0" title="اختيار صورة شخصية">؟</div>
         <input type="file" id="avatarPicker" accept="image/*" hidden>
-        <div><b id="meName">—</b><small id="meUid">—</small></div>
+        <div>
+          <b id="meName">—</b>
+          <small id="meUid">—</small>
+          <a href="/account-settings.html" style="display:block;width:fit-content;margin-top:5px;text-decoration:none;color:var(--muted);font-size:.75rem;font-weight:700">
+            إعدادات الحساب
+          </a>
+        </div>
       </div>
-      <a href="/account-settings.html" class="btn-ghost" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;margin:0 0 14px;text-decoration:none;box-sizing:border-box">
-        ⚙️ إعدادات الحساب
-      </a>
       <div class="card" style="padding:6px 16px">
         <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>
           <div>سعر التحويل<small>مُحدد من الإدارة</small></div><span class="end num" id="accRate">—</span></div>
