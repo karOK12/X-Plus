@@ -30,30 +30,35 @@
       border-bottom:1px solid var(--line);
       background:#181A20;
     }
+
     .back {
-      width:42px;
-      height:42px;
-      flex:0 0 42px;
+      width:40px;
+      height:40px;
+      flex:0 0 40px;
       display:grid;
       place-items:center;
-      border:0;
-      border-radius:10px;
-      background:var(--yellow);
-      color:#181A20;
-      font-size:22px;
-      font-weight:800;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      background:linear-gradient(145deg,var(--card),var(--card2));
+      color:var(--yellow);
+      box-shadow:0 3px 12px rgba(0,0,0,.16);
       cursor:pointer;
-      transition:.2s;
-      box-shadow:0 5px 14px rgba(252,213,53,.25);
+    }
+    .back svg {
+      width:20px;
+      height:20px;
     }
     .back:hover {
-      background:var(--yellow2);
-      transform:translateY(-2px);
-      box-shadow:0 6px 16px rgba(252,213,53,.35);
+      border-color:var(--yellow);
+      background:var(--card2);
+      color:var(--yellow);
+      transform:translateY(-1px);
     }
-    .back:active {
-      transform:scale(.96);
+    .back:focus-visible {
+      outline:2px solid var(--yellow);
+      outline-offset:3px;
     }
+
     h1 {
       margin:0;
       font-family:'Changa',sans-serif;
@@ -88,7 +93,7 @@
 <body>
   <header>
     <button class="back" type="button" aria-label="رجوع"
-      onclick="walletGoBack()">←</button>
+      onclick="walletGoBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h5a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><path d="M3 12h11m-4-4 4 4-4 4"/></svg></button>
     <h1>المساعدة والدعم</h1>
   </header>
   <main>
