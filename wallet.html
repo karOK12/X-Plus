@@ -79,7 +79,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
   width: 100%;
   max-width: 520px;
   margin: auto;
-  padding: 12px 4px 28px;
+  padding: 8px 4px 28px;
   color: var(--text);
 }
 
@@ -91,7 +91,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 4px 0 20px;
+  margin: 0 0 20px;
 }
 
 #v-settings .header h1 {
@@ -352,6 +352,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
 <div class="ambient"></div>
 <div class="app">
   <header>
+    <button id="walletBack" class="icb" onclick="go('account')" aria-label="رجوع" style="display:none">→</button>
     <h1><span class="brand-dot"></span>محفظة X Plus</h1>
     <div class="hdr-x">
       <button class="icb notification-bell" onclick="openNotifications()" aria-label="الإشعارات" aria-haspopup="dialog"><span id="notificationBadge" class="notification-badge" hidden>0</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
@@ -570,12 +571,7 @@ type="button">
     </section>
 
 <section class="view" id="v-settings">
-  <div class="settings-container">
-    <div class="header">
-      <button class="back" onclick="go('account')" aria-label="رجوع">→</button>
-      <h1>إعدادات الحساب</h1>
-    </div>
-  </div>
+  <div class="settings-container"></div>
 </section>
 
   </main>
@@ -842,6 +838,8 @@ function go(v) {
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   $('v-' + v).classList.add('active');
   document.querySelectorAll('.bn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  const walletBack = document.getElementById('walletBack');
+  if (walletBack) walletBack.style.display = v === 'settings' ? 'grid' : 'none';
   document.querySelector('main').scrollTop = 0;
   if (v === 'history') renderHistory(hF);
 }
