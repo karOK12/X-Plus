@@ -74,7 +74,7 @@
 <body>
   <header>
     <button class="back" type="button" aria-label="رجوع"
-      onclick="location.href='wallet.html'">←</button>
+      onclick="walletGoBack()">←</button>
     <h1>حول التطبيق X Plus</h1>
   </header>
   <main>
@@ -84,5 +84,21 @@
       <p style="margin-top:14px">سيتم إضافة محتوى هذا القسم لاحقاً.</p>
     </section>
   </main>
+
+<script>
+function walletGoBack() {
+  const ref = document.referrer;
+  if (ref) {
+    try {
+      if (new URL(ref).origin === location.origin && history.length > 1) {
+        history.back();
+        return;
+      }
+    } catch (e) {}
+  }
+  location.replace('/wallet.html');
+}
+</script>
+
 </body>
 </html>

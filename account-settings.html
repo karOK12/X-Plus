@@ -180,7 +180,7 @@
   <main class="container">
 
     <div class="header">
-      <button class="back" onclick="history.back()" aria-label="رجوع">→</button>
+      <button class="back" onclick="walletGoBack()" aria-label="رجوع">→</button>
       <h1>⚙️ إعدادات الحساب</h1>
     </div>
 
@@ -495,6 +495,22 @@
         '⚠️ حذف الحساب غير مفعّل حالياً لحماية بياناتك.';
     });
   </script>
+
+
+<script>
+function walletGoBack() {
+  const ref = document.referrer;
+  if (ref) {
+    try {
+      if (new URL(ref).origin === location.origin && history.length > 1) {
+        history.back();
+        return;
+      }
+    } catch (e) {}
+  }
+  location.replace('/wallet.html');
+}
+</script>
 
 </body>
 </html>
