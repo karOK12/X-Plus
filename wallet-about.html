@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>حول التطبيق X Plus | X Plus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Changa:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0B0E11;
+      --card:#1E2329;
+      --line:#2B3139;
+      --text:#EAECEF;
+      --muted:#848E9C;
+      --yellow:#FCD535;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Almarai',sans-serif;
+    }
+    header {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:18px 16px;
+      border-bottom:1px solid var(--line);
+      background:#181A20;
+    }
+    .back {
+      width:42px;
+      height:42px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--card);
+      color:var(--yellow);
+      font-size:22px;
+      cursor:pointer;
+    }
+    h1 {
+      margin:0;
+      font-family:'Changa',sans-serif;
+      font-size:19px;
+      font-weight:700;
+    }
+    main {
+      width:min(100% - 28px,650px);
+      margin:22px auto;
+    }
+    .card {
+      padding:20px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:var(--card);
+      min-height:150px;
+    }
+    .heading {
+      margin:0 0 10px;
+      color:var(--yellow);
+      font-family:'Changa',sans-serif;
+      font-size:18px;
+    }
+    p {
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="back" type="button" aria-label="رجوع"
+      onclick="if(history.length > 1) history.back(); else location.href='wallet.html'">→</button>
+    <h1>حول التطبيق X Plus</h1>
+  </header>
+  <main>
+    <section class="card">
+      <h2 class="heading">حول التطبيق X Plus</h2>
+      <p>معلومات عن تطبيق X Plus.</p>
+      <p style="margin-top:14px">سيتم إضافة محتوى هذا القسم لاحقاً.</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -553,20 +553,50 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
           </a>
         </div>
       </div>
-      <div class="card" style="padding:6px 16px">
-        <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg></span>
-          <div>سعر التحويل<small>مُحدد من الإدارة</small></div><span class="end num" id="accRate">—</span></div>
-        <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
-          <div>إجمالي النشاطات<small>جميع العمليات</small></div><span class="end num" id="accOps">0</span></div>
-        <div class="mrow"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg></span>
-          <div>نوع المحفظة<small>داخلية</small></div><span class="end" style="color:var(--green);font-size:.72rem;font-weight:800">آمنة ✓</span></div>
-      </div>
-      <button id="logoutBtn"
-class="btn-ghost"
-style="width:100%;padding:13px;position:relative;z-index:99999;pointer-events:auto"
-type="button">
-تسجيل الخروج
-</button>
+
+      <a href="/wallet-security.html" class="card"
+         style="display:block;padding:16px;text-decoration:none;color:var(--text);margin-bottom:14px">
+        <div class="mrow">
+          <span class="mi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </span>
+          <div>أمان المحفظة<small>إعدادات وحماية المحفظة</small></div>
+          <span class="end">←</span>
+        </div>
+      </a>
+
+
+      <a href="/wallet-support.html" class="card"
+         style="display:block;padding:16px;text-decoration:none;color:var(--text);margin-bottom:14px">
+        <div class="mrow">
+          <span class="mi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 13v-2a8 8 0 0 1 16 0v2"/>
+              <path d="M4 13H3a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v-8H4zM20 13h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2v-8h1z"/>
+              <path d="M18 19c-1 2-3 3-6 3"/>
+            </svg>
+          </span>
+          <div>المساعدة والدعم<small>المساعدة والتواصل مع الدعم</small></div>
+          <span class="end">←</span>
+        </div>
+      </a>
+
+      <a href="/wallet-about.html" class="card"
+         style="display:block;padding:16px;text-decoration:none;color:var(--text);margin-bottom:14px">
+        <div class="mrow">
+          <span class="mi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 11v5M12 7h.01"/>
+            </svg>
+          </span>
+          <div>حول التطبيق X Plus<small>معلومات عن التطبيق</small></div>
+          <span class="end">←</span>
+        </div>
+      </a>
       <footer>X Plus © 2026</footer>
     </section>
 
@@ -822,8 +852,6 @@ function renderAll() {
   renderAvatar();
   $('meName').textContent = S.name;
   $('meUid').textContent = S.uid;
-  $('accRate').textContent = S.rate + ' = $1';
-  $('accOps').textContent = fmt0(S.history.length);
   renderRecent();
   if ($('v-history').classList.contains('active')) renderHistory(hF);
 }
