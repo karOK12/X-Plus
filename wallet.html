@@ -346,13 +346,38 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
     font-size: .98rem;
   }
 }
+
+#walletBack {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+  background: linear-gradient(145deg, var(--card), var(--card2));
+  color: var(--yellow);
+  box-shadow: 0 3px 12px rgba(0,0,0,.16);
+}
+#walletBack svg {
+  width: 20px;
+  height: 20px;
+}
+#walletBack:hover {
+  border-color: var(--yellow);
+  background: var(--card2);
+  color: var(--yellow);
+  transform: translateY(-1px);
+}
+#walletBack:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 3px;
+}
+
 </style>
 </head>
 <body>
 <div class="ambient"></div>
 <div class="app">
   <header>
-    <button id="walletBack" class="icb" onclick="location.href='/dashboard/home.html'" aria-label="العودة إلى لوحة التحكم">→</button>
+    <button id="walletBack" class="icb" onclick="location.href='/dashboard/home.html'" aria-label="العودة إلى لوحة التحكم" title="لوحة التحكم"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h5a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><path d="M3 12h11m-4-4 4 4-4 4"/></svg></button>
     <h1><span class="brand-dot"></span>محفظة X Plus</h1>
     <div class="hdr-x">
       <button class="icb notification-bell" onclick="openNotifications()" aria-label="الإشعارات" aria-haspopup="dialog"><span id="notificationBadge" class="notification-badge" hidden>0</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
@@ -866,6 +891,8 @@ function go(v) {
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   $('v-' + v).classList.add('active');
   document.querySelectorAll('.bn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  const walletBack = document.getElementById('walletBack');
+  if (walletBack) walletBack.style.display = v === 'home' ? 'grid' : 'none';
 
   document.querySelector('main').scrollTop = 0;
   if (v === 'history') renderHistory(hF);
