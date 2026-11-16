@@ -614,7 +614,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
             </svg>
           </span>
           <div>أمان المحفظة<small>إعدادات وحماية المحفظة</small></div>
-          <span class="end">←</span>
+
         </div>
       </a>
 
@@ -629,7 +629,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
             </svg>
           </span>
           <div>المساعدة والدعم<small>المساعدة والتواصل مع الدعم</small></div>
-          <span class="end">←</span>
+
         </div>
       </a>
 
@@ -642,7 +642,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
             </svg>
           </span>
           <div>حول التطبيق X Plus<small>معلومات عن التطبيق</small></div>
-          <span class="end">←</span>
+
         </div>
       </a>
       <footer>X Plus © 2026</footer>
@@ -1470,6 +1470,10 @@ refreshNotificationCount();
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  if (new URLSearchParams(location.search).get('view') === 'account') {
+    go('account');
+  }
+
   const logout = document.getElementById('logoutBtn');
   if (logout) {
     logout.addEventListener('click', function (event) {

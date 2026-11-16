@@ -33,12 +33,26 @@
     .back {
       width:42px;
       height:42px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:var(--card);
-      color:var(--yellow);
+      flex:0 0 42px;
+      display:grid;
+      place-items:center;
+      border:0;
+      border-radius:10px;
+      background:var(--yellow);
+      color:#181A20;
       font-size:22px;
+      font-weight:800;
       cursor:pointer;
+      transition:.2s;
+      box-shadow:0 5px 14px rgba(252,213,53,.25);
+    }
+    .back:hover {
+      background:var(--yellow2);
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px rgba(252,213,53,.35);
+    }
+    .back:active {
+      transform:scale(.96);
     }
     h1 {
       margin:0;
@@ -87,16 +101,7 @@
 
 <script>
 function walletGoBack() {
-  const ref = document.referrer;
-  if (ref) {
-    try {
-      if (new URL(ref).origin === location.origin && history.length > 1) {
-        history.back();
-        return;
-      }
-    } catch (e) {}
-  }
-  location.replace('/wallet.html');
+  location.replace('/wallet.html?view=account');
 }
 </script>
 
