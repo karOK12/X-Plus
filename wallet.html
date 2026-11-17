@@ -30,7 +30,7 @@ main{flex:1;overflow-y:auto;padding:6px 16px 104px;scrollbar-width:none}main::-w
 .info-strip{display:flex;flex-direction:column;gap:9px;background:var(--card);border-radius:13px;padding:14px 16px;margin-top:12px;font-size:.76rem}.info-strip div{display:flex;justify-content:space-between;align-items:center}.info-strip span{color:var(--muted)}.info-strip b{font-weight:700;font-size:.76rem}.info-strip b.num{direction:ltr;color:var(--yellow)}
 .err{font-size:.73rem;color:var(--red);margin-top:9px;display:none;font-weight:700}
 .tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{padding:7px 16px;border-radius:99px;border:1px solid var(--line);background:none;color:var(--muted);font-size:.73rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:.2s}.tab:hover{color:var(--text)}.tab.on{background:rgba(252,213,53,.12);border-color:rgba(252,213,53,.4);color:var(--yellow)}
-.me{display:flex;align-items:center;gap:13px;padding:4px 2px 16px}.ava{isolation:isolate;position:relative;width:52px;height:52px;border-radius:50%;background:transparent;display:grid;place-items:center;font-family:'Changa';font-weight:800;font-size:1.2rem;color:#181A20;flex-shrink:0}.ava::after{z-index:1;content:"";position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border:2px solid #181A20;border-radius:50%;background-color:var(--yellow);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23181A20' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h-4L8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2-3Z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/svg%3E");background-size:12px;background-position:center;background-repeat:no-repeat;pointer-events:none}.me b{font-size:.98rem;display:block}.me small{color:var(--muted);font-size:.68rem}.mrow{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:.83rem;font-weight:700}.mrow:last-child{border:none}.mrow .mi{width:34px;height:34px;border-radius:10px;background:var(--card);display:grid;place-items:center;color:var(--yellow)}.mrow .mi svg{width:16px;height:16px}.mrow small{color:var(--muted);font-size:.66rem;display:block;font-weight:400}.mrow .end{margin-inline-start:auto;color:var(--muted)}
+.me{display:flex;align-items:center;gap:13px;padding:4px 2px 16px}.ava{isolation:isolate;position:relative;width:52px;height:52px;border-radius:50%;background:transparent;display:grid;place-items:center;font-family:'Changa';font-weight:800;font-size:1.2rem;color:#181A20;flex-shrink:0}.ava-camera{z-index:1;content:"";position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border:2px solid #181A20;border-radius:50%;background-color:var(--yellow);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23181A20' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h-4L8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2-3Z'/%3E%3Ccircle cx='12' cy='13' r='3'/%3E%3C/svg%3E");background-size:12px;background-position:center;background-repeat:no-repeat;pointer-events:none}.me b{font-size:.98rem;display:block}.me small{color:var(--muted);font-size:.68rem}.mrow{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:.83rem;font-weight:700}.mrow:last-child{border:none}.mrow .mi{width:34px;height:34px;border-radius:10px;background:var(--card);display:grid;place-items:center;color:var(--yellow)}.mrow .mi svg{width:16px;height:16px}.mrow small{color:var(--muted);font-size:.66rem;display:block;font-weight:400}.mrow .end{margin-inline-start:auto;color:var(--muted)}
 
 .account-link {
   display: block;
@@ -594,7 +594,7 @@ footer{margin:20px 0 6px;text-align:center;color:var(--muted2);font-size:.62rem;
     <section class="view" id="v-account">
       <div class="sec-h" style="margin-top:4px">الحساب</div>
       <div class="me">
-        <div class="ava" id="avaTxt" role="button" tabindex="0" title="اختيار صورة شخصية">؟</div>
+        <div class="ava" id="avaTxt" role="button" tabindex="0" title="اختيار صورة شخصية">؟<span class="ava-camera" aria-hidden="true"></span></div>
         <input type="file" id="avatarPicker" accept="image/*" hidden>
         <div>
           <b id="meName">—</b>
@@ -1368,12 +1368,17 @@ function renderAvatar() {
   const saved = localStorage.getItem(avatarStorageKey());
   const image = S.profileImage || saved;
   const current = el.querySelector('img');
+  const camera = el.querySelector('.ava-camera');
+  const setAvatarContent = node => {
+    if (camera) el.replaceChildren(node, camera);
+    else el.replaceChildren(node);
+  };
 
   if (!image) {
     el._avatarPendingImage = '';
     if (!current) {
       el.style.background = '';
-      el.textContent = (S.name || 'م')[0] || '؟';
+      setAvatarContent(document.createTextNode((S.name || 'م')[0] || '؟'));
     }
     return;
   }
@@ -1391,14 +1396,14 @@ function renderAvatar() {
     if (el._avatarPendingImage !== image) return;
     el._avatarPendingImage = '';
     el.style.background = 'transparent';
-    el.replaceChildren(img);
+    setAvatarContent(img);
   };
 
   img.onerror = () => {
     if (el._avatarPendingImage !== image) return;
     el._avatarPendingImage = '';
     if (!el.querySelector('img')) {
-      el.replaceChildren(document.createTextNode((S.name || 'م')[0] || '؟'));
+      setAvatarContent(document.createTextNode((S.name || 'م')[0] || '؟'));
       el.style.background = '';
     }
   };
