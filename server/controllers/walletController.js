@@ -1550,7 +1550,8 @@ exports.state = async (req, res) => {
         last_claim,
         total_converted,
         power,
-        mining_start_time
+        mining_start_time,
+        (SELECT profile_image FROM users WHERE users.id = xp_wallets.user_id LIMIT 1) AS profile_image
       FROM xp_wallets
       WHERE user_id = $1
       LIMIT 1
@@ -1609,6 +1610,7 @@ exports.state = async (req, res) => {
         totalConverted: Number(w.total_converted || 0),
         power: Number(w.power || 0),
         miningStartTime: w.mining_start_time,
+        profileImage: w.profile_image,
         weekPoints: Number(week.rows[0]?.points || 0)
       },
 
