@@ -1357,6 +1357,7 @@ async function markAllNotificationsRead() {
 }
 
 
+
 function avatarStorageKey() {
   return 'xplus_wallet_avatar_' + String(S && S.uid ? S.uid : 'default');
 }
@@ -1364,32 +1365,44 @@ function avatarStorageKey() {
 function renderAvatar() {
   const el = $('avaTxt');
   if (!el || !S) return;
-
-  const image = S.profileImage || localStorage.getItem(avatarStorageKey());
-  const current = el.querySelector('img');
+  const key = avatarStorageKey();
+  const cached = localStorage.getItem(key);
+  const image = S.profileImage || cached || '';
   const camera = el.querySelector('.ava-camera');
 
+  if (!el.querySelector('.avatar-fallback')) {
+    const fallback = document.createElement('span');
+    fallback.className = 'avatar-fallback';
+    fallback.textContent = (S.name || 'م')[0] || '؟';
+    fallback.style.cssText = 'position:relative;z-index:0;';
+    el.insertBefore(fallback, el.firstChild);
+  }
+
+  const fallback = el.querySelector('.avatar-fallback');
+  const current = el.querySelector('img');
+
   if (!image) {
+    el._avatarRequestId = (el._avatarRequestId || 0) + 1;
     el._avatarPendingImage = '';
-    if (!current) {
-      el.textContent = (S.name || 'م')[0] || '؟';
-      if (camera) el.appendChild(camera);
-    }
+    if (current) current.remove();
+    fallback.style.display = '';
     return;
   }
 
-  if (current && current.dataset.avatarSrc === image) return;
+  if (current && current.dataset.avatarSrc === image) {
+    fallback.style.display = 'none';
+    return;
+  }
   if (el._avatarPendingImage === image) return;
-
-  const img = new Image();
-  img.alt = 'صورة البروفايل';
-  img.dataset.avatarSrc = image;
-  img.style.cssText =
-    'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;position:absolute;inset:0;';
 
   const requestId = (el._avatarRequestId || 0) + 1;
   el._avatarRequestId = requestId;
   el._avatarPendingImage = image;
+
+  const img = new Image();
+  img.alt = 'صورة البروفايل';
+  img.dataset.avatarSrc = image;
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;position:absolute;inset:0;z-index:1;';
 
   img.onload = () => {
     if (el._avatarRequestId !== requestId) return;
@@ -1397,19 +1410,20 @@ function renderAvatar() {
     const old = el.querySelector('img');
     if (old) old.remove();
     el.insertBefore(img, el.firstChild);
+    fallback.style.display = 'none';
+    if (camera && camera.parentNode !== el) el.appendChild(camera);
+    if (S && S.profileImage === image) localStorage.setItem(key, image);
   };
 
   img.onerror = () => {
     if (el._avatarRequestId !== requestId) return;
     el._avatarPendingImage = '';
-    if (!el.querySelector('img')) {
-      el.textContent = (S.name || 'م')[0] || '؟';
-      if (camera) el.appendChild(camera);
-    }
+    fallback.style.display = current ? 'none' : '';
   };
 
   img.src = image;
 }
+
 (function setupAvatarPicker() {
   const avatar = $('avaTxt');
   const picker = $('avatarPicker');
