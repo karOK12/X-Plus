@@ -499,16 +499,16 @@
 
 <script>
 function walletGoBack() {
-  const ref = document.referrer;
-  if (ref) {
-    try {
-      if (new URL(ref).origin === location.origin && history.length > 1) {
-        history.back();
-        return;
-      }
-    } catch (e) {}
-  }
-  location.replace('/wallet.html');
+  try {
+    const previous = new URL(document.referrer);
+    if (previous.origin === location.origin &&
+        previous.pathname === '/wallet.html') {
+      history.back();
+      return;
+    }
+  } catch (e) {}
+
+  location.replace('/wallet.html?view=account');
 }
 </script>
 
