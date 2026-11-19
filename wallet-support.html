@@ -106,6 +106,15 @@
 
 <script>
 function walletGoBack() {
+  try {
+    const previous = new URL(document.referrer);
+    if (previous.origin === location.origin &&
+        previous.pathname === '/wallet.html') {
+      history.back();
+      return;
+    }
+  } catch (e) {}
+
   location.replace('/wallet.html?view=account');
 }
 </script>
