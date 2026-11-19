@@ -838,6 +838,11 @@ async function loadState() {
 async function init() {
   try {
     S = await loadState();
+
+    const cachedAvatar = localStorage.getItem(avatarStorageKey());
+    if (cachedAvatar && !S.profileImage) {
+      S.profileImage = cachedAvatar;
+    }
     $('dbErr').style.display = 'none';
     renderAll();
     loadDepositInfo(selectedDepNet).catch(() => {});
