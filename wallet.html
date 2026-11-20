@@ -846,7 +846,11 @@ async function init() {
     $('dbErr').style.display = 'none';
     renderAll();
     loadDepositInfo(selectedDepNet).catch(() => {});
-    toast('تم الاتصال بالمحفظة ✓');
+
+    if (!sessionStorage.getItem('walletConnectedToastShown')) {
+          toast('تم الاتصال بالمحفظة ✓');
+      sessionStorage.setItem('walletConnectedToastShown', '1');
+    }
   } catch (e) {
     // ❌ عرض الخطأ فقط، بدون تحويل لأي صفحة
     $('dbErr').style.display = 'block';
@@ -1370,27 +1374,26 @@ function avatarStorageKey() {
 function renderAvatar() {
   const el = $('avaTxt');
   if (!el || !S) return;
+
   const key = avatarStorageKey();
   const cached = localStorage.getItem(key);
   const image = S.profileImage || cached || '';
+  let fallback = el.querySelector('.avatar-fallback');
   const camera = el.querySelector('.ava-camera');
 
-  if (!el.querySelector('.avatar-fallback')) {
-    const fallback = document.createElement('span');
+  if (!fallback) {
+    fallback = document.createElement('span');
     fallback.className = 'avatar-fallback';
-    fallback.textContent = (S.name || 'م')[0] || '؟';
     fallback.style.cssText = 'position:relative;z-index:0;';
     el.insertBefore(fallback, el.firstChild);
   }
 
-  const fallback = el.querySelector('.avatar-fallback');
+  fallback.textContent = (S.name || 'م')[0] || '؟';
+
   const current = el.querySelector('img');
 
   if (!image) {
-    el._avatarRequestId = (el._avatarRequestId || 0) + 1;
-    el._avatarPendingImage = '';
-    if (current) current.remove();
-    fallback.style.display = '';
+    if (!current) fallback.style.display = '';
     return;
   }
 
@@ -1398,11 +1401,12 @@ function renderAvatar() {
     fallback.style.display = 'none';
     return;
   }
+
   if (el._avatarPendingImage === image) return;
 
+  el._avatarPendingImage = image;
   const requestId = (el._avatarRequestId || 0) + 1;
   el._avatarRequestId = requestId;
-  el._avatarPendingImage = image;
 
   const img = new Image();
   img.alt = 'صورة البروفايل';
@@ -1413,8 +1417,8 @@ function renderAvatar() {
     if (el._avatarRequestId !== requestId) return;
     el._avatarPendingImage = '';
     const old = el.querySelector('img');
-    if (old) old.remove();
-    el.insertBefore(img, el.firstChild);
+    if (old) old.replaceWith(img);
+    else el.insertBefore(img, el.firstChild);
     fallback.style.display = 'none';
     if (camera && camera.parentNode !== el) el.appendChild(camera);
     if (S && S.profileImage === image) localStorage.setItem(key, image);
@@ -1423,12 +1427,11 @@ function renderAvatar() {
   img.onerror = () => {
     if (el._avatarRequestId !== requestId) return;
     el._avatarPendingImage = '';
-    fallback.style.display = current ? 'none' : '';
+    if (!current) fallback.style.display = '';
   };
 
   img.src = image;
 }
-
 (function setupAvatarPicker() {
   const avatar = $('avaTxt');
   const picker = $('avatarPicker');
