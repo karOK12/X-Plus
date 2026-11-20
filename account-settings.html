@@ -499,7 +499,14 @@
 
 <script>
 function walletGoBack() {
-  location.replace('/wallet.html?view=account');
+  if (document.referrer &&
+      new URL(document.referrer).origin === location.origin &&
+      new URL(document.referrer).pathname.endsWith('/wallet.html') &&
+      history.length > 1) {
+    history.back();
+  } else {
+    location.replace('/wallet.html?view=account');
+  }
 }
 </script>
 
